@@ -454,7 +454,17 @@ class App:
 
     # ------------------------------------------------------------------ workspace
 
+    def logo(self, size):
+        """The application logo (app/assets/logo-*.png), drawn at `size` pixels."""
+        try:
+            hello_imgui.image_from_asset('logo-512.png' if size > 128 else 'logo-128.png', imgui.ImVec2(size, size))
+            return True
+        except Exception:
+            return False
+
     def toolbar(self):
+        if self.logo(imgui.get_frame_height()):
+            imgui.same_line()
         if imgui.button(label('Open file...')):
             self.dialog = pfd.open_file(tr('Open a file to decompile'), str(Path.home()), ['All files', '*'])
         imgui.same_line()
@@ -515,6 +525,16 @@ class App:
         self.toolbar()
         if not self.project:
             imgui.separator()
+            # Home screen: the logo and the name, centred.
+            width = imgui.get_content_region_avail().x
+            size = 160
+            imgui.dummy(imgui.ImVec2(0, 24))
+            imgui.set_cursor_pos_x(imgui.get_cursor_pos_x() + max(0, (width - size) / 2))
+            if self.logo(size):
+                title = 'CyDecompilator'
+                imgui.set_cursor_pos_x(imgui.get_cursor_pos_x() + max(0, (width - imgui.calc_text_size(title).x) / 2))
+                imgui.text(title)
+                imgui.dummy(imgui.ImVec2(0, 12))
             imgui.text_wrapped(tr('Open an executable, library, .NET assembly, .jar/.class, .apk/.dex, .pyc or a '
                                   'compiled shader (DXBC .cso/.fxc, DXIL, SPIR-V .spv). The format is detected from '
                                   'the bytes and the best installed engine is used. Missing engines can be '
@@ -1474,6 +1494,8 @@ def main():
     if '--smoke-test' in sys.argv:
         print('smoke', file=sys.stderr)
     runner = hello_imgui.RunnerParams()
+    # app/assets holds the logo; app_settings/icon.png becomes the window and taskbar icon.
+    hello_imgui.set_assets_folder(str(Path(__file__).resolve().parent / 'assets'))
     runner.app_window_params.window_title = 'CyDecompilator'
     runner.app_window_params.window_geometry.size = (1600, 960)
     (ROOT / 'data/settings').mkdir(parents=True, exist_ok=True)

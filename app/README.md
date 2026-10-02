@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/logo-256.png" width="160" alt="CyDecompilator"></p>
+
 # CyDecompilator — developer guide
 
 AI-assisted multi-engine decompiler built on CyToolsCore 0.10 (Python 3.11, Dear ImGui).
@@ -107,7 +109,7 @@ folder (`set_component_path`) is preferred when valid; Ghidra additionally requi
 
 - `dxbc.py`: container, RDEF (cbuffer variables, bindings), ISGN/OSGN/ISG1/OSG1/PCSG, SM4/5
   token decoding. The disassembly is checked instruction by instruction against fxc listings.
-- `hlsl.py`: structured control flow from the tokens, signature/RDEF naming, typed literals.
+- `hlsl.py`: structured control flow from the tokens, signature/RDEF naming, typed literals. <!-- gitleaks:allow (prose, not a secret) -->
   The output of every fixture is recompiled with D3DCompile in the tests.
 - `spirv.py` / `glsl.py`: SPIR-V parsing, structured CFG rebuilt from merge instructions,
   single-use inlining with a store barrier for mutable memory, Phi variables, swizzle merging,

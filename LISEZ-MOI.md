@@ -1,3 +1,5 @@
+<p align="center"><img src="app/assets/logo-256.png" width="160" alt="CyDecompilator"></p>
+
 # CyDecompilator
 
 Décompilateur multi-moteurs assisté par IA. Il ouvre presque n'importe quel binaire, montre son

@@ -24,18 +24,24 @@ function Get-VcVars {
 
 $output = Join-Path $toolRoot 'CyDecompilator.exe'
 $source = Join-Path $appRoot 'launcher.cpp'
+$resources = Join-Path $appRoot 'launcher.rc'
+$compiled = Join-Path $build 'launcher.res'
 
 if (Get-Command cl -ErrorAction SilentlyContinue) {
     Push-Location $build
     try {
-        & cl /nologo /std:c++17 /MT /EHsc /O2 $source "/Fe:$output" /link /SUBSYSTEM:WINDOWS user32.lib
+        & rc /nologo /i $appRoot /fo $compiled $resources
+        if ($LASTEXITCODE -ne 0) { throw 'Resource compilation failed' }
+        & cl /nologo /std:c++17 /MT /EHsc /O2 $source $compiled "/Fe:$output" /link /SUBSYSTEM:WINDOWS user32.lib
         if ($LASTEXITCODE -ne 0) { throw 'Launcher compilation failed' }
     } finally { Pop-Location }
 } else {
     $vcvars = Get-VcVars
     $quote = [char]34
     $line = 'call ' + $quote + $vcvars + $quote + ' >nul && cd /d ' + $quote + $build + $quote +
-            ' && cl /nologo /std:c++17 /MT /EHsc /O2 ' + $quote + $source + $quote +
+            ' && rc /nologo /i ' + $quote + $appRoot + $quote + ' /fo ' + $quote + $compiled + $quote + ' ' +
+            $quote + $resources + $quote +
+            ' && cl /nologo /std:c++17 /MT /EHsc /O2 ' + $quote + $source + $quote + ' ' + $quote + $compiled + $quote +
             ' /Fe:' + $quote + $output + $quote + ' /link /SUBSYSTEM:WINDOWS user32.lib'
     & cmd.exe /c $line
     if ($LASTEXITCODE -ne 0) { throw 'Launcher compilation failed' }
