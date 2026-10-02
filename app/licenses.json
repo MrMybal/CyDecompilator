@@ -1,0 +1,79 @@
+[
+  {
+    "kind": "Engine",
+    "name": "Ghidra (downloaded on demand)",
+    "license": "Apache-2.0",
+    "url": "https://github.com/NationalSecurityAgency/ghidra/blob/master/LICENSE",
+    "notes": "Downloaded from the official GitHub release into runtime/engines/ghidra with its published SHA256. Not redistributed with CyDecompilator."
+  },
+  {
+    "kind": "Engine",
+    "name": "Eclipse Temurin JDK 21 (downloaded on demand, or the system Java)",
+    "license": "GPL-2.0 with Classpath Exception",
+    "url": "https://adoptium.net/docs/faq/",
+    "notes": "Downloaded from the Adoptium API with its published SHA256 when no Java 21+ JDK is installed."
+  },
+  {
+    "kind": "Engine",
+    "name": "ILSpy / ilspycmd and ICSharpCode.Decompiler (downloaded on demand)",
+    "license": "MIT",
+    "url": "https://github.com/icsharpcode/ILSpy/blob/master/doc/license.txt",
+    "notes": "Downloaded from nuget.org."
+  },
+  {
+    "kind": "Engine",
+    "name": ".NET runtime (downloaded on demand, or the system runtime)",
+    "license": "MIT",
+    "url": "https://github.com/dotnet/runtime/blob/main/LICENSE.TXT",
+    "notes": "Downloaded from Microsoft's release metadata and checked against its published SHA512."
+  },
+  {
+    "kind": "Engine",
+    "name": "Vineflower (downloaded on demand)",
+    "license": "Apache-2.0",
+    "url": "https://github.com/Vineflower/vineflower/blob/master/LICENSE.md",
+    "notes": "Downloaded from the official GitHub release with its published SHA256."
+  },
+  {
+    "kind": "Engine",
+    "name": "JADX (downloaded on demand)",
+    "license": "Apache-2.0",
+    "url": "https://github.com/skylot/jadx/blob/master/LICENSE",
+    "notes": "Downloaded from the official GitHub release with its published SHA256."
+  },
+  {
+    "kind": "Engine",
+    "name": "xdis, uncompyle6, decompyle3 (downloaded on demand)",
+    "license": "GPL-2.0-or-later (xdis), GPL-3.0 (uncompyle6, decompyle3)",
+    "url": "https://github.com/rocky/python-uncompyle6/blob/master/COPYING",
+    "notes": "Installed from PyPI with pip into runtime/engines/pydecompile and run in a separate process."
+  },
+  {
+    "kind": "Component",
+    "name": "Capstone, pefile, pyelftools (built-in native engine)",
+    "license": "BSD-3-Clause (Capstone), MIT (pefile), Unlicense (pyelftools)",
+    "url": "https://www.capstone-engine.org/License.html",
+    "notes": "Python packages of the private runtime."
+  },
+  {
+    "kind": "Component",
+    "name": "CyDecompilator shader engine (DXBC, SPIR-V, DXIL)",
+    "license": "GPL-3.0-only (this Tool)",
+    "url": "",
+    "notes": "Written for CyDecompilator from the public Direct3D token format and the Khronos SPIR-V specification. No third-party decompiler code."
+  },
+  {
+    "kind": "Component",
+    "name": "AI providers and cyai_connectors (from CyTools_AIChat)",
+    "license": "Same author; cyai_connectors declares no licence",
+    "url": "",
+    "notes": "Agent command lines (Claude Code, Codex, Antigravity, OpenCode) are not redistributed: the programs already installed and signed in on this machine are started, under their publishers' terms. HTTP providers are reached with the user's own API key."
+  },
+  {
+    "kind": "Component",
+    "name": "Dear ImGui / imgui_bundle (interface)",
+    "license": "MIT",
+    "url": "https://github.com/pthom/imgui_bundle/blob/main/LICENSE",
+    "notes": "Includes ImGuiColorTextEdit and the Inconsolata font (SIL OFL 1.1)."
+  }
+]

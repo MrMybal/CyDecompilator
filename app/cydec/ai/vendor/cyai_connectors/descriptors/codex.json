@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "codex",
+  "name": "Codex",
+  "vendor": "OpenAI",
+  "categories": [
+    "agent-runtime"
+  ],
+  "phase": 2,
+  "preferred_transport": "app-server",
+  "transports": [
+    {
+      "id": "app-server",
+      "implemented": true,
+      "evidence": "implementation; live verification recorded separately"
+    },
+    {
+      "id": "cli-jsonl",
+      "implemented": true,
+      "evidence": "implementation; live verification recorded separately"
+    },
+    {
+      "id": "sdk",
+      "implemented": false,
+      "evidence": "audit; not implemented in Lab"
+    }
+  ],
+  "fallback_policy": "explicit-selection; never retry a submitted turn automatically",
+  "discovery": {
+    "executables": [
+      "codex"
+    ],
+    "paths": [
+      "%APPDATA%/npm/codex.cmd"
+    ],
+    "configured_path": true
+  },
+  "authentication": {
+    "method": "native-account",
+    "secrets_persisted": false
+  },
+  "capabilities": {
+    "models": "declared",
+    "sessions": "declared",
+    "resume": "declared",
+    "streaming": "declared",
+    "tools": "unknown",
+    "mcp": "unknown",
+    "acp": "unknown",
+    "structured_output": "unknown",
+    "persistent_process": "declared"
+  },
+  "documentation": "https://developers.openai.com/es-419/docs/app-server",
+  "limitations": [
+    "Les capacités décrivent le transport préféré, pas tous les transports du fournisseur.",
+    "Tools, MCP, ACP et sortie structurée : essais de conformité non implémentés.",
+    "SDK et autres transports doivent être validés séparément.",
+    "CLI JSONL : pas de catalogue natif ni deltas de tokens garantis ; préférer App Server."
+  ]
+}

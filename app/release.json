@@ -1,0 +1,5 @@
+{
+  "runtimeAbi": "python311-cytools010-imgui192-cydec01",
+  "version": "1.3.0",
+  "notes": "Declares which runtime an application release expects. update_download refuses an archive whose runtimeAbi differs from the installed one. make_release.py writes the published copy."
+}

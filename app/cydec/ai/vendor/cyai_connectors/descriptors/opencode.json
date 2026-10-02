@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "id": "opencode",
+  "name": "OpenCode",
+  "vendor": "Anomaly",
+  "categories": [
+    "agent-runtime"
+  ],
+  "phase": 2,
+  "preferred_transport": "cli-jsonl",
+  "transports": [
+    {
+      "id": "cli-jsonl",
+      "implemented": true,
+      "evidence": "implementation; live verification recorded separately"
+    },
+    {
+      "id": "http-server",
+      "implemented": false,
+      "evidence": "audit; not implemented in Lab"
+    },
+    {
+      "id": "sdk",
+      "implemented": false,
+      "evidence": "audit; not implemented in Lab"
+    },
+    {
+      "id": "acp",
+      "implemented": false,
+      "evidence": "audit; not implemented in Lab"
+    }
+  ],
+  "fallback_policy": "explicit-selection; never retry a submitted turn automatically",
+  "discovery": {
+    "executables": [
+      "opencode"
+    ],
+    "paths": [
+      "~/.opencode/bin/opencode",
+      "%LOCALAPPDATA%/Programs/@opencode-ai/desktop/opencode-cli.exe",
+      "%LOCALAPPDATA%/Programs/@opencode-aidesktop/opencode-cli.exe"
+    ],
+    "configured_path": true
+  },
+  "authentication": {
+    "method": "native-account",
+    "secrets_persisted": false
+  },
+  "capabilities": {
+    "models": "declared",
+    "sessions": "declared",
+    "resume": "declared",
+    "streaming": "declared",
+    "tools": "unknown",
+    "mcp": "unknown",
+    "acp": "unknown",
+    "structured_output": "unknown",
+    "persistent_process": "unsupported"
+  },
+  "documentation": "https://opencode.ai/docs/cli/",
+  "limitations": [
+    "Les capacités décrivent le transport préféré, pas tous les transports du fournisseur.",
+    "Tools, MCP, ACP et sortie structurée : essais de conformité non implémentés.",
+    "SDK et autres transports doivent être validés séparément."
+  ]
+}

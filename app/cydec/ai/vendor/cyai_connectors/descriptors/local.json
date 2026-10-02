@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "id": "local",
+  "name": "CyAI Local",
+  "vendor": "CyAI",
+  "categories": [
+    "model-provider"
+  ],
+  "phase": 3,
+  "preferred_transport": "local-http",
+  "transports": [
+    {
+      "id": "local-http",
+      "implemented": false,
+      "evidence": "audit; not implemented in Lab"
+    }
+  ],
+  "fallback_policy": "explicit-selection; never retry a submitted turn automatically",
+  "discovery": {
+    "executables": [],
+    "paths": [],
+    "configured_path": true
+  },
+  "authentication": {
+    "method": "local",
+    "secrets_persisted": false
+  },
+  "capabilities": {
+    "models": "declared",
+    "sessions": "unsupported",
+    "resume": "unsupported",
+    "streaming": "declared",
+    "tools": "unknown",
+    "mcp": "unknown",
+    "acp": "unknown",
+    "structured_output": "unknown",
+    "persistent_process": "unsupported"
+  },
+  "documentation": "",
+  "limitations": [
+    "Les capacités décrivent le transport préféré, pas tous les transports du fournisseur.",
+    "Tools, MCP, ACP et sortie structurée : essais de conformité non implémentés.",
+    "SDK et autres transports doivent être validés séparément.",
+    "Phase 3 : inventorié et audité, transport non porté dans cette version."
+  ]
+}

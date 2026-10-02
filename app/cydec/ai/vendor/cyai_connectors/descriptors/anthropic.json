@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "id": "anthropic",
+  "name": "Claude API",
+  "vendor": "Anthropic",
+  "categories": [
+    "model-provider"
+  ],
+  "phase": 3,
+  "preferred_transport": "http-sse",
+  "transports": [
+    {
+      "id": "http-sse",
+      "implemented": false,
+      "evidence": "audit; not implemented in Lab"
+    }
+  ],
+  "fallback_policy": "explicit-selection; never retry a submitted turn automatically",
+  "discovery": {
+    "executables": [],
+    "paths": [],
+    "configured_path": true
+  },
+  "authentication": {
+    "method": "api-key-env",
+    "secrets_persisted": false
+  },
+  "capabilities": {
+    "models": "declared",
+    "sessions": "unsupported",
+    "resume": "unsupported",
+    "streaming": "declared",
+    "tools": "unknown",
+    "mcp": "unknown",
+    "acp": "unknown",
+    "structured_output": "unknown",
+    "persistent_process": "unsupported"
+  },
+  "documentation": "https://platform.claude.com/docs/en/api/messages",
+  "limitations": [
+    "Les capacités décrivent le transport préféré, pas tous les transports du fournisseur.",
+    "Tools, MCP, ACP et sortie structurée : essais de conformité non implémentés.",
+    "SDK et autres transports doivent être validés séparément.",
+    "Phase 3 : inventorié et audité, transport non porté dans cette version."
+  ]
+}

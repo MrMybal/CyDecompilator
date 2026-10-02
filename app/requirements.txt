@@ -1,0 +1,8 @@
+cytools-core[mcp] @ git+https://github.com/MrMybal/CyToolsCore.git@442f53740fc65f092e4abd6b4d8ccf70d391116a
+imgui-bundle==1.92.900
+numpy>=2.0
+capstone==5.0.9
+pefile==2024.8.26
+pyelftools==0.33
+httpx==0.28.1
+pywin32==312; sys_platform == "win32"

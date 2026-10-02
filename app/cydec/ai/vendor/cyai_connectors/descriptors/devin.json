@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "id": "devin",
+  "name": "Devin CLI",
+  "vendor": "Cognition",
+  "categories": [
+    "agent-runtime"
+  ],
+  "phase": 3,
+  "preferred_transport": "cli-text-atif",
+  "transports": [
+    {
+      "id": "cli-text-atif",
+      "implemented": false,
+      "evidence": "audit; not implemented in Lab"
+    }
+  ],
+  "fallback_policy": "explicit-selection; never retry a submitted turn automatically",
+  "discovery": {
+    "executables": [
+      "devin"
+    ],
+    "paths": [],
+    "configured_path": true
+  },
+  "authentication": {
+    "method": "native-account",
+    "secrets_persisted": false
+  },
+  "capabilities": {
+    "models": "declared",
+    "sessions": "declared",
+    "resume": "declared",
+    "streaming": "declared",
+    "tools": "unknown",
+    "mcp": "unknown",
+    "acp": "unknown",
+    "structured_output": "unknown",
+    "persistent_process": "unsupported"
+  },
+  "documentation": "https://docs.devin.ai/cli/reference/commands",
+  "limitations": [
+    "Les capacités décrivent le transport préféré, pas tous les transports du fournisseur.",
+    "Tools, MCP, ACP et sortie structurée : essais de conformité non implémentés.",
+    "SDK et autres transports doivent être validés séparément.",
+    "Phase 3 : inventorié et audité, transport non porté dans cette version."
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "id": "ollama",
+  "name": "Ollama",
+  "vendor": "Ollama",
+  "categories": [
+    "model-provider"
+  ],
+  "phase": 3,
+  "preferred_transport": "http-ndjson",
+  "transports": [
+    {
+      "id": "http-ndjson",
+      "implemented": false,
+      "evidence": "audit; not implemented in Lab"
+    }
+  ],
+  "fallback_policy": "explicit-selection; never retry a submitted turn automatically",
+  "discovery": {
+    "executables": [
+      "ollama"
+    ],
+    "paths": [],
+    "configured_path": true
+  },
+  "authentication": {
+    "method": "local",
+    "secrets_persisted": false
+  },
+  "capabilities": {
+    "models": "declared",
+    "sessions": "unsupported",
+    "resume": "unsupported",
+    "streaming": "declared",
+    "tools": "unknown",
+    "mcp": "unknown",
+    "acp": "unknown",
+    "structured_output": "unknown",
+    "persistent_process": "unsupported"
+  },
+  "documentation": "https://docs.ollama.com/api",
+  "limitations": [
+    "Les capacités décrivent le transport préféré, pas tous les transports du fournisseur.",
+    "Tools, MCP, ACP et sortie structurée : essais de conformité non implémentés.",
+    "SDK et autres transports doivent être validés séparément.",
+    "Phase 3 : inventorié et audité, transport non porté dans cette version."
+  ]
+}

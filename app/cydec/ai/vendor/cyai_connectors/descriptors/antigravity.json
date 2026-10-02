@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "id": "antigravity",
+  "name": "Antigravity",
+  "vendor": "Google",
+  "categories": [
+    "agent-runtime"
+  ],
+  "phase": 2,
+  "preferred_transport": "cli-jsonl",
+  "transports": [
+    {
+      "id": "cli-jsonl",
+      "implemented": true,
+      "evidence": "implementation; live verification recorded separately"
+    }
+  ],
+  "fallback_policy": "explicit-selection; never retry a submitted turn automatically",
+  "discovery": {
+    "executables": [
+      "agy"
+    ],
+    "paths": [
+      "~/.local/bin/agy.exe",
+      "%LOCALAPPDATA%/Programs/Antigravity/bin/agy.exe"
+    ],
+    "configured_path": true
+  },
+  "authentication": {
+    "method": "native-account",
+    "secrets_persisted": false
+  },
+  "capabilities": {
+    "models": "declared",
+    "sessions": "declared",
+    "resume": "declared",
+    "streaming": "declared",
+    "tools": "unknown",
+    "mcp": "unknown",
+    "acp": "unknown",
+    "structured_output": "unknown",
+    "persistent_process": "unsupported"
+  },
+  "documentation": "https://antigravity.google/docs/cli/headless/",
+  "limitations": [
+    "Les capacités décrivent le transport préféré, pas tous les transports du fournisseur.",
+    "Tools, MCP, ACP et sortie structurée : essais de conformité non implémentés.",
+    "SDK et autres transports doivent être validés séparément."
+  ]
+}

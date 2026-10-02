@@ -1,0 +1,12 @@
+# Private runtime, engines, downloads and builds are recreated, never committed.
+runtime/
+# User data: projects, settings, credentials, logs, reports.
+data/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.tmp
+# Keep the launcher out of the source tree; it is a build product.
+CyDecompilator.exe
+# Release archives built by app/scripts/make_release.py.
+dist/

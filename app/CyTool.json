@@ -1,0 +1,2579 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": "1.0",
+  "id": "cy.tool.decompilator",
+  "name": "CyDecompilator",
+  "displayName": "CyDecompilator",
+  "version": "1.3.0",
+  "description": "AI assisted multi-engine decompiler: native code (Ghidra, own x86/x64 C decompiler, built-in disassembler), .NET (ILSpy), Java (Vineflower), Android (JADX), Python bytecode and shaders (own DXBC/SPIR-V/DXIL engine), with an assistant that explains, renames and converts pseudo-code into real code.",
+  "vendor": "Cyberalien",
+  "author": "Cyberalien",
+  "license": "GPL-3.0-only",
+  "executable": "runtime/python/Scripts/python.exe app/tool.py",
+  "categories": [
+    "reverse-engineering",
+    "developer-tools"
+  ],
+  "tags": [
+    "decompiler",
+    "disassembler",
+    "ghidra",
+    "ilspy",
+    "java",
+    "android",
+    "python",
+    "shader",
+    "hlsl",
+    "glsl",
+    "spirv",
+    "dxbc",
+    "ai"
+  ],
+  "capabilities": [
+    "jobs",
+    "cancellation",
+    "progress"
+  ],
+  "backends": [],
+  "platforms": [
+    {
+      "os": "Windows",
+      "architecture": "x64",
+      "status": "Supported",
+      "computeBackends": [
+        "CPU"
+      ]
+    },
+    {
+      "os": "Linux",
+      "architecture": "x64",
+      "status": "Experimental",
+      "computeBackends": [
+        "CPU"
+      ]
+    }
+  ],
+  "interfaces": [
+    "Native",
+    "CLI",
+    "JSONL",
+    "HTTP",
+    "MCP",
+    "ImGui"
+  ],
+  "runtimeRequirements": [],
+  "concurrency": {
+    "policy": "Concurrent",
+    "maxWorkers": 6
+  },
+  "operations": [
+    {
+      "id": "open_file",
+      "name": "Open file",
+      "description": "Open a binary, assembly, archive, bytecode or shader file as a project (deduplicated by SHA256), detect its format and, by default, analyze it with the best installed engine.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute path of the file to open.",
+            "x-cy-kind": "File"
+          },
+          "analyze": {
+            "type": "boolean",
+            "description": "Run the analysis immediately.",
+            "default": true
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "force": {
+            "type": "boolean",
+            "description": "Re-analyze even if an analysis already exists.",
+            "default": false
+          },
+          "options": {
+            "type": "object",
+            "description": "Engine options.",
+            "additionalProperties": false,
+            "properties": {
+              "maxDecompile": {
+                "type": "integer",
+                "description": "Ghidra: functions decompiled during analysis; others on demand.",
+                "default": 2000,
+                "minimum": 0,
+                "maximum": 1000000
+              },
+              "functionTimeout": {
+                "type": "integer",
+                "description": "Ghidra: decompiler timeout per function, seconds.",
+                "default": 60,
+                "minimum": 5,
+                "maximum": 3600
+              },
+              "analysisTimeout": {
+                "type": "integer",
+                "description": "Ghidra: auto-analysis timeout, seconds.",
+                "default": 3600,
+                "minimum": 60,
+                "maximum": 86400
+              },
+              "processor": {
+                "type": "string",
+                "description": "Ghidra: language id for raw binaries, e.g. ARM:LE:32:v8 or x86:LE:64:default."
+              },
+              "decodeResources": {
+                "type": "boolean",
+                "description": "JADX: decode AndroidManifest.xml and resources.",
+                "default": true
+              },
+              "deobfuscate": {
+                "type": "boolean",
+                "description": "JADX: rename obfuscated short names.",
+                "default": false
+              },
+              "javaHeapMb": {
+                "type": "integer",
+                "description": "JADX: Java heap in MiB.",
+                "default": 4096,
+                "minimum": 512,
+                "maximum": 65536
+              },
+              "symbols": {
+                "type": "boolean",
+                "description": "PE files: load PDB debug symbols (local folders, then the configured symbol server) and apply their names (native engine and Ghidra).",
+                "default": true
+              }
+            }
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id."
+          },
+          "format": {
+            "type": "object",
+            "description": "Detected format."
+          },
+          "analyses": {
+            "type": "object",
+            "description": "Analyses by engine."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine used."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 2147483648
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "analysis"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "analyze",
+      "name": "Analyze",
+      "description": "Analyze a project with an engine (Ghidra, native, ILSpy, Vineflower, JADX, Python, shader).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "force": {
+            "type": "boolean",
+            "description": "Re-analyze even if done.",
+            "default": false
+          },
+          "options": {
+            "type": "object",
+            "description": "Engine options.",
+            "additionalProperties": false,
+            "properties": {
+              "maxDecompile": {
+                "type": "integer",
+                "description": "Ghidra: functions decompiled during analysis; others on demand.",
+                "default": 2000,
+                "minimum": 0,
+                "maximum": 1000000
+              },
+              "functionTimeout": {
+                "type": "integer",
+                "description": "Ghidra: decompiler timeout per function, seconds.",
+                "default": 60,
+                "minimum": 5,
+                "maximum": 3600
+              },
+              "analysisTimeout": {
+                "type": "integer",
+                "description": "Ghidra: auto-analysis timeout, seconds.",
+                "default": 3600,
+                "minimum": 60,
+                "maximum": 86400
+              },
+              "processor": {
+                "type": "string",
+                "description": "Ghidra: language id for raw binaries, e.g. ARM:LE:32:v8 or x86:LE:64:default."
+              },
+              "decodeResources": {
+                "type": "boolean",
+                "description": "JADX: decode AndroidManifest.xml and resources.",
+                "default": true
+              },
+              "deobfuscate": {
+                "type": "boolean",
+                "description": "JADX: rename obfuscated short names.",
+                "default": false
+              },
+              "javaHeapMb": {
+                "type": "integer",
+                "description": "JADX: Java heap in MiB.",
+                "default": 4096,
+                "minimum": 512,
+                "maximum": 65536
+              },
+              "symbols": {
+                "type": "boolean",
+                "description": "PE files: load PDB debug symbols (local folders, then the configured symbol server) and apply their names (native engine and Ghidra).",
+                "default": true
+              }
+            }
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine used."
+          },
+          "analyses": {
+            "type": "object",
+            "description": "Analyses."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 2147483648
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "analysis"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "list_projects",
+      "name": "List projects",
+      "description": "Every project with its analyses.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "projects": {
+            "type": "array",
+            "description": "Projects."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "project_info",
+      "name": "Project info",
+      "description": "Format, architecture, sections, imports, exports, counts, shader reflection and notes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "delete_project",
+      "name": "Delete project",
+      "description": "Delete a project and its analyses, caches and AI results. The original file is untouched.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "deleted": {
+            "type": "boolean",
+            "description": "Deleted."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "list_functions",
+      "name": "List functions",
+      "description": "Functions, types or code units of an analysis, filtered and paginated.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "query": {
+            "type": "string",
+            "description": "Substring filter on id/name/address.",
+            "default": ""
+          },
+          "offset": {
+            "type": "integer",
+            "description": "First result.",
+            "default": 0,
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Page size.",
+            "default": 500,
+            "minimum": 1,
+            "maximum": 200000
+          },
+          "kind": {
+            "type": "string",
+            "description": "Only this kind (function, class, entry, code...).",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "functions": {
+            "type": "array",
+            "description": "Units."
+          },
+          "total": {
+            "type": "integer",
+            "description": "All units."
+          },
+          "matched": {
+            "type": "integer",
+            "description": "Matching units."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "function_info",
+      "name": "Function info",
+      "description": "One unit: signature, callers, callees, imports, strings, comment and local renames.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "function": {
+            "type": "string",
+            "description": "Unit to use: function id, original or renamed name, or address (0x401000). For .NET/Java units are fully qualified type names; shaders use the entry point name."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId",
+          "function"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "function": {
+            "type": "object",
+            "description": "Unit details."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "decompile",
+      "name": "Decompile",
+      "description": "Decompiled source (or disassembly) of one unit, with the user's renames and comments applied.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "function": {
+            "type": "string",
+            "description": "Unit to use: function id, original or renamed name, or address (0x401000). For .NET/Java units are fully qualified type names; shaders use the entry point name."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "view": {
+            "type": "string",
+            "description": "decompiled source or disassembly/bytecode.",
+            "enum": [
+              "decompiled",
+              "disassembly"
+            ],
+            "default": "decompiled"
+          },
+          "refresh": {
+            "type": "boolean",
+            "description": "Ignore the cache and decompile again.",
+            "default": false
+          },
+          "annotate": {
+            "type": "boolean",
+            "description": "Apply renames and comments.",
+            "default": true
+          }
+        },
+        "required": [
+          "projectId",
+          "function"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Code."
+          },
+          "language": {
+            "type": "string",
+            "description": "Language of the code."
+          },
+          "view": {
+            "type": "string",
+            "description": "View produced."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn"
+      ],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "xrefs",
+      "name": "Cross references",
+      "description": "Callers, callees and imports of a unit.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "function": {
+            "type": "string",
+            "description": "Unit to use: function id, original or renamed name, or address (0x401000). For .NET/Java units are fully qualified type names; shaders use the entry point name."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId",
+          "function"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "callers": {
+            "type": "array",
+            "description": "Callers."
+          },
+          "callees": {
+            "type": "array",
+            "description": "Callees."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "strings",
+      "name": "Strings",
+      "description": "Strings found by the analysis, filtered and paginated.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "query": {
+            "type": "string",
+            "description": "Substring filter.",
+            "default": ""
+          },
+          "offset": {
+            "type": "integer",
+            "description": "First result.",
+            "default": 0,
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Page size.",
+            "default": 500,
+            "minimum": 1,
+            "maximum": 5000
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "strings": {
+            "type": "array",
+            "description": "Strings."
+          },
+          "matched": {
+            "type": "integer",
+            "description": "Matches."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "search",
+      "name": "Search",
+      "description": "Search function names, cached decompiled code and strings.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "query": {
+            "type": "string",
+            "description": "Text to find (case-insensitive)."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "inCode": {
+            "type": "boolean",
+            "description": "Also search decompiled code.",
+            "default": true
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum hits.",
+            "default": 200,
+            "minimum": 1,
+            "maximum": 5000
+          }
+        },
+        "required": [
+          "projectId",
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "hits": {
+            "type": "array",
+            "description": "Hits."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "rename",
+      "name": "Rename symbol",
+      "description": "Rename a function/global (or, with function, a local identifier). Applied to every view.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "old": {
+            "type": "string",
+            "description": "Current (original or renamed) name."
+          },
+          "new": {
+            "type": "string",
+            "description": "New identifier."
+          },
+          "function": {
+            "type": "string",
+            "description": "Unit for a local rename; empty for a global rename.",
+            "default": ""
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId",
+          "old",
+          "new"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "scope": {
+            "type": "string",
+            "description": "global or the unit id."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "set_comment",
+      "name": "Set comment",
+      "description": "Attach a comment to a unit (empty text removes it).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "function": {
+            "type": "string",
+            "description": "Unit to use: function id, original or renamed name, or address (0x401000). For .NET/Java units are fully qualified type names; shaders use the entry point name."
+          },
+          "text": {
+            "type": "string",
+            "description": "Comment text."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId",
+          "function",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "string",
+            "description": "Stored comment."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "set_notes",
+      "name": "Set project notes",
+      "description": "Free-form notes for the whole project.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "text": {
+            "type": "string",
+            "description": "Notes (Markdown)."
+          }
+        },
+        "required": [
+          "projectId",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "notes": {
+            "type": "string",
+            "description": "Stored notes."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "export_sources",
+      "name": "Export sources",
+      "description": "Write every unit's code (annotations applied) as files: into the job workspace, or into destination when given. .NET can also produce a compilable C# project.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "destination": {
+            "type": "string",
+            "description": "Absolute folder to write into (created if missing). Empty = job workspace.",
+            "default": ""
+          },
+          "decompileMissing": {
+            "type": "boolean",
+            "description": "Decompile units not yet cached (slow on large binaries).",
+            "default": false
+          },
+          "maxUnits": {
+            "type": "integer",
+            "description": "Limit the number of units (0 = all).",
+            "default": 0,
+            "minimum": 0
+          },
+          "csharpProject": {
+            "type": "boolean",
+            "description": ".NET only: also write a compilable C# project with ILSpy.",
+            "default": false
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "directory": {
+            "type": "string",
+            "description": "Folder written."
+          },
+          "written": {
+            "type": "integer",
+            "description": "Files written."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 2147483648
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "analysis"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "c_module",
+      "name": "Recompilable C module",
+      "description": "x86 / x86-64 / ARM64: decompile functions (and, by default, everything they call) with the built-in C decompiler into ONE C file meant to compile again (MSVC / clang): globals are initialised from the image, constants inlined, prototypes emitted. Empty functions = every exported function.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "functions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Functions (id, name or address). Empty = exported functions."
+          },
+          "includeCallees": {
+            "type": "boolean",
+            "description": "Also decompile every function they call.",
+            "default": true
+          },
+          "destination": {
+            "type": "string",
+            "description": "Absolute .c file to write. Empty = only returned.",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "C source."
+          },
+          "functions": {
+            "type": "array",
+            "description": "Root functions."
+          },
+          "path": {
+            "type": "string",
+            "description": "File written."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 1073741824
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "extract_embedded",
+      "name": "Extract embedded content",
+      "description": "Extract what an executable carries: PyInstaller bundles (entry scripts and modules as .pyc), .NET single-file bundles (assemblies), UPX-packed files (unpacked original) and appended zip archives. Each extracted file can then be opened with open_file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "kind": {
+            "type": "string",
+            "description": "pyinstaller, dotnet-bundle, upx or zip-overlay; empty = first detected.",
+            "enum": [
+              "",
+              "pyinstaller",
+              "dotnet-bundle",
+              "upx",
+              "zip-overlay"
+            ],
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "array",
+            "description": "Extracted files with their detected format."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Extraction folder."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 1073741824
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "analysis"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "extracted_files",
+      "name": "Extracted files",
+      "description": "List the files of a previous extraction.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "kind": {
+            "type": "string",
+            "description": "Extraction kind.",
+            "enum": [
+              "pyinstaller",
+              "dotnet-bundle",
+              "upx",
+              "zip-overlay"
+            ]
+          }
+        },
+        "required": [
+          "projectId",
+          "kind"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "array",
+            "description": "Files."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "load_symbols",
+      "name": "Load debug symbols",
+      "description": "Find the PDB of a PE file (local folders, next to the original file, then the symbol server) and read its function names. Re-analyze afterwards to apply them.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "force": {
+            "type": "boolean",
+            "description": "Search again even if symbols were already looked up.",
+            "default": true
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Result."
+          },
+          "functions": {
+            "type": "integer",
+            "description": "Named functions."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network"
+      ],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "symbols_configure",
+      "name": "Configure symbols",
+      "description": "PDB lookup: enable/disable, symbol server (HTTPS; empty = local folders only) and local folders.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Load PDB symbols during analysis."
+          },
+          "server": {
+            "type": "string",
+            "description": "Symbol server URL, e.g. https://msdl.microsoft.com/download/symbols; empty = none."
+          },
+          "localFolders": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Folders searched for PDBs first."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Enabled."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "list_engines",
+      "name": "List engines",
+      "description": "Engines with formats, licence and availability.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "engines": {
+            "type": "array",
+            "description": "Engines."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "list_components",
+      "name": "List components",
+      "description": "Downloadable components (JDK, Ghidra, .NET, ILSpy, Vineflower, JADX, Python decompilers) with installed versions, system installs and overrides.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "refresh": {
+            "type": "boolean",
+            "description": "Probe the system again.",
+            "default": false
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "components": {
+            "type": "array",
+            "description": "Components."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "install_component",
+      "name": "Install component",
+      "description": "Download the current release of a component from its official source, verify it (SHA256/SHA512 when published) and install it under runtime/engines.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "component": {
+            "type": "string",
+            "description": "Component id.",
+            "enum": [
+              "jdk",
+              "ghidra",
+              "dotnet",
+              "ilspycmd",
+              "vineflower",
+              "jadx",
+              "pydecompile",
+              "upx"
+            ]
+          },
+          "includeRequirements": {
+            "type": "boolean",
+            "description": "Also install what it needs (e.g. the JDK for Ghidra).",
+            "default": true
+          }
+        },
+        "required": [
+          "component"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "installed": {
+            "type": "array",
+            "description": "Installed components."
+          },
+          "status": {
+            "type": "object",
+            "description": "Component status."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 536870912,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "install"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "remove_component",
+      "name": "Remove component",
+      "description": "Remove a privately installed component version (system installs are never touched).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "component": {
+            "type": "string",
+            "description": "Component id.",
+            "enum": [
+              "jdk",
+              "ghidra",
+              "dotnet",
+              "ilspycmd",
+              "vineflower",
+              "jadx",
+              "pydecompile",
+              "upx"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "description": "Version to remove; empty removes every private version.",
+            "default": ""
+          }
+        },
+        "required": [
+          "component"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "removed": {
+            "type": "array",
+            "description": "Removed versions."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [
+        "install"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "set_component_path",
+      "name": "Use existing installation",
+      "description": "Use a component already installed elsewhere (e.g. a Ghidra folder or a JDK). Empty clears it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "component": {
+            "type": "string",
+            "description": "Component id.",
+            "enum": [
+              "jdk",
+              "ghidra",
+              "dotnet",
+              "ilspycmd",
+              "vineflower",
+              "jadx",
+              "pydecompile",
+              "upx"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "description": "Folder or file of the existing installation; empty to clear.",
+            "default": ""
+          }
+        },
+        "required": [
+          "component"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "installed": {
+            "type": "boolean",
+            "description": "Usable now."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [
+        "install"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "ai_status",
+      "name": "AI status",
+      "description": "Configured AI provider/model, availability of every provider and compile checkers.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "refresh": {
+            "type": "boolean",
+            "description": "Probe providers (spawns CLIs / contacts endpoints).",
+            "default": true
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "type": "object",
+            "description": "AI settings."
+          },
+          "providers": {
+            "type": "array",
+            "description": "Providers."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "ai_configure",
+      "name": "Configure AI",
+      "description": "Choose the AI provider and model and the assistant limits. API keys are not accepted here; store them in the window (Options > AI) or in the provider environment variable.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "Provider id.",
+            "enum": [
+              "claude-code",
+              "codex",
+              "antigravity",
+              "opencode",
+              "anthropic",
+              "openai",
+              "openrouter",
+              "openai-compatible",
+              "ollama"
+            ]
+          },
+          "model": {
+            "type": "string",
+            "description": "Model id (empty = provider default)."
+          },
+          "transport": {
+            "type": "string",
+            "description": "Transport for agent CLIs (empty = preferred)."
+          },
+          "temperature": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Sampling temperature (null = default)."
+          },
+          "maxTokens": {
+            "type": "integer",
+            "description": "Maximum tokens per reply.",
+            "minimum": 256,
+            "maximum": 200000
+          },
+          "maxToolSteps": {
+            "type": "integer",
+            "description": "Tool calls allowed per question.",
+            "minimum": 1,
+            "maximum": 60
+          },
+          "allowEdits": {
+            "type": "boolean",
+            "description": "Let the assistant rename and comment when asked."
+          },
+          "verifyRounds": {
+            "type": "integer",
+            "description": "Repair rounds after a failed compile check.",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "providers": {
+            "type": "object",
+            "description": "Per-provider options: {\"ollama\": {\"base_url\": \"...\"}}; keys: base_url, timeout_seconds, executable."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "type": "object",
+            "description": "Saved settings."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "ai_explain",
+      "name": "AI: explain",
+      "description": "Explain a function/unit in Markdown: summary, step by step, inputs/outputs, notable details.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "function": {
+            "type": "string",
+            "description": "Unit to use: function id, original or renamed name, or address (0x401000). For .NET/Java units are fully qualified type names; shaders use the entry point name."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "language": {
+            "type": "string",
+            "description": "Answer language for the AI.",
+            "enum": [
+              "en",
+              "fr"
+            ],
+            "default": "en"
+          },
+          "provider": {
+            "type": "string",
+            "description": "Override the configured AI provider for this call.",
+            "enum": [
+              "",
+              "claude-code",
+              "codex",
+              "antigravity",
+              "opencode",
+              "anthropic",
+              "openai",
+              "openrouter",
+              "openai-compatible",
+              "ollama"
+            ],
+            "default": ""
+          },
+          "model": {
+            "type": "string",
+            "description": "Override the model id for this call (empty = configured/default).",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId",
+          "function"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Explanation (Markdown)."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "ai"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "ai_rename",
+      "name": "AI: rename",
+      "description": "Propose names for the function and its variables (and a one-line comment); apply=true stores them as renames.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "function": {
+            "type": "string",
+            "description": "Unit to use: function id, original or renamed name, or address (0x401000). For .NET/Java units are fully qualified type names; shaders use the entry point name."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "apply": {
+            "type": "boolean",
+            "description": "Apply the proposal.",
+            "default": false
+          },
+          "provider": {
+            "type": "string",
+            "description": "Override the configured AI provider for this call.",
+            "enum": [
+              "",
+              "claude-code",
+              "codex",
+              "antigravity",
+              "opencode",
+              "anthropic",
+              "openai",
+              "openrouter",
+              "openai-compatible",
+              "ollama"
+            ],
+            "default": ""
+          },
+          "model": {
+            "type": "string",
+            "description": "Override the model id for this call (empty = configured/default).",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId",
+          "function"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "functionName": {
+            "type": "string",
+            "description": "Proposed function name."
+          },
+          "variables": {
+            "type": "array",
+            "description": "Proposed variable names."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "ai"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "ai_convert",
+      "name": "AI: convert to source",
+      "description": "Turn pseudo-code, disassembly or bytecode into clean compilable source in a target language, then compile-check it and let the AI repair errors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "function": {
+            "type": "string",
+            "description": "Unit to use: function id, original or renamed name, or address (0x401000). For .NET/Java units are fully qualified type names; shaders use the entry point name."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "target": {
+            "type": "string",
+            "description": "Target language; same keeps the source language (asm -> C).",
+            "enum": [
+              "same",
+              "c",
+              "cpp",
+              "csharp",
+              "java",
+              "python",
+              "rust",
+              "go",
+              "hlsl",
+              "glsl",
+              "javascript"
+            ],
+            "default": "same"
+          },
+          "verify": {
+            "type": "boolean",
+            "description": "Compile-check and repair.",
+            "default": true
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Extra instructions for the rewrite.",
+            "default": ""
+          },
+          "language": {
+            "type": "string",
+            "description": "Answer language for the AI.",
+            "enum": [
+              "en",
+              "fr"
+            ],
+            "default": "en"
+          },
+          "provider": {
+            "type": "string",
+            "description": "Override the configured AI provider for this call.",
+            "enum": [
+              "",
+              "claude-code",
+              "codex",
+              "antigravity",
+              "opencode",
+              "anthropic",
+              "openai",
+              "openrouter",
+              "openai-compatible",
+              "ollama"
+            ],
+            "default": ""
+          },
+          "model": {
+            "type": "string",
+            "description": "Override the model id for this call (empty = configured/default).",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId",
+          "function"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Converted source."
+          },
+          "verification": {
+            "type": "string",
+            "description": "passed, failed, unavailable or skipped."
+          },
+          "file": {
+            "type": "string",
+            "description": "Saved file."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "ai"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "ai_ask",
+      "name": "AI: ask",
+      "description": "Ask a question about the program. The assistant navigates the analysis with tools (list, decompile, xrefs, strings, search) and answers; conversations can be continued.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "question": {
+            "type": "string",
+            "description": "Question."
+          },
+          "function": {
+            "type": "string",
+            "description": "Currently open unit (context).",
+            "default": ""
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "Continue this conversation.",
+            "default": ""
+          },
+          "allowEdits": {
+            "type": "boolean",
+            "description": "Allow rename/comment tools."
+          },
+          "language": {
+            "type": "string",
+            "description": "Answer language for the AI.",
+            "enum": [
+              "en",
+              "fr"
+            ],
+            "default": "en"
+          },
+          "provider": {
+            "type": "string",
+            "description": "Override the configured AI provider for this call.",
+            "enum": [
+              "",
+              "claude-code",
+              "codex",
+              "antigravity",
+              "opencode",
+              "anthropic",
+              "openai",
+              "openrouter",
+              "openai-compatible",
+              "ollama"
+            ],
+            "default": ""
+          },
+          "model": {
+            "type": "string",
+            "description": "Override the model id for this call (empty = configured/default).",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId",
+          "question"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string",
+            "description": "Answer (Markdown)."
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "Conversation id."
+          },
+          "tools": {
+            "type": "array",
+            "description": "Tool calls."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "ai"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "ai_batch_rename",
+      "name": "AI: name functions",
+      "description": "Name many auto-named functions (FUN_*, sub_*) in one job and apply the names.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader"
+            ],
+            "default": ""
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Functions to process.",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 2000
+          },
+          "onlyUnnamed": {
+            "type": "boolean",
+            "description": "Only functions with generated names.",
+            "default": true
+          },
+          "provider": {
+            "type": "string",
+            "description": "Override the configured AI provider for this call.",
+            "enum": [
+              "",
+              "claude-code",
+              "codex",
+              "antigravity",
+              "opencode",
+              "anthropic",
+              "openai",
+              "openrouter",
+              "openai-compatible",
+              "ollama"
+            ],
+            "default": ""
+          },
+          "model": {
+            "type": "string",
+            "description": "Override the model id for this call (empty = configured/default).",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "description": "Per-function results."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "ai"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "ai_conversations",
+      "name": "AI: conversations",
+      "description": "Conversations stored for a project.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "conversations": {
+            "type": "array",
+            "description": "Conversations."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "ai_conversation",
+      "name": "AI: conversation",
+      "description": "Turns of one conversation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "Conversation id."
+          }
+        },
+        "required": [
+          "projectId",
+          "conversationId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "turns": {
+            "type": "array",
+            "description": "Turns."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "update_state",
+      "name": "Update state",
+      "description": "Installed version, configured repository, staged update and kept versions.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "type": "string",
+            "description": "Installed version."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "update_configure",
+      "name": "Configure updates",
+      "description": "Set the GitHub repository (owner/name) that publishes CyDecompilator releases, and automatic checks.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "repository": {
+            "type": "string",
+            "description": "owner/name, or empty to clear."
+          },
+          "automaticCheck": {
+            "type": "boolean",
+            "description": "Check at start-up."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationRepository": {
+            "type": "string",
+            "description": "Configured repository."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [
+        "install"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "update_check",
+      "name": "Check for updates",
+      "description": "Ask GitHub for the latest application release.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "updateAvailable": {
+            "type": "boolean",
+            "description": "A newer release exists."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "update_download",
+      "name": "Download update",
+      "description": "Download a release into runtime/updates and verify it (identity, runtime ABI, digest, compilation).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "description": "Release tag; empty = latest.",
+            "default": ""
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "staged": {
+            "type": "boolean",
+            "description": "Staged and verified."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 536870912,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "install"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "update_apply",
+      "name": "Apply update",
+      "description": "Activate the staged update (keeps the current app/ in runtime/backups; data/ is untouched). Restart afterwards.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "boolean",
+            "description": "Applied."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "install"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "update_rollback",
+      "name": "Restore previous version",
+      "description": "Restore the app/ kept by the last update.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "restored": {
+            "type": "boolean",
+            "description": "Restored."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [
+        "install"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    }
+  ],
+  "standaloneExecutable": "CyDecompilator.exe",
+  "distributionStatus": "Portable on the machine where runtime/ was created; see README."
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "id": "claude-code",
+  "name": "Claude Code",
+  "vendor": "Anthropic",
+  "categories": [
+    "agent-runtime"
+  ],
+  "phase": 2,
+  "preferred_transport": "cli-jsonl",
+  "transports": [
+    {
+      "id": "cli-jsonl",
+      "implemented": true,
+      "evidence": "implementation; live verification recorded separately"
+    },
+    {
+      "id": "sdk",
+      "implemented": false,
+      "evidence": "audit; not implemented in Lab"
+    }
+  ],
+  "fallback_policy": "explicit-selection; never retry a submitted turn automatically",
+  "discovery": {
+    "executables": [
+      "claude"
+    ],
+    "paths": [
+      "~/.local/bin/claude.exe",
+      "%APPDATA%/npm/claude.cmd"
+    ],
+    "configured_path": true
+  },
+  "authentication": {
+    "method": "native-account",
+    "secrets_persisted": false
+  },
+  "capabilities": {
+    "models": "unsupported",
+    "sessions": "declared",
+    "resume": "declared",
+    "streaming": "declared",
+    "tools": "unknown",
+    "mcp": "unknown",
+    "acp": "unknown",
+    "structured_output": "unknown",
+    "persistent_process": "unsupported"
+  },
+  "documentation": "https://code.claude.com/docs/en/headless",
+  "limitations": [
+    "Les capacités décrivent le transport préféré, pas tous les transports du fournisseur.",
+    "Tools, MCP, ACP et sortie structurée : essais de conformité non implémentés.",
+    "SDK et autres transports doivent être validés séparément."
+  ]
+}

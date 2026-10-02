@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "id": "command-code",
+  "name": "Command Code",
+  "vendor": "Command Code",
+  "categories": [
+    "agent-runtime"
+  ],
+  "phase": 3,
+  "preferred_transport": "cli-jsonl",
+  "transports": [
+    {
+      "id": "cli-jsonl",
+      "implemented": false,
+      "evidence": "audit; not implemented in Lab"
+    }
+  ],
+  "fallback_policy": "explicit-selection; never retry a submitted turn automatically",
+  "discovery": {
+    "executables": [
+      "command-code",
+      "cmdc"
+    ],
+    "paths": [],
+    "configured_path": true
+  },
+  "authentication": {
+    "method": "native-account",
+    "secrets_persisted": false
+  },
+  "capabilities": {
+    "models": "declared",
+    "sessions": "declared",
+    "resume": "declared",
+    "streaming": "declared",
+    "tools": "unknown",
+    "mcp": "unknown",
+    "acp": "unknown",
+    "structured_output": "unknown",
+    "persistent_process": "unsupported"
+  },
+  "documentation": "https://commandcode.ai/docs/headless",
+  "limitations": [
+    "Les capacités décrivent le transport préféré, pas tous les transports du fournisseur.",
+    "Tools, MCP, ACP et sortie structurée : essais de conformité non implémentés.",
+    "SDK et autres transports doivent être validés séparément.",
+    "Phase 3 : inventorié et audité, transport non porté dans cette version."
+  ]
+}
