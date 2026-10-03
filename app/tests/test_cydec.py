@@ -440,6 +440,35 @@ def test_updates_repository_token_and_staged_tree(tmp_path, monkeypatch):
     assert report['version'] == updates.current_version() and report['toolId'] == 'cy.tool.decompilator'
 
 
+def test_interface_translations_complete_and_safe():
+    """Every interface language translates every English string, keeps format placeholders,
+    surrounding spaces and ImGui identifiers, and tr() switches language without restart."""
+    import ui_common
+    catalog = json.loads((APP / 'locales' / 'ui.json').read_text(encoding='utf-8-sig'))
+    english = {entry['en'] for entry in catalog.values() if 'en' in entry}
+    placeholder = re.compile(r'%[-+ #0]*\d*(?:\.\d+)?[sdfxXrc%]|\{[^{}]*\}')
+    for code, _ in ui_common.LANGUAGES[2:]:
+        path = APP / 'locales' / ('ui.%s.json' % code)
+        assert path.is_file(), code
+        table = json.loads(path.read_text(encoding='utf-8'))
+        assert set(table) == english, (code, len(english - set(table)), len(set(table) - english))
+        for source, text in table.items():
+            assert isinstance(text, str) and (text or not source), (code, source)
+            assert sorted(placeholder.findall(source)) == sorted(placeholder.findall(text)), (code, source, text)
+            assert source[:len(source) - len(source.lstrip())] == text[:len(text) - len(text.lstrip())], (code, source)
+            assert source[len(source.rstrip()):] == text[len(text.rstrip()):], (code, source)
+            if '###' in source:
+                assert source.split('###', 1)[1] == text.split('###', 1)[1], (code, source)
+    saved = ui_common.preferences.values['language']
+    try:
+        for code, _ in ui_common.LANGUAGES:
+            ui_common.preferences.values['language'] = code
+            text = ui_common.tr('Open file...')
+            assert text and (code == 'en' or text != 'Open file...'), code
+    finally:
+        ui_common.preferences.values['language'] = saved
+
+
 def test_pe_details_and_symbols(store, tmp_path, monkeypatch):
     from cydec import pdb, pe_info
     windows = Path(os.environ.get('SystemRoot', r'C:\Windows'))

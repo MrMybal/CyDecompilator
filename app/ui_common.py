@@ -19,6 +19,11 @@ from standalone_log import install as install_standalone_log
 journal = install_standalone_log(ROOT)
 PREFERENCES = ROOT / 'data/settings/ui-preferences.json'
 DEFAULTS = {'language': 'en', 'theme': 'dark', 'font_scale': 1.0, 'autosave_generation': False}
+# Interface languages: English source, French in ui.json, the others in locales/ui.<code>.json
+# (English text -> translation). A missing entry falls back to English.
+LANGUAGES = (('en', 'English'), ('fr', 'Français'), ('de', 'Deutsch'), ('es', 'Español'), ('it', 'Italiano'),
+             ('pt', 'Português'), ('ru', 'Русский'), ('zh', '简体中文'), ('ja', '日本語'), ('ko', '한국어'))
+LANGUAGE_CODES = tuple(code for code, _ in LANGUAGES)
 
 def read(path, default):
     try: return json.loads(path.read_text(encoding='utf-8-sig'))
@@ -29,7 +34,7 @@ class Preferences:
         self.path = Path(path)
         stored = read(self.path, {})
         self.values = {**DEFAULTS, **(stored if isinstance(stored, dict) else {})}
-        if self.values['language'] not in ('en', 'fr'): self.values['language'] = 'en'
+        if self.values['language'] not in LANGUAGE_CODES: self.values['language'] = 'en'
         if self.values['theme'] not in ('dark', 'light', 'classic'): self.values['theme'] = 'dark'
         if not isinstance(self.values.get('autosave_generation'),bool): self.values['autosave_generation']=False
         try: self.values['font_scale'] = min(1.6, max(.8, float(self.values['font_scale'])))
@@ -46,6 +51,19 @@ def normalized(text):
     return ''.join(c for c in unicodedata.normalize('NFKD',text) if not unicodedata.combining(c)).replace('’',"'").casefold()
 _normalized = {normalized(k):v for k,v in catalog.items()}
 _prefixes = sorted((k for k in catalog if len(k)>=8 and k.endswith((' ',': '))),key=len,reverse=True)
+_languages = {}
+
+def language_catalog(code):
+    """English text -> translation for languages kept outside ui.json (loaded once, on use)."""
+    if code not in _languages:
+        data = read(APP/'locales'/('ui.%s.json' % code), {})
+        _languages[code] = data if isinstance(data, dict) else {}
+    return _languages[code]
+
+def _pick(translation, language, text):
+    if language in ('en', 'fr'): return translation.get(language, translation.get('en', text))
+    english = translation.get('en', text)
+    return language_catalog(language).get(english) or english
 _raw = None
 _tab_depth = 0
 _has_tabs = False
@@ -270,12 +288,15 @@ def tr(text):
     if not isinstance(text, str) or not text: return text
     language = preferences.values['language']
     translation = catalog.get(text) or _normalized.get(normalized(text))
-    if translation: return translation.get(language, translation.get('en', text))
+    if translation: return _pick(translation, language, text)
+    if language not in ('en', 'fr'):
+        extra = language_catalog(language).get(text)
+        if extra: return extra
     # Only registered display fragments are substituted. No remote translator,
     # model inference, token access or modification of user-entered text.
     if not text.lstrip().startswith(('{','[')):
         for prefix in _prefixes:
-            if text.startswith(prefix): return catalog[prefix].get(language,prefix)+tr(text[len(prefix):])
+            if text.startswith(prefix): return _pick(catalog[prefix],language,prefix)+tr(text[len(prefix):])
     return text
 
 def label(text):
@@ -391,8 +412,8 @@ def options_panel():
     global _licenses
     native=raw()
     native.text(tr('Interface preferences'))
-    changed,index=native.combo(label('Language'),('en','fr').index(preferences.values['language']),['English','Français'])
-    if changed: preferences.values['language']=('en','fr')[index]; preferences.save()
+    changed,index=native.combo(label('Language'),LANGUAGE_CODES.index(preferences.values['language']),[name for _,name in LANGUAGES])
+    if changed: preferences.values['language']=LANGUAGE_CODES[index]; preferences.save()
     changed,index=native.combo(label('Theme'),('dark','light','classic').index(preferences.values['theme']),[tr('Dark'),tr('Light'),tr('Classic')])
     if changed: preferences.values['theme']=('dark','light','classic')[index]; preferences.save(); apply_style()
     changed,scale=native.slider_float(label('Text size'),preferences.values['font_scale'],.8,1.6,'%.2fx')
@@ -458,7 +479,7 @@ def run(runner):
     frames=0
     # Run options smoke checks without mutating the user's saved preference.
     test_language=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--ui-test-language=')),None)
-    if test_language in ('en','fr'): preferences.values['language']=test_language
+    if test_language in LANGUAGE_CODES: preferences.values['language']=test_language
     runner.app_window_params.window_title=tr(runner.app_window_params.window_title)
     source=Path(sys.modules['__main__'].__file__).read_text(encoding='utf-8-sig')
     has_tabs='begin_tab_bar(' in source

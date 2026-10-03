@@ -1790,7 +1790,15 @@
             "description": "Answer language for the AI.",
             "enum": [
               "en",
-              "fr"
+              "fr",
+              "de",
+              "es",
+              "it",
+              "pt",
+              "ru",
+              "zh",
+              "ja",
+              "ko"
             ],
             "default": "en"
           },
@@ -2006,7 +2014,15 @@
             "description": "Answer language for the AI.",
             "enum": [
               "en",
-              "fr"
+              "fr",
+              "de",
+              "es",
+              "it",
+              "pt",
+              "ru",
+              "zh",
+              "ja",
+              "ko"
             ],
             "default": "en"
           },
@@ -2122,7 +2138,15 @@
             "description": "Answer language for the AI.",
             "enum": [
               "en",
-              "fr"
+              "fr",
+              "de",
+              "es",
+              "it",
+              "pt",
+              "ru",
+              "zh",
+              "ja",
+              "ko"
             ],
             "default": "en"
           },

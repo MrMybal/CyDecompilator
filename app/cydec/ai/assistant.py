@@ -207,7 +207,9 @@ def fenced(language, code):
 
 
 def answer_language(language):
-    return {'fr': 'French', 'en': 'English'}.get((language or 'en')[:2], 'English')
+    return {'fr': 'French', 'en': 'English', 'de': 'German', 'es': 'Spanish', 'it': 'Italian',
+            'pt': 'Portuguese', 'ru': 'Russian', 'zh': 'Simplified Chinese', 'ja': 'Japanese',
+            'ko': 'Korean'}.get((language or 'en')[:2], 'English')
 
 
 def extract_code(text):

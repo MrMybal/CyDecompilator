@@ -26,7 +26,8 @@ PROJECT = S('Project id returned by open_file or list_projects.')
 ENGINE = S('Engine id. Empty selects the analysed (or best available) engine for the file.', enum=ENGINE_IDS, default='')
 FUNCTION = S('Unit to use: function id, original or renamed name, or address (0x401000). '
              'For .NET/Java units are fully qualified type names; shaders use the entry point name.')
-LANGUAGE = S('Answer language for the AI.', enum=['en', 'fr'], default='en')
+LANGUAGE = S('Answer language for the AI.', enum=['en', 'fr', 'de', 'es', 'it', 'pt', 'ru', 'zh', 'ja', 'ko'],
+             default='en')
 AI_PROVIDER = S('Override the configured AI provider for this call.', enum=PROVIDERS, default='')
 AI_MODEL = S('Override the model id for this call (empty = configured/default).', default='')
 ANALYSIS_OPTIONS = {

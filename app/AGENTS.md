@@ -15,8 +15,9 @@ CyToolsCore contracts copied in `Docs/` (StandaloneDelivery, Localization, TaskF
   `runtime/engines/<id>/<version>`. Never install engines into the Tool's Python.
 - Shader engine changes: keep `tests/test_cydec.py` green — DXBC disassembly must equal the
   fxc listings and decompiled HLSL must recompile with D3DCompile.
-- Every visible string goes through `tr()`/`label()`; add French to `locales/cydec-fr.json`
-  and run `scripts/merge_translations.py`.
+- Every visible string goes through `tr()`/`label()`; add French to `locales/cydec-fr.json`,
+  run `scripts/merge_translations.py`, and add the string to every `locales/ui.<code>.json`
+  (de, es, it, pt, ru, zh, ja, ko): `test_interface_translations_complete_and_safe` fails otherwise.
 - No API key in parameters, settings JSON, jobs or logs (`cydec/ai/credentials.py` only).
 - Declare `processSpawn` / `network` / `filesystemExternal` on operations that really do it.
 - Tests: `runtime/python/Scripts/python.exe -m pytest app/tests -q` and

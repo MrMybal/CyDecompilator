@@ -39,10 +39,71 @@ PLAIN = ed.TextEditor.Language()
 FONTS = {'mono': None}
 
 
+# System fonts merged after the interface fonts for scripts they lack (Chinese, Japanese,
+# Korean; Cyrillic where the default font misses glyphs). Glyphs are rasterised on demand,
+# so the merges cost nothing until a character is drawn. The selected language goes first,
+# which picks the right regional shapes of shared Han characters.
+FALLBACK_FONTS = {
+    'zh': ['C:/Windows/Fonts/msyh.ttc', '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+           '/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc', '/System/Library/Fonts/PingFang.ttc'],
+    'ja': ['C:/Windows/Fonts/YuGothM.ttc', 'C:/Windows/Fonts/meiryo.ttc',
+           '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', '/System/Library/Fonts/Hiragino Sans GB.ttc'],
+    'ko': ['C:/Windows/Fonts/malgun.ttf', '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+           '/System/Library/Fonts/AppleSDGothicNeo.ttc'],
+    'latin': ['C:/Windows/Fonts/segoeui.ttf', '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'],
+}
+
+
+def merge_fallback_fonts(size):
+    language = preferences.values.get('language', 'en')
+    order = [language] if language in FALLBACK_FONTS else []
+    order += [code for code in ('latin', 'zh', 'ja', 'ko') if code not in order]
+    for code in order:
+        path = next((p for p in FALLBACK_FONTS[code] if Path(p).is_file()), None)
+        if path is None:
+            continue
+        params = hello_imgui.FontLoadingParams()
+        params.merge_to_last_font = True
+        params.inside_assets = False
+        try:
+            hello_imgui.load_font(path, size, params)
+        except Exception:
+            pass
+
+
+APP_ASSETS = Path(__file__).resolve().parent / 'assets'
+
+
+def prepare_assets():
+    """One assets folder for hello_imgui: imgui_bundle's fonts plus ours (logo; app_settings/
+    icon.png is the window and taskbar icon). Rebuilt in runtime/ui-assets when either changes."""
+    import shutil
+    import imgui_bundle
+    bundled = Path(imgui_bundle.__file__).resolve().parent / 'assets'
+    target = ROOT / 'runtime' / 'ui-assets'
+    stamp = '%s|%s' % (getattr(imgui_bundle, '__version__', ''),
+                       max((f.stat().st_mtime_ns for f in APP_ASSETS.rglob('*') if f.is_file()), default=0))
+    try:
+        if (target / '.stamp').read_text(encoding='utf-8') == stamp:
+            return target
+    except OSError:
+        pass
+    try:
+        shutil.rmtree(target, ignore_errors=True)
+        shutil.copytree(bundled / 'fonts', target / 'fonts')
+        shutil.copytree(APP_ASSETS, target, dirs_exist_ok=True)
+        (target / '.stamp').write_text(stamp, encoding='utf-8')
+        return target
+    except OSError:
+        return bundled      # read-only installation: bundled fonts, default window icon
+
+
 def load_fonts():
     hello_imgui.imgui_default_settings.load_default_font_with_font_awesome_icons()
+    merge_fallback_fonts(15.0)
     try:
         FONTS['mono'] = hello_imgui.load_font('fonts/Inconsolata-Medium.ttf', 15.0)
+        merge_fallback_fonts(15.0)
     except Exception:
         FONTS['mono'] = None
 
@@ -457,7 +518,8 @@ class App:
     def logo(self, size):
         """The application logo (app/assets/logo-*.png), drawn at `size` pixels."""
         try:
-            hello_imgui.image_from_asset('logo-512.png' if size > 128 else 'logo-128.png', imgui.ImVec2(size, size))
+            name = 'logo-512.png' if size > 128 else 'logo-128.png'
+            hello_imgui.image_from_asset(str(APP_ASSETS / name), imgui.ImVec2(size, size))
             return True
         except Exception:
             return False
@@ -1494,8 +1556,7 @@ def main():
     if '--smoke-test' in sys.argv:
         print('smoke', file=sys.stderr)
     runner = hello_imgui.RunnerParams()
-    # app/assets holds the logo; app_settings/icon.png becomes the window and taskbar icon.
-    hello_imgui.set_assets_folder(str(Path(__file__).resolve().parent / 'assets'))
+    hello_imgui.set_assets_folder(str(prepare_assets()))
     runner.app_window_params.window_title = 'CyDecompilator'
     runner.app_window_params.window_geometry.size = (1600, 960)
     (ROOT / 'data/settings').mkdir(parents=True, exist_ok=True)
