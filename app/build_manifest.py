@@ -8,7 +8,7 @@ from pathlib import Path
 from operations import OPERATIONS
 
 APP = Path(__file__).resolve().parent
-VERSION = '1.3.0'
+VERSION = '1.4.0'
 
 
 def operation(spec):

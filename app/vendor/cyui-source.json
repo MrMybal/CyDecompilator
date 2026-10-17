@@ -1,0 +1,8 @@
+{
+  "library": "CyUI",
+  "version": "1.0.0",
+  "source": "CyImgui_Interface/python/cyui.py",
+  "sha256": "ac907847bd917ea9e8b9a6d38a35c040fb7909e278e77b7722cecfff2f042cdb",
+  "license": "MIT",
+  "guide": "CyImgui_Interface/docs/AI_GUIDE.md"
+}

@@ -5,7 +5,7 @@
 <p align="center">
 Décompilateur multi-moteurs assisté par IA — Windows, Linux · x86, x64, ARM64 · .NET, Java, Android, Python, shaders
 <br>
-<img src="https://img.shields.io/badge/version-1.3.0-1f4e8c" alt="version 1.3.0">
+<img src="https://img.shields.io/badge/version-1.4.0-1f4e8c" alt="version 1.4.0">
 <img src="https://img.shields.io/badge/licence-GPL--3.0-1f4e8c" alt="GPL-3.0">
 </p>
 
@@ -19,9 +19,16 @@ serveur MCP, pour qu'une IA (Claude Code, Codex…) l'utilise directement.
 - **Linux** : `./CyDecompilator.sh` (nécessite un `runtime/python` créé sous Linux, voir
   [`app/README.md`](app/README.md)).
 
-L'interface est en anglais par défaut. Onglet **Options** → *Language* : English, Français,
+L'interface est en anglais par défaut. Menu latéral **Options** → *Language* : English, Français,
 Deutsch, Español, Italiano, Português, Русский, 简体中文, 日本語, 한국어 (changement immédiat,
 sans redémarrage). L'assistant IA répond dans la langue choisie.
+
+L’interface utilise **CyUI** : navigation permanente à gauche, barres d’outils avec infobulles,
+explorateur et code redimensionnables, état des tâches en bas. **Options** propose cinq thèmes
+(gris moyen, gris clair, nuit ambrée, violet, bleu nuit), une densité compacte ou confortable
+et la taille du texte. Les anciennes préférences de thème sont reprises automatiquement.
+Sur une petite fenêtre, l’IA reste accessible depuis son entrée dédiée du menu et
+les détails de la fonction depuis un onglet près du code.
 
 ## Ce qu'il sait ouvrir
 
@@ -65,18 +72,19 @@ Le format est reconnu à partir du contenu du fichier, pas de son extension.
 
 ## Premiers pas
 
-1. Onglet **Engines** : installer les moteurs voulus (*Install*). Ils sont téléchargés depuis
+1. Menu **Engines** : installer les moteurs voulus (*Install*). Ils sont téléchargés depuis
    leurs sources officielles et vérifiés. Un Java 21+, un .NET ou un Ghidra déjà présents
    peuvent être utilisés via *Browse* / *Use*.
-2. Onglet **Workspace** : *Open file...* (ou coller un chemin et Entrée).
+2. Menu **Workspace** : *Open file...*, **Ctrl+O** ou coller un chemin et Entrée.
 3. Cliquer sur une fonction à gauche : son code s'affiche au centre. Double-clic sur un nom pour
    y aller, clic droit pour renommer ou chercher, boutons `<` `>` pour revenir.
-4. Panneau **AI** à droite :
+4. Panneau **AI** à droite ou menu **AI** : choisir **Autonomous workflow** pour une tâche
+   complète, **Conversation** pour poser une question, ou **Function** pour les actions ciblées :
    - **Explain** : explication de la fonction ;
    - **Suggest names** (+ *Apply*) : noms parlants pour la fonction et ses variables ;
    - **Convert to source** : réécriture en vrai code (C, C++, C#, Java, Python, Rust, Go, HLSL,
      GLSL…), vérification par compilation et réparation automatique des erreurs ;
-   - **Ask** : questions libres ; l'assistant parcourt lui-même le programme avant de répondre ;
+   - **Conversation → Send** : questions libres ; l'assistant parcourt lui-même le programme avant de répondre ;
    - **Name functions** : nomme en lot les fonctions générées (`FUN_*`, `sub_*`).
 
 ## Éditer, reconstruire et tester un projet
@@ -265,8 +273,23 @@ outils. Avec un fournisseur en ligne, ce code quitte la machine.
 claude mcp add cydecompilator -- "<dossier>\runtime\python\Scripts\python.exe" "<dossier>\app\tool.py" mcp
 ```
 
-Toutes les fonctions de l'interface sont disponibles (`op_open_file`, `op_decompile`,
-`op_c_module`, `op_rename`, `op_ai_convert`…). Voir [`app/README.md`](app/README.md).
+Les opérations métier déclarées sont disponibles, dont l'analyse, la reconstruction,
+la compilation, Git, la réinjection, le débogage .NET et les comparaisons réseau/graphiques.
+Le [guide MCP et IA](app/Docs/AIIntegration.md) détaille la connexion et les parcours.
+Un [skill dédié `cydecompilator`](app/skills/cydecompilator/SKILL.md) est livré :
+
+```powershell
+runtime/python/Scripts/python.exe app/scripts/install_skill.py
+```
+
+Il installe les instructions dans le dossier de skills de Codex ; la connexion MCP
+se configure séparément. Les tests vérifient le catalogue complet et des parcours
+réels via MCP ; ils ne certifient pas toutes les combinaisons de moteurs et d'options.
+
+Le panneau **AI** propose aussi **Lancer la tâche autonome** : choisir le parcours,
+donner l'objectif et laisser l'assistant analyser, corriger, compiler et tester.
+Les outils MCP `ai_agent` et `ai_agent_status` offrent le même mode, avec suivi,
+reprise, sauvegardes Git et validation obligatoire avant de conclure.
 
 ## Mises à jour
 

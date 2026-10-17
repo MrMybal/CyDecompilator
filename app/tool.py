@@ -81,9 +81,10 @@ def create_runtime(data_dir, **options):
     # ------------------------------------------------------------------ projects
 
     def open_file(context, p):
+        from cydec.inputs import original_path
         ctx = engine_context(context, p.get('options'))
         ctx.progress(1, 'Hashing and detecting')
-        summary = service.open_file(p['path'], ctx)
+        summary = service.open_file(p['path'], ctx, source_path=original_path(context))
         if p.get('analyze', True):
             summary = service.analyze(summary['projectId'], p.get('engine', ''), ctx, force=p.get('force', False))
         return summary
@@ -244,6 +245,9 @@ def create_runtime(data_dir, **options):
         registrations[name] = ai(name)
 
     from cydec import updates
+    from cydec.ai import agent
+    registrations['ai_agent'] = agent.run
+    registrations['ai_agent_status'] = lambda c, p: agent.status(p['projectId'], p.get('runId', ''))
     registrations.update({
         'update_state': lambda c, p: updates.state(),
         'update_configure': lambda c, p: updates.configure(p.get('repository'), p.get('automaticCheck')),

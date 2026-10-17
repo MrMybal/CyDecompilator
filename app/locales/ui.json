@@ -10810,5 +10810,137 @@
  "Project tests failed": {
   "en": "Project tests failed",
   "fr": "Échec des tests du projet"
+ },
+ "Autonomous workflow": {
+  "en": "Autonomous workflow",
+  "fr": "Parcours autonome"
+ },
+ "Investigate": {
+  "en": "Investigate",
+  "fr": "Investiguer"
+ },
+ "Patch and test": {
+  "en": "Patch and test",
+  "fr": "Modifier et tester"
+ },
+ "Run autonomous task": {
+  "en": "Run autonomous task",
+  "fr": "Lancer la tâche autonome"
+ },
+ "Resume autonomous task": {
+  "en": "Resume autonomous task",
+  "fr": "Reprendre la tâche autonome"
+ },
+ "Explore": {
+  "en": "Explore",
+  "fr": "Explorer"
+ },
+ "Tools": {
+  "en": "Tools",
+  "fr": "Outils"
+ },
+ "System": {
+  "en": "System",
+  "fr": "Système"
+ },
+ "Working...": {
+  "en": "Working...",
+  "fr": "Traitement…"
+ },
+ "Back": {
+  "en": "Back",
+  "fr": "Précédent"
+ },
+ "Forward": {
+  "en": "Forward",
+  "fr": "Suivant"
+ },
+ "Density": {
+  "en": "Density",
+  "fr": "Densité"
+ },
+ "Compact": {
+  "en": "Compact",
+  "fr": "Compacte"
+ },
+ "Comfortable": {
+  "en": "Comfortable",
+  "fr": "Confortable"
+ },
+ "Mid grey": {
+  "en": "Mid grey",
+  "fr": "Gris moyen"
+ },
+ "Light grey": {
+  "en": "Light grey",
+  "fr": "Gris clair"
+ },
+ "Amber night": {
+  "en": "Amber night",
+  "fr": "Nuit ambrée"
+ },
+ "Violet": {
+  "en": "Violet",
+  "fr": "Violet"
+ },
+ "Navy": {
+  "en": "Navy",
+  "fr": "Bleu nuit"
+ },
+ "Start an investigation": {
+  "en": "Start an investigation",
+  "fr": "Commencer une analyse"
+ },
+ "Analyze an application, rebuild its project, then validate your changes.": {
+  "en": "Analyze an application, rebuild its project, then validate your changes.",
+  "fr": "Analysez une application, reconstruisez son projet, puis validez vos modifications."
+ },
+ "Open an application": {
+  "en": "Open an application",
+  "fr": "Ouvrir une application"
+ },
+ "Executables, libraries, .NET, Java, Android, Python and shaders.": {
+  "en": "Executables, libraries, .NET, Java, Android, Python and shaders.",
+  "fr": "Exécutables, bibliothèques, .NET, Java, Android, Python et shaders."
+ },
+ "Your recent projects will appear here.": {
+  "en": "Your recent projects will appear here.",
+  "fr": "Vos projets récents apparaîtront ici."
+ },
+ "Describe the result you want.": {
+  "en": "Describe the result you want.",
+  "fr": "Décrivez le résultat souhaité."
+ },
+ "Ready to assist": {
+  "en": "Ready to assist",
+  "fr": "Prêt à vous aider"
+ },
+ "Give the AI a task to begin.": {
+  "en": "Give the AI a task to begin.",
+  "fr": "Confiez une tâche à l’IA pour commencer."
+ },
+ "No source project": {
+  "en": "No source project",
+  "fr": "Aucun projet source"
+ },
+ "Open an application in Workspace.": {
+  "en": "Open an application in Workspace.",
+  "fr": "Ouvrez une application dans l’espace de travail."
+ },
+ "Create or open a project above.": {
+  "en": "Create or open a project above.",
+  "fr": "Créez ou ouvrez un projet ci-dessus."
+ },
+ "Select a source file": {
+  "en": "Select a source file",
+  "fr": "Sélectionnez un fichier source"
+ },
+ "Choose a file in the solution explorer.": {
+  "en": "Choose a file in the solution explorer.",
+  "fr": "Choisissez un fichier dans l’explorateur de solution."
+ },
+ "No application selected": {
+  "en": "No application selected",
+  "fr": "Aucune application sélectionnée"
  }
 }

@@ -4,7 +4,7 @@
   "id": "cy.tool.decompilator",
   "name": "CyDecompilator",
   "displayName": "CyDecompilator",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "AI assisted multi-engine decompiler: native code (Ghidra, own x86/x64 C decompiler, built-in disassembler), .NET (ILSpy), Java (Vineflower), Android (JADX), Python bytecode and shaders (own DXBC/SPIR-V/DXIL engine), with an assistant that explains, renames and converts pseudo-code into real code.",
   "vendor": "Cyberalien",
   "author": "Cyberalien",
@@ -4364,6 +4364,194 @@
       "exclusiveGroups": [
         "ai"
       ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "ai_agent",
+      "name": "AI: autonomous project task",
+      "description": "Autonomously investigate, reconstruct or patch the selected project using live operation schemas and authenticated child jobs. Recovers from tool/build errors, installs missing official components when enabled, saves checkpoints and requires recorded validation before completion. Existing AI provider credentials are required.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "objective": {
+            "type": "string",
+            "description": "Concrete requested task and representative scenarios."
+          },
+          "workflow": {
+            "type": "string",
+            "description": "Task effects and completion proof.",
+            "enum": [
+              "investigate",
+              "reconstruct",
+              "patch"
+            ],
+            "default": "reconstruct"
+          },
+          "runId": {
+            "type": "string",
+            "description": "Resume an existing checkpoint with the same objective/workflow.",
+            "default": ""
+          },
+          "maxSteps": {
+            "type": "integer",
+            "description": "Maximum tool decisions per invocation.",
+            "default": 60,
+            "minimum": 1,
+            "maximum": 200
+          },
+          "operationTimeout": {
+            "type": "integer",
+            "description": "Maximum child operation duration in seconds.",
+            "default": 900,
+            "minimum": 30,
+            "maximum": 86400
+          },
+          "allowInstall": {
+            "type": "boolean",
+            "description": "Install missing official engine components for this task.",
+            "default": true
+          },
+          "language": {
+            "type": "string",
+            "description": "Answer language for the AI.",
+            "enum": [
+              "en",
+              "fr",
+              "de",
+              "es",
+              "it",
+              "pt",
+              "ru",
+              "zh",
+              "ja",
+              "ko"
+            ],
+            "default": "en"
+          },
+          "provider": {
+            "type": "string",
+            "description": "Override the configured AI provider for this call.",
+            "enum": [
+              "",
+              "claude-code",
+              "codex",
+              "antigravity",
+              "opencode",
+              "anthropic",
+              "openai",
+              "openrouter",
+              "openai-compatible",
+              "ollama"
+            ],
+            "default": ""
+          },
+          "model": {
+            "type": "string",
+            "description": "Override the model id for this call (empty = configured/default).",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId",
+          "objective"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "string",
+            "description": "Checkpoint id."
+          },
+          "status": {
+            "type": "string",
+            "description": "completed, blocked, budget-exhausted, cancelled or failed."
+          },
+          "answer": {
+            "type": "string",
+            "description": "Result with evidence and remaining limits."
+          },
+          "verification": {
+            "type": "object",
+            "description": "Server-checked completion proof."
+          },
+          "steps": {
+            "type": "array",
+            "description": "Tool decisions and actual results."
+          },
+          "childJobs": {
+            "type": "array",
+            "description": "Authenticated owning child jobs."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network",
+        "processSpawn",
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "ai-agent"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "ai_agent_status",
+      "name": "AI: autonomous task status",
+      "description": "Read persisted autonomous task progress and evidence, including after cancellation or a restart.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "runId": {
+            "type": "string",
+            "description": "Checkpoint id; empty selects the latest task.",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "string",
+            "description": "Checkpoint id."
+          },
+          "status": {
+            "type": "string",
+            "description": "Task state."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
       "canRunAsync": true,
       "canCancel": true,
       "supportsProgress": true

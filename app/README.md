@@ -5,6 +5,35 @@
 AI-assisted multi-engine decompiler built on CyToolsCore 0.10 (Python 3.11, Dear ImGui).
 User guide (French): `../README.md` (same text as `../LISEZ-MOI.md`, kept for the CyTools delivery layout).
 
+## Native interface (CyUI)
+
+The window uses the upstream **CyUI Python port for imgui_bundle** from
+`CyImgui_Interface/python/cyui.py`. It is shipped unchanged in `vendor/cyui.py`, with
+its MIT license and source SHA256 in `vendor/cyui-source.json`; no sibling checkout
+is required to launch the delivered application. `cyui.py` exposes that port and
+`cyui_shell.py` owns the viewport bars, sidebar and page routing. Panels still submit
+their existing Runtime jobs.
+
+`ui_common.apply_style()` applies the semantic palette, density and current viewport
+DPI; it also retains the user's text scale. Options offers all five CyUI themes and
+compact/comfortable density. Old dark/light/classic settings migrate to
+navy/light-grey/mid-grey without discarding the saved language or text size. Fonts
+come from CyUI, with system CJK fallbacks merged into the UI, bold and monospace fonts.
+The bundled source-editor binding exposes immutable palettes, so its built-in light
+or dark syntax palette follows the selected theme's luminance.
+
+Navigation separates Workspace, Project IDE, Investigation, AI, engine installation,
+AI settings, logs, advanced operations and Options. Narrow workspaces omit the
+right inspector to preserve code space; Details moves into a code-panel tab and
+the dedicated AI page remains available.
+The AI panel separates autonomous tasks, conversation and function actions.
+
+Theme migration and actual ImGui style/DPI checks are in `tests/test_cyui_integration.py`.
+Native screenshot flags include `--ui-test-theme=navy`, `--ui-test-density=comfortable`,
+`--ui-test-language=fr`, `--ui-test-size=1100x760`, `--ui-test-dpi=1.5`,
+`--ui-test-tab=project` and `--ui-test-source=main.js`. Test captures use a separate
+workspace-state file and do not save the temporary theme/language overrides.
+
 ## Evidence and behavior investigations
 
 The Investigation tab shares nine Runtime operations for inert JS/TS/HTML/ASAR
@@ -26,6 +55,14 @@ native executable/shared/static targets and Node/web/Electron workspaces. Report
 separate compiled artifacts from validated scenarios and retain missing evidence.
 See [Docs/Reconstruction.md](Docs/Reconstruction.md), with actual runtime/build
 integration coverage in `tests/test_reconstruction.py`.
+
+`ai_agent` adds an autonomous project task over the authenticated Runtime scheduler:
+live operation discovery, engine preparation, bounded error recovery, revision-aware
+source edits with automatic Git backups, builds, debugging and scenario validation.
+`ai_agent_status` persists progress and resumable checkpoints. Completion requires
+actual validation evidence; model prose alone cannot finish a reconstruction or patch.
+The AI panel exposes investigate/reconstruct/patch workflows and freezes saved source
+buffers while changes run. See [Docs/AIIntegration.md](Docs/AIIntegration.md).
 
 ## Layout
 
@@ -104,12 +141,19 @@ create one with `tool.py create-client --name ai --permission processSpawn` and 
 
 ## MCP usage pattern
 
+The complete client setup and advanced workflow guide is
+[Docs/AIIntegration.md](Docs/AIIntegration.md). The bundled
+[cydecompilator skill](skills/cydecompilator/SKILL.md) can be installed with
+`runtime/python/Scripts/python.exe app/scripts/install_skill.py` from the repository root.
+Real stdio integration coverage lives in `tests/test_mcp_workflows.py`.
+
 1. `op_open_file {"parameters": {"path": "D:/samples/app.exe"}}` → poll `cy_get_job` → `projectId`.
 2. `op_list_functions`, `op_decompile`, `op_xrefs`, `op_strings`, `op_search` to explore.
 3. `op_rename`, `op_set_comment` to annotate (applied to every later view).
 4. `op_ai_convert` / `op_ai_explain` / `op_ai_ask` to use the configured AI provider of the Tool
    (an AI client usually reasons itself and only needs steps 1–3).
-5. `op_export_sources {"destination": "D:/out"}` writes all units with annotations.
+5. `op_export_sources {"parameters": {"projectId": "<id>", "destination": "D:/out"}}`
+   writes all units with annotations.
 
 Projects are the Tool's persistent store (like a database): they survive task cleanup by
 design. `op_delete_project` removes one. Input copies staged by the SDK are task files and are
@@ -347,6 +391,10 @@ cleared). `app/scripts/make_release.py` builds `dist/CyDecompilator-<version>.zi
 committed tree (`git archive HEAD` + `app/release.json` with `runtimeAbi` and commit) and, with
 `--publish`, creates the GitHub release `v<version>` and uploads it. Bump `VERSION` in
 `build_manifest.py` (and regenerate `CyTool.json`) before a release.
+On Windows, the script rebuilds `CyDecompilator.exe` with the Visual Studio C++ tools
+and includes it in the archive. The private Python runtime and downloaded engines are
+not bundled: this is an application update for a matching installation. New installations
+must prepare the runtime with the development setup above.
 
 The updater stages the asset in `runtime/updates`, checks GitHub's SHA-256 digest, the Tool
 identity, the runtime ABI and that the tree compiles, keeps the current `app/` in

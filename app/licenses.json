@@ -1,5 +1,12 @@
 [
   {
+    "kind": "Component",
+    "name": "CyUI",
+    "license": "MIT",
+    "url": "",
+    "notes": "Bundled upstream Python port for imgui_bundle. Original license: app/vendor/CYUI_LICENSE.txt. Source and SHA256: app/vendor/cyui-source.json."
+  },
+  {
     "kind": "Engine",
     "name": "Electron (downloaded on demand)",
     "license": "MIT",

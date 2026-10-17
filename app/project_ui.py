@@ -5,6 +5,7 @@ from pathlib import Path
 
 from imgui_bundle import imgui_color_text_edit as ed, portable_file_dialogs as pfd
 from ui_common import imgui, label, tr
+import cyui
 
 
 class ProjectIDE:
@@ -407,34 +408,42 @@ class ProjectIDE:
 
     def draw(self):
         if not self.app.project:
-            imgui.text_wrapped(tr('Open and analyze an application in Workspace first.'))
+            cyui.empty_state(tr('No source project'), tr('Open an application in Workspace.'), cyui.icon.document)
             return
         pid, session = self.session()
-        busy = self.app.jobs.busy('ide-' + pid) or self.debug.active(pid) or session['history_restoring']
+        busy = (self.app.jobs.busy('ide-' + pid) or self.debug.active(pid) or session['history_restoring']
+                or session['reconstruction_busy'])
         info = session['info']
         if self.dialog is not None and self.dialog.ready():
             folder = self.dialog.result()
             self.dialog = None
             if folder:
                 self.destination = folder
-        imgui.text(self.app.project['name'])
+        cyui.panel_header(tr('Project IDE'), self.app.project['name'])
         if self.app.jobs.message:
             imgui.text_wrapped(self.app.jobs.message)
         self.app.jobs.progress_widget('ide-' + pid)
-        if imgui.collapsing_header(label('Source project'), imgui.TreeNodeFlags_.default_open):
-            _, self.destination = imgui.input_text(label('Project folder'), self.destination)
-            imgui.same_line()
-            if imgui.small_button(label('Browse##ide-folder')):
-                self.dialog = pfd.select_folder(tr('Project folder'), self.destination)
+        if cyui.begin_section(label('Source project'), not info.get('available')):
             native = self.app.project['format']['format'] in ('pe', 'elf')
-            if native:
-                _, self.create_scope = imgui.combo(label('Native export scope'), self.create_scope,
-                                                   [tr('Exported functions / entry point'), tr('Selected function and callees')])
-                _,self.native_target=imgui.combo(label('Native project target'),self.native_target,
-                    [tr('Automatic target'),tr('Executable application'),tr('Shared library'),tr('Static library')])
-                _,self.native_entry=imgui.input_text(label('Native application entry (optional)'),self.native_entry)
+            if cyui.begin_properties('###project-properties', 230):
+                cyui.property(tr('Project folder'))
+                imgui.set_next_item_width(max(cyui.dp(80), imgui.get_content_region_avail().x-cyui.button_width(tr('Browse'))-cyui.dp(8)))
+                _, self.destination = imgui.input_text('###Project folder', self.destination)
+                imgui.same_line()
+                if cyui.button(label('Browse##ide-folder')):
+                    self.dialog = pfd.select_folder(tr('Project folder'), self.destination)
+                if native:
+                    cyui.property(tr('Native export scope'))
+                    _, self.create_scope = imgui.combo('###Native export scope', self.create_scope,
+                        [tr('Exported functions / entry point'), tr('Selected function and callees')])
+                    cyui.property(tr('Native project target'))
+                    _,self.native_target=imgui.combo('###Native project target',self.native_target,
+                        [tr('Automatic target'),tr('Executable application'),tr('Shared library'),tr('Static library')])
+                    cyui.property(tr('Native application entry (optional)'))
+                    _,self.native_entry=imgui.input_text('###Native application entry (optional)',self.native_entry)
+                cyui.end_properties()
             imgui.begin_disabled(busy or bool(info.get('available')))
-            if imgui.button(label('Create source project')):
+            if cyui.primary_button(label('Create source project')):
                 if native and self.create_scope == 1 and not self.app.selected:
                     self.error(pid, tr('Select a function first.'))
                 else:
@@ -456,6 +465,7 @@ class ProjectIDE:
                 imgui.text_wrapped(info['directory'])
             if info.get('note'):
                 imgui.text_wrapped(tr(info['note']))
+            cyui.end_section()
         if imgui.begin_tab_bar('###ide-modes'):
             opened,_=imgui.begin_tab_item(label('Reconstruction'))
             if opened:
@@ -487,22 +497,22 @@ class ProjectIDE:
     def draw_project(self, pid, session, busy):
         info = session['info']
         if not info.get('available'):
-            imgui.text_wrapped(tr('Create a reconstructed project or open an existing source folder.'))
+            cyui.empty_state(tr('No source project'), tr('Create or open a project above.'), cyui.icon.document)
             return
         imgui.begin_disabled(busy)
-        if imgui.button(label('Save all')):
+        if cyui.icon_button(cyui.icon.save, tr('Save all')):
             self.save_all(pid)
         for action, caption in [('build', 'Build'), ('rebuild', 'Rebuild'), ('test', 'Test'), ('run', 'Run')]:
             imgui.same_line()
-            if imgui.button(label(caption + '##ide')):
+            if cyui.icon_button({'build':cyui.icon.repair,'rebuild':cyui.icon.refresh,'test':cyui.icon.check,'run':cyui.icon.play}[action], tr(caption)):
                 self.execute(pid, action)
         imgui.same_line()
         imgui.begin_disabled(Path(session['target_project'] or info.get('entry', '')).suffix != '.csproj')
-        if imgui.button(label('Debug (F5)')):
+        if cyui.icon_button(cyui.icon.bug, tr('Debug (F5)')):
             self.debug.start(pid)
         imgui.end_disabled()
         imgui.same_line()
-        imgui.set_next_item_width(110)
+        imgui.set_next_item_width(cyui.dp(110))
         changed, session['configuration'] = imgui.combo('##configuration', session['configuration'], ['Debug', 'Release'])
         if changed:
             session['patch_plan'] = None
@@ -531,7 +541,8 @@ class ProjectIDE:
             _, session['debug_stop_entry'] = imgui.checkbox(label('Stop at entry'), session['debug_stop_entry'])
             _, session['debug_executable'] = imgui.input_text(label('Debug assembly (optional)'), session['debug_executable'])
             imgui.end_disabled()
-        height = max(140, imgui.get_content_region_avail().y - 255)
+        # Give source editing most of the remaining area, including at high DPI.
+        height = max(cyui.dp(140), imgui.get_content_region_avail().y * .70)
         if imgui.begin_table('###ide-layout', 2, imgui.TableFlags_.resizable | imgui.TableFlags_.borders_inner_v,
                              imgui.ImVec2(-1, height)):
             imgui.table_setup_column('files', imgui.TableColumnFlags_.width_stretch, 0.23)
@@ -539,10 +550,11 @@ class ProjectIDE:
             imgui.table_next_row()
             imgui.table_next_column()
             imgui.begin_child('###ide-files', imgui.ImVec2(0, height))
-            imgui.text(tr('Solution explorer'))
-            _, session['file_filter'] = imgui.input_text_with_hint('##file-filter', tr('Filter files'), session['file_filter'])
+            cyui.section_title(tr('Solution explorer'))
+            _, session['file_filter'] = cyui.search_field('##file-filter', session['file_filter'], tr('Filter files'), width=-1)
             if imgui.small_button(label('Refresh##ide-files')) and not busy:
                 self.refresh(pid)
+            imgui.set_next_item_width(-1)
             _, session['new_file'] = imgui.input_text_with_hint('##new-source', tr('New file: src/example.c'), session['new_file'])
             imgui.begin_disabled(busy or not session['new_file'])
             if imgui.small_button(label('Add file')):
@@ -597,8 +609,10 @@ class ProjectIDE:
                 editor.set_read_only_enabled(self.debug.active(pid) or session['history_restoring'] or session['reconstruction_busy'])
                 self.draw_file_actions(pid, session, busy, editor)
                 self.palette(editor)
-                self.render(editor, '###source-editor', imgui.ImVec2(-1, max(80, height - 75)))
+                self.render(editor, '###source-editor', imgui.ImVec2(-1, max(cyui.dp(80), height - cyui.dp(75))))
                 self.csharp_tick(pid, session, busy)
+            else:
+                cyui.empty_state(tr('Select a source file'), tr('Choose a file in the solution explorer.'), cyui.icon.code)
             imgui.end_table()
         self.draw_output(pid, session)
 
@@ -1067,7 +1081,7 @@ class ProjectIDE:
             imgui.text_wrapped(tr('This copy is a library. Run it through a source project test harness.'))
             return
         _, session['copy_arguments'] = imgui.input_text(label('Run arguments'), session['copy_arguments'])
-        imgui.set_next_item_width(120)
+        imgui.set_next_item_width(cyui.dp(120))
         _, session['copy_timeout'] = imgui.input_int(label('Run timeout (seconds)'), session['copy_timeout'])
         session['copy_timeout'] = min(900, max(1, session['copy_timeout']))
         if imgui.button(label('Run modified copy')):

@@ -1,4 +1,4 @@
-# Capability coverage — CyDecompilator 0.1.0
+# Capability coverage — CyDecompilator 1.4.0
 
 Status values: **Tested** (exercised on this machine, with the proof named), **Implemented**
 (code path present, not run end to end here), **Not exposed** (engine feature not offered),
@@ -46,7 +46,7 @@ Status values: **Tested** (exercised on this machine, with the proof named), **I
 | Imported HAR correlations | `investigation_har` | Tested: observed metadata and inference edges, cookies/headers not retained. |
 | Process versions, finite stdin, output/exit/file changes | `behavior_capture/compare/captures` | Tested: real processes, scenarios, timeout/output limits and child termination. External files remain outside scope. |
 | Live HTTP and owned-process TCP observations | `behavior_capture/compare/evidence` | Tested: real Chromium fetch metadata/initiator and passive owned-process TCP; no headers/bodies, UDP or packet interception. Sampling and renderer scope are explicit. |
-| Replayable GUI and visual comparisons | `behavior_capture/compare/evidence` | Tested: real Windows UI Automation controls and headless Chromium CSS steps; states, PNG hashes, failed steps and integrity checks. Electron uses the CDP path; packaged Electron fixture not tested. Native custom-rendered controls may be unavailable. |
+| Replayable GUI and visual comparisons | `behavior_capture/compare/evidence` | Tested: real Windows UI Automation controls, headless Chromium CSS steps and reconstructed Electron ASAR/preload/IPC scenarios; states, PNG hashes, failed steps and integrity checks. Native custom-rendered controls may be unavailable. |
 
 See [Investigation.md](Investigation.md) for setup and limits.
 
@@ -110,6 +110,7 @@ See [Investigation.md](Investigation.md) for setup and limits.
 | Rename proposals, apply | `ai_rename apply=true` | Tested with Claude Code on a Ghidra function of find.exe (proposal); apply path Implemented |
 | Convert to source + compile check + repair | `ai_convert target verify instructions` | Tested with Claude Code: DXBC pixel shader → HLSL, check passed (D3DCompile) |
 | Agentic Q&A with tools | `ai_ask` | Tested with Claude Code: 4 tool calls, answer produced |
+| Autonomous project work with verified completion | `ai_agent/status`, AI panel | Tested: `test_autonomous_agent.py`, actual Node compiler recovery/scenario comparisons, native DLL replacement/harness assertions, scoped authenticated child jobs, cancellation, checkpoints, source freshness and editor freezing; real configured Claude Code repaired and validated three Node scenarios. Model prose cannot mark an unverified task completed. Account administration and unrelated projects remain outside the selected task. |
 | Batch naming | `ai_batch_rename` | Implemented |
 | Providers | Claude Code, Codex, Antigravity, OpenCode (CLI); Anthropic, OpenAI, OpenRouter, OpenAI-compatible, Ollama (HTTP) | Claude Code Tested; others Implemented (vendored from CyTools_AIChat where they are tested) |
 | Compile checks | Python, Java (javac), HLSL (D3DCompile), C/C++ (MSVC via vswhere, clang, gcc), C# (dotnet SDK), Rust, Go | Python/HLSL/Java/C/C++ Tested; others Implemented |
@@ -118,9 +119,10 @@ See [Investigation.md](Investigation.md) for setup and limits.
 
 | Interface | Status |
 |---|---|
-| Dear ImGui window (EN/FR, Options, log, advanced operations) | Tested: screenshots in data/reports |
+| CyUI Dear ImGui window (10 languages, sidebar, project/AI views, Options, log, advanced operations) | Tested: `tests/test_cyui_integration.py` for preferences, actual five-theme styles and DPI; native screenshots of all five themes, French/Chinese, 1100px windows, 150% DPI and main panels in `data/reports/cyui-qa`. Native GUI exercised on Windows; Linux rendering not exercised here. |
 | CLI `invoke` | Tested |
-| MCP (stdio) | Tested: `tests/acceptance_mcp.py` |
+| MCP (stdio) | Tested: `tests/acceptance_mcp.py` and `tests/test_mcp_workflows.py`: every declared operation discoverable/describable; real Node/Git/conflicts, native reconstruction/patch/captures, .NET local dependency/reconstruction/managed-copy run/debug cancellation, Chromium HTTP/graphics/evidence integrity. Not every engine/operation combination has a transport-level scenario. |
+| Dedicated AI skill and client guide | Tested: `tests/test_skill_delivery.py`, self-contained reference links, install/copy parity, idempotence and existing-customization protection; bundled `app/skills/cydecompilator`, `Docs/AIIntegration.md`. Installing a skill does not configure a client's MCP connection. |
 | HTTP / JSONL | Provided by CyToolsCore, not exercised here |
 | Windows launcher | Tested: built with MSVC |
 | Linux launcher | Implemented, not run (no Linux runtime prepared) |

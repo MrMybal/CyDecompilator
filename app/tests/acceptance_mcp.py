@@ -56,7 +56,12 @@ async def main(arguments):
             await session.initialize()
             tools = sorted(tool.name for tool in (await session.list_tools()).tools)
             report['toolCount'] = len(tools)
-            assert 'op_decompile' in tools and 'op_ai_ask' in tools and 'cy_get_job' in tools, tools
+            operations = json.loads((APP / 'CyTool.json').read_text(encoding='utf-8'))['operations']
+            declared = {'op_' + operation['id'] for operation in operations}
+            assert declared.issubset(tools), sorted(declared - set(tools))
+            assert {'cy_get_job', 'cy_cancel_job', 'cy_finish_task', 'cy_describe_operation'}.issubset(tools)
+            report['declaredOperationCount'] = len(declared)
+            report['allDeclaredOperationsExposed'] = True
             described = await payload(session, 'cy_describe_operation', {'operationId': 'decompile'})
             report['decompileInputs'] = sorted(described.get('inputSchema', described.get('operation', {}).get('inputSchema', {})).get('properties', {}))
             opened = await run(session, 'open_file', {'path': arguments.file})

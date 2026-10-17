@@ -11,3 +11,5 @@
 *.spv binary
 *.png binary
 *.ico binary
+# Preserve the upstream CyUI port byte-for-byte (its SHA256 is recorded with the source).
+app/vendor/cyui.py -text whitespace=cr-at-eol

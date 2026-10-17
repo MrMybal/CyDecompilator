@@ -1,0 +1,6 @@
+interface:
+  display_name: "CyDecompilator"
+  short_description: "Analyze, rebuild, patch and test apps through MCP"
+  default_prompt: "Use $cydecompilator to investigate this application, reconstruct its project, and validate the requested changes."
+policy:
+  allow_implicit_invocation: true

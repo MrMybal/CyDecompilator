@@ -1,5 +1,6 @@
 """Runtime-only reconstruction frontend integrated with the project editor."""
 import json
+import cyui
 from ui_common import imgui,label,tr
 
 STATUS={'scenarios-matched':'Recorded scenarios match','compiled-unverified':'Compiled; behavior unverified',
@@ -77,18 +78,25 @@ class ReconstructionUI:
         self.ide.app.force_tab='investigation'
 
     def draw(self,pid,state,busy):
-        imgui.text_wrapped(tr('Reconstruct, build, repair and compare the recorded behavior.'))
-        imgui.text_wrapped(tr('Matching scenarios validate only the recorded interactions.'))
+        cyui.section_title(tr('Reconstruct, build, repair and compare the recorded behavior.'))
+        cyui.callout('info', tr('Matching scenarios validate only the recorded interactions.'))
         imgui.begin_disabled(busy)
-        _,state['reconstruction_rounds']=imgui.slider_int(label('Maximum build rounds'),state['reconstruction_rounds'],1,10)
-        _,state['reconstruction_repair']=imgui.checkbox(label('Automatic AI repairs with Git history'),state['reconstruction_repair'])
-        _,state['reconstruction_tests']=imgui.checkbox(label('Run project tests'),state['reconstruction_tests'])
-        _,state['reconstruction_verify']=imgui.checkbox(label('Compare with the original application'),state['reconstruction_verify'])
-        _,state['reconstruction_runtime']=imgui.input_text(label('Electron / browser runtime'),state['reconstruction_runtime'])
+        if cyui.begin_properties('###reconstruction-properties', 330):
+            cyui.property(tr('Maximum build rounds'))
+            _,state['reconstruction_rounds']=imgui.slider_int('###Maximum build rounds',state['reconstruction_rounds'],1,10)
+            cyui.property(tr('Automatic AI repairs with Git history'))
+            _,state['reconstruction_repair']=cyui.toggle_switch('###Automatic AI repairs with Git history',state['reconstruction_repair'])
+            cyui.property(tr('Run project tests'))
+            _,state['reconstruction_tests']=cyui.toggle_switch('###Run project tests',state['reconstruction_tests'])
+            cyui.property(tr('Compare with the original application'))
+            _,state['reconstruction_verify']=cyui.toggle_switch('###Compare with the original application',state['reconstruction_verify'])
+            cyui.property(tr('Electron / browser runtime'))
+            _,state['reconstruction_runtime']=imgui.input_text('###Electron / browser runtime',state['reconstruction_runtime'])
+            cyui.end_properties()
         if imgui.button(label('Use investigation scenario')):self.import_scenario(pid,state)
         if imgui.collapsing_header(label('Comparison scenarios (JSON)')):
-            _,state['reconstruction_scenarios']=imgui.input_text_multiline('###reconstruction-scenarios',state['reconstruction_scenarios'],imgui.ImVec2(-1,140))
-        if imgui.button(label('Reconstruct and validate')):self.start(pid,state)
+            _,state['reconstruction_scenarios']=imgui.input_text_multiline('###reconstruction-scenarios',state['reconstruction_scenarios'],imgui.ImVec2(-1,cyui.dp(140)))
+        if cyui.primary_button(label('Reconstruct and validate')):self.start(pid,state)
         imgui.same_line()
         if imgui.button(label('Refresh reconstruction report')):
             self.ide.submit(pid,'reconstruction_status',{},lambda out:state.update(reconstruction_report=out))

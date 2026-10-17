@@ -18,7 +18,10 @@ ROOT = APP.parent
 from standalone_log import install as install_standalone_log
 journal = install_standalone_log(ROOT)
 PREFERENCES = ROOT / 'data/settings/ui-preferences.json'
-DEFAULTS = {'language': 'en', 'theme': 'dark', 'font_scale': 1.0, 'autosave_generation': False}
+DEFAULTS = {'language': 'en', 'theme': 'navy', 'density': 'compact', 'font_scale': 1.0, 'autosave_generation': False}
+THEME_KEYS = ('mid-grey', 'light-grey', 'amber-night', 'violet', 'navy')
+THEME_LABELS = ('Mid grey', 'Light grey', 'Amber night', 'Violet', 'Navy')
+_shell_navigation = False
 # Interface languages: English source, French in ui.json, the others in locales/ui.<code>.json
 # (English text -> translation). A missing entry falls back to English.
 LANGUAGES = (('en', 'English'), ('fr', 'Français'), ('de', 'Deutsch'), ('es', 'Español'), ('it', 'Italiano'),
@@ -35,7 +38,9 @@ class Preferences:
         stored = read(self.path, {})
         self.values = {**DEFAULTS, **(stored if isinstance(stored, dict) else {})}
         if self.values['language'] not in LANGUAGE_CODES: self.values['language'] = 'en'
-        if self.values['theme'] not in ('dark', 'light', 'classic'): self.values['theme'] = 'dark'
+        self.values['theme'] = {'dark': 'navy', 'light': 'light-grey', 'classic': 'mid-grey'}.get(self.values['theme'], self.values['theme'])
+        if self.values['theme'] not in THEME_KEYS: self.values['theme'] = DEFAULTS['theme']
+        if self.values.get('density') not in ('compact', 'comfortable'): self.values['density'] = 'compact'
         if not isinstance(self.values.get('autosave_generation'),bool): self.values['autosave_generation']=False
         try: self.values['font_scale'] = min(1.6, max(.8, float(self.values['font_scale'])))
         except (TypeError, ValueError): self.values['font_scale'] = 1.0
@@ -340,7 +345,7 @@ class ImGuiFacade:
         if name == 'end_tab_bar':
             def end(*args, **kwargs):
                 global _tab_depth
-                if _tab_depth == 1 and not _inside_options:
+                if _tab_depth == 1 and not _inside_options and not _shell_navigation:
                     if _mesh_panel is not None: _mesh_panel.tab()
                     journal.draw_tab()
                     if _model_panel is not None:_model_panel.draw_tab()
@@ -377,9 +382,12 @@ class ImGuiFacade:
 imgui = ImGuiFacade()
 
 def apply_style():
+    import cyui
     native = raw()
-    {'dark': native.style_colors_dark, 'light': native.style_colors_light,
-     'classic': native.style_colors_classic}[preferences.values['theme']]()
+    dpi = native.get_main_viewport().dpi_scale or 1.0
+    test_dpi = next((a.split('=',1)[1] for a in sys.argv if a.startswith('--ui-test-dpi=')), None)
+    if test_dpi: dpi = max(.5, min(3., float(test_dpi)))
+    cyui.apply(preferences.values['theme'], preferences.values.get('density', 'compact'), dpi)
     style = native.get_style()
     if hasattr(style, 'font_scale_main'): style.font_scale_main = preferences.values['font_scale']
     else: native.get_io().font_global_scale = preferences.values['font_scale']
@@ -415,21 +423,35 @@ def dependency_records():
 def options_panel():
     global _licenses
     native=raw()
-    native.text(tr('Interface preferences'))
-    changed,index=native.combo(label('Language'),LANGUAGE_CODES.index(preferences.values['language']),[name for _,name in LANGUAGES])
-    if changed: preferences.values['language']=LANGUAGE_CODES[index]; preferences.save()
-    changed,index=native.combo(label('Theme'),('dark','light','classic').index(preferences.values['theme']),[tr('Dark'),tr('Light'),tr('Classic')])
-    if changed: preferences.values['theme']=('dark','light','classic')[index]; preferences.save(); apply_style()
-    changed,scale=native.slider_float(label('Text size'),preferences.values['font_scale'],.8,1.6,'%.2fx')
-    if changed: preferences.values['font_scale']=scale; preferences.save(); apply_style()
+    import cyui
+    cyui.panel_header(tr('Interface preferences'))
+    if cyui.begin_properties('###interface-properties', 190):
+        cyui.property(tr('Language'))
+        changed,index=native.combo('###Language',LANGUAGE_CODES.index(preferences.values['language']),[name for _,name in LANGUAGES])
+        if changed: preferences.values['language']=LANGUAGE_CODES[index]; preferences.save()
+        cyui.property(tr('Theme'))
+        changed,index=native.combo('###Theme',THEME_KEYS.index(preferences.values['theme']),[tr(x) for x in THEME_LABELS])
+        if changed: preferences.values['theme']=THEME_KEYS[index]; preferences.save(); apply_style()
+        cyui.property(tr('Density'))
+        changed,index=native.combo('###Density',('compact','comfortable').index(preferences.values['density']),[tr('Compact'),tr('Comfortable')])
+        if changed: preferences.values['density']=('compact','comfortable')[index]; preferences.save(); apply_style()
+        cyui.property(tr('Text size'))
+        changed,scale=native.slider_float('###Text size',preferences.values['font_scale'],.8,1.6,'%.2fx')
+        if changed: preferences.values['font_scale']=scale; preferences.save(); apply_style()
+        cyui.end_properties()
     if native.button(label('Reset interface preferences')):
         preferences.values=dict(DEFAULTS); preferences.save(); apply_style()
     native.text_wrapped(tr('Preferences are saved for this Tool. Model settings and files are not changed.'))
-    configuration_panel()
-    from installation_ui import panel as installation_panel
-    installation_panel(native, tr, label)
-    native.separator()
-    native.text(tr('Licenses'))
+    cyui.space(12)
+    if cyui.begin_section(label('Generation configurations'), False):
+        configuration_panel()
+        cyui.end_section()
+    if cyui.begin_section(label('Installation storage'), False):
+        from installation_ui import panel as installation_panel
+        installation_panel(native, tr, label)
+        cyui.end_section()
+    if not cyui.begin_section(label('Licenses'), False):
+        return
     native.text_wrapped(tr('Application, engine and model licenses are separate. Missing information does not grant usage rights. See the original license for its exact terms; translated interface labels are not a legal translation.'))
     if _licenses is None: _licenses=license_records()
     for index,record in enumerate(_licenses):
@@ -451,6 +473,7 @@ def options_panel():
                 value=record['license']; native.text_wrapped(tr(value) if value=='Not declared' else value)
                 if record['url'].startswith(('https://','http://')) and native.button(label('Open publisher page')): webbrowser.open(record['url'])
             native.pop_id()
+    cyui.end_section()
 
 def options_tab():
     global _inside_options
@@ -462,8 +485,9 @@ def options_tab():
         try: options_panel()
         finally: _inside_options=False; native.end_tab_item()
 
-def run(runner):
-    global _mesh_panel,_model_panel,_advanced_panel
+def run(runner, *, shell_navigation=False):
+    global _mesh_panel,_model_panel,_advanced_panel,_shell_navigation
+    _shell_navigation = shell_navigation
     from imgui_bundle import hello_imgui
     original=runner.callbacks.show_gui
     bind_runtime(original)
@@ -484,15 +508,21 @@ def run(runner):
     # Run options smoke checks without mutating the user's saved preference.
     test_language=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--ui-test-language=')),None)
     if test_language in LANGUAGE_CODES: preferences.values['language']=test_language
+    test_theme=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--ui-test-theme=')),None)
+    if test_theme in THEME_KEYS: preferences.values['theme']=test_theme
+    test_density=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--ui-test-density=')),None)
+    if test_density in ('compact','comfortable'): preferences.values['density']=test_density
     runner.app_window_params.window_title=tr(runner.app_window_params.window_title)
     source=Path(sys.modules['__main__'].__file__).read_text(encoding='utf-8-sig')
-    has_tabs='begin_tab_bar(' in source
+    has_tabs=shell_navigation or 'begin_tab_bar(' in source
     def draw():
         nonlocal frames
         frames+=1
         journal.poll()
         if _mesh_panel is not None: _mesh_panel.poll()
-        if frames==1: apply_style()
+        import cyui
+        current_dpi=raw().get_main_viewport().dpi_scale or 1.0
+        if frames==1 or (not any(a.startswith('--ui-test-dpi=') for a in sys.argv) and abs(current_dpi-cyui.dpi())>.01): apply_style()
         if has_tabs: original()
         else:
             native=raw()
@@ -520,6 +550,7 @@ def run(runner):
         if _mesh_panel is not None:
             if _mesh_panel.test: runner.app_shall_exit=False
             _mesh_panel.check_test(runner)
+        cyui.render_notifications()
     runner.callbacks.show_gui=draw
     try: hello_imgui.run(runner)
     except Exception:

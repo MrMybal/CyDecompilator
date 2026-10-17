@@ -2,6 +2,7 @@
 import time
 from pathlib import Path
 
+import cyui
 from ui_common import imgui, label, tr
 
 

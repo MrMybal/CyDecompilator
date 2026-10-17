@@ -4,7 +4,8 @@
     runtime/python/Scripts/python.exe app/scripts/make_release.py --publish  # + GitHub release
 
 The archive is `git archive HEAD` (only committed files: never runtime/ or data/) with an added
-app/release.json (version, runtime ABI, commit). The version comes from app/CyTool.json; the
+app/release.json (version, runtime ABI, commit). On Windows the launcher is rebuilt and added.
+The version comes from app/CyTool.json; the
 tag is v<version>. Publishing needs a GitHub token with write access to the repository, read
 from GITHUB_TOKEN or the credential store ('github'); the commit must already be pushed.
 GitHub records the asset's SHA-256 digest, which the updater checks before installing.
@@ -26,7 +27,8 @@ sys.path.insert(0, str(APP))
 
 
 def git(*args):
-    return subprocess.run(['git', *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    return subprocess.run(['git', '-c', 'safe.directory=' + ROOT.as_posix(), *args],
+                          cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
 
 
 def build():
@@ -36,14 +38,22 @@ def build():
     if git('status', '--porcelain', '--untracked-files=no'):
         raise SystemExit('Commit your changes first: the release is built from HEAD.')
     commit = git('rev-parse', 'HEAD')
-    archive = subprocess.run(['git', 'archive', '--format=zip', '--prefix=CyDecompilator/', 'HEAD'], cwd=ROOT,
+    launcher = None
+    if sys.platform == 'win32':
+        subprocess.run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
+                        str(APP / 'build_launcher.ps1')], cwd=ROOT, check=True)
+        launcher = ROOT / 'CyDecompilator.exe'
+    archive = subprocess.run(['git', '-c', 'safe.directory=' + ROOT.as_posix(),
+                              'archive', '--format=zip', '--prefix=CyDecompilator/', 'HEAD'], cwd=ROOT,
                              capture_output=True, check=True).stdout
     DIST.mkdir(exist_ok=True)
     target = DIST / ('CyDecompilator-%s.zip' % version)
     with zipfile.ZipFile(io.BytesIO(archive)) as source, zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as out:
         for item in source.infolist():
-            if item.filename != 'CyDecompilator/app/release.json':     # replaced by the generated one
+            if item.filename not in ('CyDecompilator/app/release.json', 'CyDecompilator/CyDecompilator.exe'):
                 out.writestr(item, source.read(item))
+        if launcher:
+            out.write(launcher, 'CyDecompilator/CyDecompilator.exe')
         out.writestr('CyDecompilator/app/release.json', json.dumps(
             {'version': version, 'runtimeAbi': RUNTIME_ABI, 'commit': commit, 'repository': DEFAULT_REPOSITORY},
             indent=2) + '\n')

@@ -290,6 +290,15 @@ class ProjectStore:
         digest = sha256_file(path, cancellation)
         existing = self.find_by_hash(digest)
         if existing is not None:
+            # Older MCP opens recorded the task staging path, which disappears
+            # at task cleanup. Reopening the same immutable bytes repairs the
+            # reference location without resetting annotations or analysis.
+            if source_path:
+                with existing.lock:
+                    meta = existing.meta()
+                    if not Path(meta.get('sourcePath', '')).is_file():
+                        meta['sourcePath'] = str(source_path)
+                        write_json(existing.dir / 'project.json', meta)
             return existing, False
         info = detection.detect(path)
         if info['format'] == 'empty':

@@ -1,5 +1,6 @@
 """Investigation frontend. Analysis, reads and captures are Runtime jobs."""
 import json
+import cyui
 from imgui_bundle import portable_file_dialogs as pfd, hello_imgui
 from ui_common import imgui, label, tr
 
@@ -123,15 +124,16 @@ class InvestigationUI:
         if self.dialog is not None and self.dialog.ready():
             self.application_path = self.dialog.result() or self.application_path
             self.dialog = None
-        imgui.text(tr('Application folder or ASAR'))
-        imgui.set_next_item_width(max(200, imgui.get_content_region_avail().x - 640))
-        _, self.application_path = imgui.input_text('###application-path', self.application_path)
-        imgui.same_line()
+        cyui.panel_header(tr('Investigation'))
+        if cyui.begin_properties('###application-properties', 220):
+            cyui.property(tr('Application folder or ASAR'))
+            _, self.application_path = imgui.input_text('###application-path', self.application_path)
+            cyui.end_properties()
         if imgui.button(label('Choose application folder')):
             self.dialog = pfd.select_folder(tr('Choose application folder'), self.application_path)
         imgui.same_line()
         imgui.begin_disabled(self.app.jobs.busy('application-open'))
-        if imgui.button(label('Analyze application')):
+        if cyui.primary_button(label('Analyze application')):
             self.open_application()
         imgui.end_disabled()
         imgui.same_line()
@@ -168,10 +170,10 @@ class InvestigationUI:
                      if any(k in row for k in ('path','channel','value','receiver')) else ''))
 
     def evidence(self, pid, state):
-        imgui.set_next_item_width(300)
+        imgui.set_next_item_width(cyui.dp(300))
         _, state['query'] = imgui.input_text(label('Feature, symbol or endpoint'), state['query'])
         imgui.same_line()
-        imgui.set_next_item_width(130)
+        imgui.set_next_item_width(cyui.dp(130))
         _, state['depth'] = imgui.slider_int(label('Relation depth'), state['depth'], 0, 4)
         imgui.same_line()
         busy = self.app.jobs.busy('investigation-' + pid)
@@ -188,7 +190,7 @@ class InvestigationUI:
                     self.query(pid, state)
                 self.submit(pid, state, 'investigation_native', {'function': self.app.selected['id']}, inspected)
         imgui.end_disabled()
-        imgui.set_next_item_width(470)
+        imgui.set_next_item_width(cyui.dp(470))
         _, state['har'] = imgui.input_text(label('HAR recording path'), state['har'])
         imgui.same_line()
         imgui.begin_disabled(busy or not state['har'])
@@ -285,7 +287,7 @@ class InvestigationUI:
     def scenario_controls(self,state):
         if not imgui.collapsing_header(label('Network and graphical scenario')):
             return
-        imgui.set_next_item_width(280)
+        imgui.set_next_item_width(cyui.dp(280))
         _,state['driver']=imgui.combo(label('Graphical driver'),state['driver'],
             [tr('No graphical scenario'),tr('Windows controls'),tr('Chromium browser'),tr('Electron renderer')])
         imgui.same_line()
@@ -294,21 +296,21 @@ class InvestigationUI:
             imgui.same_line()
             _,state['headless']=imgui.checkbox(label('Headless browser'),state['headless'])
         if state['driver'] in (2,3):
-            imgui.set_next_item_width(500)
+            imgui.set_next_item_width(cyui.dp(500))
             _,state['url']=imgui.input_text(label('Scenario URL'),state['url'])
             imgui.same_line()
-            imgui.set_next_item_width(350)
+            imgui.set_next_item_width(cyui.dp(350))
             _,state['target_url']=imgui.input_text(label('Renderer target URL'),state['target_url'])
         if state['driver']:
             if imgui.button(label('Insert scenario example')):
                 selector={'automationId':'go'} if state['driver']==1 else '#go'
                 state['steps']=json.dumps([{'action':'click','selector':selector},{'action':'snapshot','label':'result'}],indent=2)
             imgui.same_line()
-            imgui.set_next_item_width(170)
+            imgui.set_next_item_width(cyui.dp(170))
             _,state['settle']=imgui.slider_int(label('Settle delay (ms)'),state['settle'],0,3000)
             self.step_builder(state)
             if imgui.collapsing_header(label('Advanced scenario JSON')):
-                _,state['steps']=imgui.input_text_multiline(label('Graphical steps (JSON)'),state['steps'],imgui.ImVec2(800,115))
+                _,state['steps']=imgui.input_text_multiline(label('Graphical steps (JSON)'),state['steps'],imgui.ImVec2(cyui.dp(800),cyui.dp(115)))
             imgui.text_wrapped(tr('Steps: click, fill, waitFor, assertText, snapshot, wait. Use CSS selectors for web or automationId/name/controlType for Windows. The application stops after the scenario.'))
 
     def step_builder(self,state):
@@ -321,30 +323,30 @@ class InvestigationUI:
         except (ValueError,TypeError):
             imgui.text_wrapped(tr('Use JSON arrays for arguments and steps, and a JSON object for seed files.'))
             return
-        imgui.set_next_item_width(180)
+        imgui.set_next_item_width(cyui.dp(180))
         _,state['step_action']=imgui.combo(label('Step action'),state['step_action'],[tr(STEP_CAPTIONS[a]) for a in actions])
         action=actions[state['step_action']]
         if action in ('click','fill','waitFor','assertText','toggle','select','press'):
             if state['driver']==1:
                 for field,caption in (('step_id','Automation ID'),('step_name','Control name'),('step_type','Control type')):
-                    imgui.same_line();imgui.set_next_item_width(190)
+                    imgui.same_line();imgui.set_next_item_width(cyui.dp(190))
                     _,state[field]=imgui.input_text(label(caption),state[field])
             else:
-                imgui.same_line();imgui.set_next_item_width(330)
+                imgui.same_line();imgui.set_next_item_width(cyui.dp(330))
                 _,state['step_selector']=imgui.input_text(label('CSS selector'),state['step_selector'])
         if action in ('fill','assertText'):
-            imgui.set_next_item_width(500)
+            imgui.set_next_item_width(cyui.dp(500))
             _,state['step_text']=imgui.input_text(label('Step text'),state['step_text'])
         elif action=='wait':
-            imgui.set_next_item_width(200)
+            imgui.set_next_item_width(cyui.dp(200))
             _,state['step_ms']=imgui.slider_int(label('Wait duration (ms)'),state['step_ms'],0,10000)
         elif action=='navigate':
-            imgui.set_next_item_width(500)
+            imgui.set_next_item_width(cyui.dp(500))
             _,state['step_url']=imgui.input_text(label('Navigation URL'),state['step_url'])
         elif action=='press':
-            imgui.set_next_item_width(200)
+            imgui.set_next_item_width(cyui.dp(200))
             _,state['step_key']=imgui.combo(label('Scenario key'),state['step_key'],['Enter','Tab','Escape','ArrowDown','ArrowUp','Space'])
-        imgui.set_next_item_width(200)
+        imgui.set_next_item_width(cyui.dp(200))
         _,state['step_timeout']=imgui.slider_int(label('Step timeout (ms)'),state['step_timeout'],100,10000)
         imgui.same_line()
         if imgui.button(label('Apply step' if state['step_edit']>=0 else 'Add step')):
@@ -363,7 +365,7 @@ class InvestigationUI:
             state['step_edit']=-1
         imgui.same_line()
         if imgui.button(label('New step')):state['step_edit']=-1
-        imgui.begin_child('###scenario-step-list',imgui.ImVec2(0,80),True)
+        imgui.begin_child('###scenario-step-list',imgui.ImVec2(0,cyui.dp(80)),True)
         for index,step in enumerate(steps):
             if not isinstance(step,dict):continue
             imgui.push_id(index)
@@ -393,7 +395,7 @@ class InvestigationUI:
             imgui.text_wrapped(tr('Load recordings to view the retained screenshots and step results.'))
             return
         state['frame']=min(state['frame'],count-1)
-        imgui.set_next_item_width(250)
+        imgui.set_next_item_width(cyui.dp(250))
         _,state['frame']=imgui.slider_int(label('Captured state'),state['frame'],0,count-1)
         if imgui.begin_table('###captured-screens',2,imgui.TableFlags_.resizable):
             imgui.table_next_row()
@@ -458,30 +460,30 @@ class InvestigationUI:
         self.scenario_controls(state)
         for index in range(2):
             imgui.push_id(index)
-            imgui.set_next_item_width(420)
+            imgui.set_next_item_width(cyui.dp(420))
             _, state['executables'][index] = imgui.input_text(label('Version executable'), state['executables'][index])
             imgui.same_line()
-            imgui.set_next_item_width(400)
+            imgui.set_next_item_width(cyui.dp(400))
             _, state['arguments'][index] = imgui.input_text(label('Arguments (JSON)'), state['arguments'][index])
             imgui.same_line()
             if imgui.button((tr('Capture version %d') % (index + 1)) + '###capture-version'):
                 self.capture(pid, state, index)
             imgui.pop_id()
-        imgui.set_next_item_width(650)
-        _, state['stdin'] = imgui.input_text_multiline(label('Scenario input (stdin)'), state['stdin'], imgui.ImVec2(650,65))
-        imgui.set_next_item_width(500)
+        imgui.set_next_item_width(cyui.dp(650))
+        _, state['stdin'] = imgui.input_text_multiline(label('Scenario input (stdin)'), state['stdin'], imgui.ImVec2(cyui.dp(650),cyui.dp(65)))
+        imgui.set_next_item_width(cyui.dp(500))
         _, state['assets'] = imgui.input_text(label('Scenario assets folder'), state['assets'])
         imgui.same_line()
-        imgui.set_next_item_width(480)
+        imgui.set_next_item_width(cyui.dp(480))
         _, state['seeds'] = imgui.input_text(label('Seed files (JSON)'), state['seeds'])
-        imgui.set_next_item_width(170)
+        imgui.set_next_item_width(cyui.dp(170))
         _, state['timeout'] = imgui.slider_int(label('Capture timeout'), state['timeout'], 1, 300)
         if imgui.button(label('Refresh captures')):
             self.refresh_captures(pid, state)
         for index in range(2):
             imgui.same_line()
             imgui.push_id('capture-select-' + str(index))
-            imgui.set_next_item_width(350)
+            imgui.set_next_item_width(cyui.dp(350))
             if imgui.begin_combo((tr('Recording %d') % (index+1)) + '###recording',state['chosen'][index][:16]):
                 for row in state['captures']:
                     clicked, _ = imgui.selectable('%s · %s' % (row['captureId'][:16],row['exitCode']), row['captureId'] == state['chosen'][index])
