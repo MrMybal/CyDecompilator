@@ -40,6 +40,17 @@ USER_AGENT = 'CyDecompilator/0.1 (+https://github.com/)'
 CREATE_NO_WINDOW = 0x08000000 if WINDOWS else 0
 
 CATALOG = {
+    'electron':{'name':'Electron','license':'MIT','url':'https://github.com/electron/electron',
+        'approxBytes':100_000_000,'requires':[],'usedBy':['reconstruction'],
+        'description':'Runtime for rebuilt Electron applications. Native modules require a matching version and architecture.'},
+    'typescript': {'name': 'TypeScript parser', 'license': 'Apache-2.0',
+                   'url': 'https://github.com/microsoft/TypeScript', 'approxBytes': 4_400_000,
+                   'requires': [], 'usedBy': ['javascript'],
+                   'description': 'Static JavaScript and TypeScript parser for Electron and web investigations. Requires Node.js on PATH.'},
+    'netcoredbg': {'name': 'NetCoreDbg', 'license': 'MIT',
+                  'url': 'https://github.com/Samsung/netcoredbg', 'approxBytes': 4_000_000,
+                  'requires': [], 'usedBy': ['debugger'],
+                  'description': 'Debugger for reconstructed .NET projects: breakpoints, stepping, stack frames and variables.'},
     'jdk': {'name': 'Eclipse Temurin JDK 21', 'license': 'GPL-2.0-with-classpath-exception',
             'url': 'https://adoptium.net/', 'approxBytes': 205_000_000, 'requires': [],
             'usedBy': ['ghidra', 'vineflower', 'jadx'],
@@ -354,7 +365,44 @@ def _locate_pydecompile():
     return None
 
 
-LOCATORS = {'jdk': _locate_jdk, 'ghidra': _locate_ghidra, 'dotnet': _locate_dotnet,
+def _locate_netcoredbg():
+    candidates = []
+    override = overrides().get('netcoredbg', {}).get('path')
+    if override:
+        candidates.append(('override', Path(override)))
+    candidates.extend(('private', Path(v['path'])) for v in _installed_versions('netcoredbg'))
+    which = shutil.which('netcoredbg')
+    if which:
+        candidates.append(('system', Path(which)))
+    for source, root in candidates:
+        exe = root if root.is_file() else _find(root, '**/netcoredbg' + EXE)
+        if exe and exe.is_file():
+            return {'path': str(exe.parent), 'exe': str(exe), 'source': source}
+    return None
+
+
+def _locate_typescript():
+    candidates = [('override', Path(overrides()['typescript']['path']))] if overrides().get('typescript', {}).get('path') else []
+    candidates.extend(('private', Path(v['path'])) for v in _installed_versions('typescript'))
+    for source, root in candidates:
+        parser = root if root.is_file() else _find(root, '**/lib/typescript.js')
+        if parser and parser.is_file():
+            return {'path': str(parser.parent.parent), 'parser': str(parser), 'source': source}
+    return None
+
+
+def _locate_electron():
+    candidates=[]
+    override=overrides().get('electron',{}).get('path')
+    if override:candidates.append(('override',Path(override)))
+    candidates.extend(('private',Path(v['path'])) for v in _installed_versions('electron'))
+    for source,root in candidates:
+        exe=root if root.is_file() else _find(root,'**/Electron.app/Contents/MacOS/Electron' if sys.platform=='darwin' else '**/electron'+EXE)
+        if exe and exe.is_file():return {'path':str(exe.parent),'exe':str(exe),'source':source}
+    return None
+
+
+LOCATORS = {'electron':_locate_electron,'typescript': _locate_typescript, 'netcoredbg': _locate_netcoredbg, 'jdk': _locate_jdk, 'ghidra': _locate_ghidra, 'dotnet': _locate_dotnet,
             'ilspycmd': _locate_ilspycmd, 'vineflower': _locate_vineflower,
             'jadx': _locate_jadx, 'pydecompile': _locate_pydecompile, 'upx': _locate_upx}
 
@@ -395,6 +443,38 @@ def status(component_id=None, refresh=False):
 def resolve(component_id):
     """Ask the official source for the current release: url, version, size, sha256."""
     plat, arch = _platform(), _arch()
+    if component_id=='electron':
+        target={'windows':'win32','mac':'darwin','linux':'linux'}[plat]+'-'+('arm64' if arch=='aarch64' else 'x64')
+        release=_github_asset('electron/electron',r'electron-v[\d.]+-'+re.escape(target)+r'\.zip')
+        if not release.get('sha256'):
+            url='https://github.com/electron/electron/releases/download/v'+release['version']+'/SHASUMS256.txt'
+            request=urllib.request.Request(url,headers={'User-Agent':USER_AGENT})
+            try:
+                with urllib.request.urlopen(request,timeout=30) as response:sums=response.read(1024*1024).decode('ascii')
+            except (OSError,UnicodeError) as error:raise CyToolError('DownloadFailed','Cannot read official Electron checksums: '+str(error))
+            for line in sums.splitlines():
+                parts=line.split()
+                if len(parts)==2 and parts[1].lstrip('*')==release['fileName'] and re.fullmatch(r'[a-fA-F0-9]{64}',parts[0]):
+                    release['sha256']=parts[0];break
+        if not release.get('sha256'):raise CyToolError('IntegrityFailure','The official Electron archive has no verified checksum.')
+        return release
+    if component_id == 'typescript':
+        import base64
+        version = '5.9.3'
+        metadata = _http_json('https://registry.npmjs.org/typescript/' + version)
+        dist = metadata['dist']
+        integrity = dist['integrity']
+        if not integrity.startswith('sha512-') or not dist['tarball'].startswith('https://registry.npmjs.org/typescript/-/'):
+            raise CyToolError('IntegrityFailure', 'Invalid official parser release metadata.')
+        return {'version': version, 'url': dist['tarball'], 'fileName': 'typescript-' + version + '.tgz',
+                'sha512': base64.b64decode(integrity[7:], validate=True).hex()}
+    if component_id == 'netcoredbg':
+        target = 'win64.zip' if plat == 'windows' and arch == 'x64' else \
+            ('osx-arm64.zip' if plat == 'mac' and arch == 'aarch64' else
+             'linux-%s.tar.gz' % ('arm64' if arch == 'aarch64' else 'amd64') if plat == 'linux' else '')
+        if not target:
+            raise CyToolError('Unsupported', 'No official NetCoreDbg binary is available for this platform.')
+        return _github_asset('Samsung/netcoredbg', re.escape('netcoredbg-' + target))
     if component_id == 'jdk':
         os_name = {'windows': 'windows', 'linux': 'linux', 'mac': 'mac'}[plat]
         data = _http_json('https://api.adoptium.net/v3/assets/latest/21/hotspot?architecture=%s'
@@ -552,7 +632,7 @@ def _install_one(component_id, context):
                 digest.update(block)
         if digest.hexdigest().lower() != release['sha512'].lower():
             manager.remove(file_name)
-            raise CyToolError('IntegrityFailure', 'SHA512 of the .NET runtime does not match the published value.')
+            raise CyToolError('IntegrityFailure', 'SHA512 of the downloaded component does not match the published value.')
     version = re.sub(r'[^A-Za-z0-9_.+-]', '_', release['version'])
     final = ENGINES / component_id / version
     staging = ENGINES / component_id / (version + '.staging')
@@ -570,6 +650,7 @@ def _install_one(component_id, context):
         home = nested.parent if nested else final
     _record_install(component_id, release['version'], home,
                     {'url': release['url'], 'sha256': result.get('sha256Verified') and release.get('sha256'),
+                     'sha512': release.get('sha512'),
                      'sha256Verified': bool(release.get('sha256') or release.get('sha512'))})
     if context is not None:
         context.log('%s %s installed in %s' % (component_id, release['version'], home))

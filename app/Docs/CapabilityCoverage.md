@@ -34,6 +34,22 @@ Status values: **Tested** (exercised on this machine, with the proof named), **I
 | PDB symbols (symbol server, local folders, GUID/age check, publics + procedures, MSVC demangling) | `load_symbols`, `symbols_configure`, `options.symbols` | Program / Engines tabs | Tested: cmd.exe, find.exe, kernel32.dll from msdl.microsoft.com; names injected into Ghidra (`FIND::SearchStream`) |
 | Native discovery: data-section code pointers, x86 prologues, TLS callbacks | `analyze engine=native` | — | Tested: find.exe / cmd.exe 32-bit (no false functions from in-code relocations) |
 
+## Investigation and observed behavior
+
+| Capability | Operation / control | Status and limits |
+|---|---|---|
+| Native types, instruction references and high p-code SSA dependencies | `investigation_native`, selected Ghidra function | Tested: real x64 PE. Bounded within one function; indirect calls, aliases and inter-function values unresolved. |
+| Immutable JS/TS/HTML folders and Electron ASAR snapshots | `application_open`, Investigation | Tested: private TypeScript parser, bounds and exclusions; modules never executed. |
+| Imports, preload, window options, bridge/IPC, HTML resources and event candidates | `investigation_query` | Tested: unique/ambiguous IPC, shadowing, local resolution. Static candidates do not prove execution. |
+| Local source-map v3 VLQ positions and names | Investigation evidence | Tested: valid, unmapped, invalid segments. Indexed, inline and remote maps unsupported. |
+| Feature-to-source paths and hash-bound evidence | `investigation_query/source` | Tested: snapshot tampering, source lines and relationship paths. |
+| Imported HAR correlations | `investigation_har` | Tested: observed metadata and inference edges, cookies/headers not retained. |
+| Process versions, finite stdin, output/exit/file changes | `behavior_capture/compare/captures` | Tested: real processes, scenarios, timeout/output limits and child termination. External files remain outside scope. |
+| Live HTTP and owned-process TCP observations | `behavior_capture/compare/evidence` | Tested: real Chromium fetch metadata/initiator and passive owned-process TCP; no headers/bodies, UDP or packet interception. Sampling and renderer scope are explicit. |
+| Replayable GUI and visual comparisons | `behavior_capture/compare/evidence` | Tested: real Windows UI Automation controls and headless Chromium CSS steps; states, PNG hashes, failed steps and integrity checks. Electron uses the CDP path; packaged Electron fixture not tested. Native custom-rendered controls may be unavailable. |
+
+See [Investigation.md](Investigation.md) for setup and limits.
+
 ## Projects and annotations
 
 | Capability | Operation | Status |
@@ -42,6 +58,37 @@ Status values: **Tested** (exercised on this machine, with the proof named), **I
 | Global/local renames, comments, notes applied to every view | `rename`, `set_comment`, `set_notes` | Tested (`test_project_dedup_and_annotations`, MCP acceptance) |
 | Cross references, strings, search (names, cached code, strings) | `xrefs`, `strings`, `search` | Tested |
 | Export all units as files | `export_sources` | Tested (`test_export_and_search`) |
+| Reconstruct Visual Studio C# solution, edit source, build and run | `workspace_create`, `workspace_read/save`, `workspace_execute` | Tested: `test_dotnet_decompile_edit_rebuild_roundtrip` |
+| Reconstruct native VC++/CMake static-library project | `workspace_create nativeTarget=library` | Tested: `test_native_solution_build`, `test_native_test_harness` |
+| Reconstruct native DLL exports/ordinals and executable entry/resources | `workspace_create nativeTarget=auto/executable/shared` | Tested: `test_shared_native_reconstruction_exports_and_behavior`, `test_native_executable_entry_resources_and_observed_exit`; unresolved entry/TLS/data exports remain explicit blockers |
+| Reconstruct JS/TS/Node/web/Electron source and ASAR artifacts | `workspace_create`, `workspace_execute`, `workspace_dependencies` | Tested: syntax/transpile/maps, ASAR bytes, stale outputs and run conflicts; full semantic TS typechecking and signed installers are not provided |
+| Bounded reconstruction/build/AI repair/Git/scenario loop | `reconstruction_run/status`, IDE Reconstruction | Tested: real builds, captures, revision/batch rollback, cancellation report, Runtime jobs; visual QA `project-ide-reconstruction.png`; AI responses are controlled test fixtures, configured live provider not exercised in this test |
+| Reconstructed .NET, web and Electron behavioral scenarios | `reconstruction_run scenarios` | Tested: .NET console, Chromium clicks/screens, private official Electron with preload/IPC; file-URL mappings and disabled checks are recorded, matching scenarios do not imply universal equivalence |
+| Attach C#/VC++/CMake folder, tabbed source editor, conflict-aware saves | `workspace_open/info/read/save` | Tested: source confinement, BOM/CRLF, disk conflicts; visual QA `data/reports/project-ide-editor.png` |
+| Compile/review a C function and replace it in a native x86/x64 PE copy | `patch_prepare`, `patch_apply` | Tested: x86 patch, x64 DLL execution, original preserved; leaf functions only, no unwind or relocations |
+| Multi-project .sln/.slnx builds and startup project selection | `workspace_open`, `workspace_execute targetProject` | Tested: `test_solution_build_and_startup_project` |
+| Compile C# and replace one .NET IL method in the original assembly copy | `managed_methods`, `managed_patch_prepare`, `patch_apply` | Tested: ILSpy roundtrip, larger bodies, branches/strings/locals/try-catch, own generic members, unchanged original helpers/Main; `test_managed_patching.py` |
+| Strong-name refusal and explicit removal; stale or tampered IL plan rejection | `managed_patch_prepare removeStrongName`, `patch_apply` | Tested: generated signed assembly, changed signature/new user helper refusal (including inside a closure), source/candidate conflicts |
+| Isolated lambda/closure/local-function and async/iterator dependencies | `managed_patch_prepare`, `patch_apply` | Tested: nested captured variables, shared lambda caches, generic/instance async, async lambdas, iterators/async iterators in Debug/Release; successive patches preserve original method/type/field tokens and other bodies; visual QA `data/reports/project-ide-generated-patch.png` |
+| Saved copy history and direct application-copy execution | `patch_outputs`, `patch_run` | Tested: real .NET copy run, spaced arguments, nonzero exit code, hashes/original protection, library refusal; `test_patch_execution.py` |
+| Local Git source/resource/dependency versions, reviewed diffs and reversible restore | `workspace_history`, IDE Git history | Tested: real Git commits, exact BOM/CRLF/binary restore, added/deleted files, automatic backup, stale preview/foreign workspace refusal, original protection, user index/config/hooks/attributes isolation, matching managed receipt; `test_history.py` |
+| Live build/run stdout and stderr, cancellation and timeout | `ProcessOutput` events | Tested: events before process completion, Runtime copy cancellation, descendant tree stopped, full job logs preserved; `test_patch_execution.py` |
+| Search saved sources, whole-word/case filters, file and line navigation | `workspace_search`, IDE search tab/file filter/Go to line | Tested: literal metacharacters, UTF-8/CRLF coordinates, skipped binaries/build output/large files, result limits/cancellation; `test_source_search_coordinates_filters_and_limits` |
+| Reload from disk without overwriting edits made during the read | `workspace_read`, IDE Reload file | Tested: `test_editor_reload_preserves_edits_made_during_read` |
+| New referenced .NET types/methods and compatible fields | `managed_patch_prepare allowNewMembers=true` | Tested: helper method, initialized new type, property, default static field; existing initializer/layout changes refused |
+| New fields affecting existing type layout/initialization, mixed-mode, ReadyToRun method replacement | — | Not exposed: full application rebuild required |
+| C# semantic completion at cursor, member access, undoable insertion | `workspace_csharp action=complete`, Ctrl+Space | Tested: real Roslyn, visibility/static/instance, string members, emoji columns, undo/stale buffers; `test_csharp_services.py`; visual QA `project-ide-csharp.png` |
+| C# definitions and declaration navigation across files/projects | `workspace_csharp action=definition/symbols`, F12, C# symbols | Tested: correct receiver type among same-named methods, unsaved definitions and ProjectReference source navigation |
+| C# diagnostics while editing unsaved buffers | `workspace_csharp action=diagnostics`, C# assistance | Tested: syntax/name diagnostics, SDK implicit usings/reference packs, stale callback rejection, real Runtime job |
+| Semantic rename, references and formatting with undoable previews | `workspace_csharp rename/references/format`, `workspace_refactor_check` | Tested: homonyms preserved, cross-file edits, stale source/buffers refusal, undo; visual QA `project-ide-refactoring.png` |
+| Evaluated MSBuild editor metadata | `workspace_evaluate` | Tested: imported conditional defines, removed Compile items, resolved references; explicit ResolveReferences execution; cached reads during editing |
+| Full analyzer/generator execution in editor, semantic services for other languages | — | Planned: Build remains authoritative; evaluated generated sources are read but not refactored |
+| Rebuilt .NET source debugger: breakpoints, entry stop, threads, stack, locals, object expansion and stepping | `debug_start/status/control/breakpoints`, IDE Debugger panel | Tested: real NetCoreDbg + portable PDB, step in/over/out, pause/continue, normal exit; `test_debugger.py`; visual QA `project-ide-debugger.png` |
+| Debugger lifecycle, cancellation/timeout/shutdown, original protection and stale handles | `debug_start` owning job, sessionId/stopId | Tested: Runtime controls while launch runs, restart identity, process/child cleanup on cancellation, timeout, protocol failure and shutdown |
+| Patched .NET copy symbols and source debugger | `managed_patch_prepare symbols=true`, `debug_start receiptId` | Tested: changed body breakpoint/local variables, async MoveNext breakpoint, original Main unchanged, PDB/copy/source checks; visual QA `project-ide-debug-copy.png` |
+| Native appended replacements with calls/data/ASLR/unwind | `patch_prepare extended=true` | Tested: x64 Debug/Release execution, original function/IAT calls, pointer relocation under ASLR, Windows unwind lookup, x86 Unicorn execution, tampered copy refusal; visual QA `project-ide-native-link.png` |
+| Desktop/resource/dependency reconstruction | `workspace_create`, build/run, managed patch/run | Tested: reproducible WPF BAML and WinForms applications, embedded resources and local assembly with compact names; `test_desktop_roundtrip.py` |
+| Native debugger, .NET Framework attach and hot reload | — | Planned |
 
 ## Components
 
@@ -51,6 +98,8 @@ Status values: **Tested** (exercised on this machine, with the proof named), **I
 | JDK download | `install_component component=jdk` | Implemented (system JBR 21 used here) |
 | Use an existing installation | `set_component_path` | Implemented |
 | Remove a private version | `remove_component` | Implemented |
+| NetCoreDbg official release installation | `install_component component=netcoredbg` | Tested: 3.2.0-1092 Windows x64 release, published SHA256 verified |
+| Private Electron runtime | `install_component component=electron` | Tested: official Windows x64 release 44.7.0, published SHA256 verified; original runtime version/ABI may require an override |
 | Archive traversal refused | — | Tested (`test_extract_refuses_traversal`) |
 
 ## AI

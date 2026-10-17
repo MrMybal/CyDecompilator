@@ -68,6 +68,2246 @@
   },
   "operations": [
     {
+      "id": "application_open",
+      "name": "Open Electron or web application",
+      "description": "Capture a bounded immutable folder, ASAR or JS/TS/HTML artifact snapshot and analyze it with the inert TypeScript AST parser. Excluded artifacts are reported.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute application folder or artifact path."
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Application project."
+          },
+          "engine": {
+            "type": "string",
+            "description": "javascript."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "investigation"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "investigation_native",
+      "name": "Investigate native function",
+      "description": "Read-only Ghidra function dossier: type layouts, instruction references, call sites and bounded high p-code SSA value dependencies. Requires existing Ghidra analysis.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "function": {
+            "type": "string",
+            "description": "Unit to use: function id, original or renamed name, or address (0x401000). For .NET/Java units are fully qualified type names; shaders use the entry point name."
+          },
+          "refresh": {
+            "type": "boolean",
+            "description": "Re-export the dossier.",
+            "default": false
+          }
+        },
+        "required": [
+          "projectId",
+          "function"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "dossier": {
+            "type": "object",
+            "description": "Types, instructions, references and value dependencies."
+          },
+          "evidence": {
+            "type": "object",
+            "description": "Evidence graph."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "investigation"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "investigation_query",
+      "name": "Trace feature evidence",
+      "description": "Find feature text, names or endpoints and return related graph nodes with explicit relationship paths, hash-bound source locations, observations, inferences and unknowns.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "query": {
+            "type": "string",
+            "description": "Feature text or symbol.",
+            "default": ""
+          },
+          "depth": {
+            "type": "integer",
+            "description": "Relationship distance.",
+            "default": 2,
+            "minimum": 0,
+            "maximum": 4
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum returned nodes.",
+            "default": 200,
+            "minimum": 1,
+            "maximum": 1000
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "description": "Evidence nodes."
+          },
+          "edges": {
+            "type": "array",
+            "description": "Relationships."
+          },
+          "paths": {
+            "type": "object",
+            "description": "Evidence paths from matching nodes."
+          },
+          "unknowns": {
+            "type": "array",
+            "description": "Explicit analysis limits."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "investigation_source",
+      "name": "Read application evidence source",
+      "description": "Read a source from the immutable application snapshot and verify its SHA256.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "path": {
+            "type": "string",
+            "description": "Relative snapshot path."
+          }
+        },
+        "required": [
+          "projectId",
+          "path"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Source text."
+          },
+          "sha256": {
+            "type": "string",
+            "description": "Snapshot file digest."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "investigation_har",
+      "name": "Correlate web network recording",
+      "description": "Import HAR metadata and correlate exact literal URLs or paths with route/endpoint candidates. Request headers, cookies and bodies are not retained; no URL is fetched.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "path": {
+            "type": "string",
+            "description": "Absolute HAR file path."
+          }
+        },
+        "required": [
+          "projectId",
+          "path"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "description": "Static and observed evidence."
+          },
+          "unknowns": {
+            "type": "array",
+            "description": "Correlation limitations."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "investigation"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "behavior_capture",
+      "name": "Capture version behavior",
+      "description": "Run an explicitly selected executable in a fresh working directory. Record text streams, exit status, file changes, optional owned TCP connections and Windows/Chromium/Electron graphical scenarios. This is not an OS sandbox; external file writes and traffic outside the observation scope are not captured.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "executable": {
+            "type": "string",
+            "description": "Absolute executable path."
+          },
+          "arguments": {
+            "type": "array",
+            "description": "Command arguments, including an absolute script path for Node.js."
+          },
+          "stdin": {
+            "type": "string",
+            "description": "Finite text input.",
+            "default": ""
+          },
+          "assetsDirectory": {
+            "type": "string",
+            "description": "Optional folder copied into the working directory.",
+            "default": ""
+          },
+          "seedFiles": {
+            "type": "object",
+            "description": "Relative filename to UTF-8 text; same setup for both versions."
+          },
+          "timeout": {
+            "type": "integer",
+            "description": "Maximum capture seconds.",
+            "default": 60,
+            "minimum": 1,
+            "maximum": 300
+          },
+          "observation": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Optional replay and network recording.",
+            "properties": {
+              "driver": {
+                "type": "string",
+                "description": "Graphical driver.",
+                "enum": [
+                  "none",
+                  "windows",
+                  "chromium",
+                  "electron"
+                ],
+                "default": "none"
+              },
+              "network": {
+                "type": "boolean",
+                "description": "Sample owned TCP connections and record selected renderer HTTP metadata.",
+                "default": false
+              },
+              "url": {
+                "type": "string",
+                "description": "Navigate the owned renderer to this URL.",
+                "default": ""
+              },
+              "targetUrl": {
+                "type": "string",
+                "description": "Exact renderer URL when multiple pages exist.",
+                "default": ""
+              },
+              "headless": {
+                "type": "boolean",
+                "description": "Chromium only: render without a visible browser window.",
+                "default": false
+              },
+              "steps": {
+                "type": "array",
+                "description": "Up to 30 click/fill/wait/assertText/snapshot steps; CSS selectors for web, selector object with automationId/name/controlType for Windows. Windows also toggle/select; web also press/navigate."
+              },
+              "settleMs": {
+                "type": "integer",
+                "description": "Wait after each step before recording state.",
+                "default": 500,
+                "minimum": 0,
+                "maximum": 3000
+              },
+              "stopAfterScenario": {
+                "type": "boolean",
+                "description": "Stop the owned target after the scenario, including a failed step.",
+                "default": true
+              }
+            }
+          }
+        },
+        "required": [
+          "projectId",
+          "executable"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "captureId": {
+            "type": "string",
+            "description": "Persistent recording id."
+          },
+          "changes": {
+            "type": "array",
+            "description": "Created, modified and deleted files."
+          },
+          "complete": {
+            "type": "boolean",
+            "description": "Process observation completed within limits."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn",
+        "filesystemExternal",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "investigation"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "behavior_captures",
+      "name": "List behavior captures",
+      "description": "Recordings retained for this project.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "captures": {
+            "type": "array",
+            "description": "Recordings."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "behavior_evidence",
+      "name": "Read runtime evidence",
+      "description": "Read retained GUI steps, DOM/UI Automation states, HTTP/TCP observations and hash-verified screenshot paths.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "captureId": {
+            "type": "string",
+            "description": "Recording id."
+          }
+        },
+        "required": [
+          "projectId",
+          "captureId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "runtime": {
+            "type": "object",
+            "description": "Observed network and UI evidence."
+          },
+          "images": {
+            "type": "array",
+            "description": "Verified screenshot paths."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "behavior_compare",
+      "name": "Compare captured versions",
+      "description": "Compare recorded text outputs, termination, file hashes, HTTP/TCP observations, GUI states and screenshots for the same replay scenario. Matching observations do not establish program equivalence.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "left": {
+            "type": "string",
+            "description": "First capture id."
+          },
+          "right": {
+            "type": "string",
+            "description": "Second capture id."
+          }
+        },
+        "required": [
+          "projectId",
+          "left",
+          "right"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "streams": {
+            "type": "object",
+            "description": "Output diffs."
+          },
+          "fileChanges": {
+            "type": "array",
+            "description": "Filesystem differences."
+          },
+          "network": {
+            "type": "object",
+            "description": "HTTP/TCP and console differences."
+          },
+          "graphics": {
+            "type": "object",
+            "description": "Per-step state and screenshot differences."
+          },
+          "sameScenario": {
+            "type": "boolean",
+            "description": "Matching inputs, initial files and graphical scenario."
+          },
+          "observationsMatch": {
+            "type": "boolean",
+            "description": "All retained observations match."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_history",
+      "name": "Git project history",
+      "description": "Keep exact source/resource/dependency snapshots in a private local Git repository per attached folder. Status lists versions; snapshot saves a described version; compare previews changes against a commit. Restore requires its preview revision, saves current files first and creates a restoration commit. Build output and VCS folders are excluded. No remotes, user index or hooks are used.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "action": {
+            "type": "string",
+            "description": "History action.",
+            "enum": [
+              "status",
+              "snapshot",
+              "compare",
+              "restore"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "Snapshot description, up to 500 characters.",
+            "default": ""
+          },
+          "commit": {
+            "type": "string",
+            "description": "Full commit id from history for compare/restore.",
+            "default": ""
+          },
+          "revision": {
+            "type": "string",
+            "description": "Workspace revision returned by compare; required for restore.",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId",
+          "action"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "commits": {
+            "type": "array",
+            "description": "Saved Git versions."
+          },
+          "head": {
+            "type": "string",
+            "description": "Latest commit."
+          },
+          "revision": {
+            "type": "string",
+            "description": "Saved-file revision."
+          },
+          "dirty": {
+            "type": "boolean",
+            "description": "Workspace differs from latest version."
+          },
+          "changes": {
+            "type": "array",
+            "description": "Text diffs or binary change markers."
+          },
+          "backupCommit": {
+            "type": "string",
+            "description": "Current files saved before restoration."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_refactor_check",
+      "name": "Verify refactoring preview",
+      "description": "Reject a stale source snapshot before applying a refactoring to editor buffers.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "revision": {
+            "type": "string",
+            "description": "Source revision from rename/format preview."
+          }
+        },
+        "required": [
+          "projectId",
+          "revision"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "description": "Snapshot unchanged."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_evaluate",
+      "name": "Evaluate C# project with MSBuild",
+      "description": "Explicitly execute ResolveReferences and read evaluated Compile/ReferencePath/ProjectReference metadata. Custom MSBuild targets may run. Cache the model for editor requests until project configuration changes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "configuration": {
+            "type": "string",
+            "description": "Configuration.",
+            "enum": [
+              "Debug",
+              "Release"
+            ],
+            "default": "Debug"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "projects": {
+            "type": "integer",
+            "description": "Evaluated projects."
+          },
+          "sources": {
+            "type": "integer",
+            "description": "Evaluated source files."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn",
+        "filesystemExternal",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "debug_status",
+      "name": "Debugger status",
+      "description": "Snapshot of the in-memory .NET debug session, current pause and console.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "idle, building, starting, running, paused, terminated, failed or cancelled."
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "Ephemeral session id."
+          },
+          "stopId": {
+            "type": "integer",
+            "description": "Current pause generation."
+          },
+          "frames": {
+            "type": "array",
+            "description": "Current stack frames."
+          },
+          "variables": {
+            "type": "array",
+            "description": "Current variables."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "debug_breakpoints",
+      "name": "Source breakpoints",
+      "description": "Read or replace persistent C# source breakpoints while no debug session is active.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "breakpoints": {
+            "type": "array",
+            "description": "Optional replacement list of {path,line}, relative to the source workspace; at most 200."
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "breakpoints": {
+            "type": "array",
+            "description": "Saved breakpoints."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "debug_start",
+      "name": "Debug reconstructed .NET project",
+      "description": "Build the startup C# project in Debug with portable PDB, or launch a verified modified-copy receipt with regenerated symbols, then launch NetCoreDbg. This job owns the session until it ends: cancel it to kill the adapter and application tree. Use separate debug_status/debug_control jobs while it runs. NetCoreDbg must be installed explicitly.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "targetProject": {
+            "type": "string",
+            "description": "Startup .csproj relative to the source workspace.",
+            "default": ""
+          },
+          "executable": {
+            "type": "string",
+            "description": "Optional built .dll relative to workspace for multi-target/custom output projects.",
+            "default": ""
+          },
+          "receiptId": {
+            "type": "string",
+            "description": "Optional verified modified-copy receipt: debug its regenerated symbols without rebuilding.",
+            "default": ""
+          },
+          "arguments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Application arguments."
+          },
+          "breakpoints": {
+            "type": "array",
+            "description": "Optional {path,line} breakpoints; otherwise use saved breakpoints."
+          },
+          "stopAtEntry": {
+            "type": "boolean",
+            "description": "Pause at the entry point.",
+            "default": false
+          },
+          "timeout": {
+            "type": "integer",
+            "description": "Maximum debug session duration in seconds.",
+            "default": 1800,
+            "minimum": 30,
+            "maximum": 86400
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "description": "Session id."
+          },
+          "status": {
+            "type": "string",
+            "description": "Final status."
+          },
+          "exitCode": {
+            "type": "integer",
+            "description": "Application exit code."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn",
+        "filesystemExternal",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "debug-session"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "debug_control",
+      "name": "Control .NET debugger",
+      "description": "Continue, pause, step, stop, inspect threads/frames/locals or expand a variable. Paused commands require the current stopId to reject stale frame/variable handles. No arbitrary DAP requests, expression evaluation or attach to an existing process.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "Id from debug_status."
+          },
+          "action": {
+            "type": "string",
+            "description": "Command.",
+            "enum": [
+              "status",
+              "continue",
+              "pause",
+              "next",
+              "stepIn",
+              "stepOut",
+              "stop",
+              "inspect",
+              "variables",
+              "breakpoints"
+            ]
+          },
+          "stopId": {
+            "type": "integer",
+            "description": "Pause generation from debug_status.",
+            "default": 0,
+            "minimum": 0
+          },
+          "frameId": {
+            "type": "integer",
+            "description": "Optional frame to inspect.",
+            "default": 0,
+            "minimum": 0
+          },
+          "threadId": {
+            "type": "integer",
+            "description": "Optional thread to inspect.",
+            "default": 0,
+            "minimum": 0
+          },
+          "variablesReference": {
+            "type": "integer",
+            "description": "Current variable reference to expand.",
+            "default": 0,
+            "minimum": 0
+          },
+          "breakpoints": {
+            "type": "array",
+            "description": "Replacement {path,line} list for action=breakpoints."
+          }
+        },
+        "required": [
+          "projectId",
+          "sessionId",
+          "action"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Session status."
+          },
+          "frames": {
+            "type": "array",
+            "description": "Stack frames."
+          },
+          "variables": {
+            "type": "array",
+            "description": "Locals."
+          },
+          "children": {
+            "type": "array",
+            "description": "Expanded variable members."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_info",
+      "name": "Source workspace",
+      "description": "Source workspace, editable files and last build.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "description": "Available."
+          },
+          "files": {
+            "type": "array",
+            "description": "Editable files."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_create",
+      "name": "Create source project",
+      "description": "Reconstruct an editable .NET solution, native executable/shared/static project, or Node/web/Electron source workspace. Report missing entry points, dependencies, exports and initialization rather than inventing recovered behavior.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "destination": {
+            "type": "string",
+            "description": "New absolute folder; empty = persistent project/source.",
+            "default": ""
+          },
+          "functions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Native root functions; empty selects exports or entry point."
+          },
+          "nativeTarget": {
+            "type": "string",
+            "description": "Native project target.",
+            "enum": [
+              "library",
+              "auto",
+              "executable",
+              "shared"
+            ],
+            "default": "library"
+          },
+          "entryFunction": {
+            "type": "string",
+            "description": "Optional analyzed native application entry function.",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "directory": {
+            "type": "string",
+            "description": "Source directory."
+          },
+          "files": {
+            "type": "array",
+            "description": "Editable files."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal",
+        "processSpawn",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_open",
+      "name": "Open source project",
+      "description": "Attach an existing C#, VC++, CMake or multi-project solution folder to an analysis project.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Absolute existing project folder."
+          }
+        },
+        "required": [
+          "projectId",
+          "directory"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "directory": {
+            "type": "string",
+            "description": "Attached folder."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_read",
+      "name": "Read source file",
+      "description": "Read a confined UTF-8 source file and its revision.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "path": {
+            "type": "string",
+            "description": "Relative file path inside the workspace."
+          }
+        },
+        "required": [
+          "projectId",
+          "path"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Text."
+          },
+          "revision": {
+            "type": "string",
+            "description": "Content revision."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_save",
+      "name": "Save source file",
+      "description": "Save edited source atomically, refusing concurrent disk changes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "path": {
+            "type": "string",
+            "description": "Relative file path."
+          },
+          "text": {
+            "type": "string",
+            "description": "UTF-8 source text."
+          },
+          "revision": {
+            "type": "string",
+            "description": "Revision returned by workspace_read; empty creates a new file."
+          }
+        },
+        "required": [
+          "projectId",
+          "path",
+          "text",
+          "revision"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "revision": {
+            "type": "string",
+            "description": "New content revision."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_search",
+      "name": "Search source project",
+      "description": "Search saved UTF-8 source files by literal text and return clickable file/line/column matches. Exclude build output and binary files; bound results and scan size.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "query": {
+            "type": "string",
+            "description": "Literal single-line text, maximum 256 characters."
+          },
+          "caseSensitive": {
+            "type": "boolean",
+            "description": "Match letter case.",
+            "default": false
+          },
+          "wholeWord": {
+            "type": "boolean",
+            "description": "Match whole words.",
+            "default": false
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum matches.",
+            "default": 100,
+            "minimum": 1,
+            "maximum": 500
+          }
+        },
+        "required": [
+          "projectId",
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "matches": {
+            "type": "array",
+            "description": "Source matches."
+          },
+          "truncated": {
+            "type": "boolean",
+            "description": "More results or scan limit reached."
+          },
+          "skippedFiles": {
+            "type": "array",
+            "description": "Binary, unsupported or oversized files omitted."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_csharp",
+      "name": "C# editor services",
+      "description": "Use installed SDK Roslyn for completion, definitions, references, diagnostics and reviewed semantic rename/format edits across source projects and unsaved buffers. Read project/reference metadata without executing user MSBuild targets or analyzers. Custom build targets/generators require a normal build for complete diagnostics.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "path": {
+            "type": "string",
+            "description": "C# source path relative to the workspace."
+          },
+          "action": {
+            "type": "string",
+            "description": "Editor action.",
+            "enum": [
+              "complete",
+              "definition",
+              "diagnostics",
+              "symbols",
+              "rename",
+              "references",
+              "format"
+            ]
+          },
+          "newName": {
+            "type": "string",
+            "description": "New C# identifier for action=rename.",
+            "default": ""
+          },
+          "line": {
+            "type": "integer",
+            "description": "One-based source line.",
+            "default": 1,
+            "minimum": 1
+          },
+          "column": {
+            "type": "integer",
+            "description": "One-based Unicode character column.",
+            "default": 1,
+            "minimum": 1
+          },
+          "buffers": {
+            "type": "array",
+            "default": [],
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Relative C# source path."
+                },
+                "text": {
+                  "type": "string",
+                  "description": "Unsaved source text."
+                }
+              },
+              "required": [
+                "path",
+                "text"
+              ]
+            },
+            "description": "Edited buffers, up to 200; disk files are unchanged."
+          },
+          "targetProject": {
+            "type": "string",
+            "description": "Optional owning .csproj path; empty selects the file owner.",
+            "default": ""
+          },
+          "configuration": {
+            "type": "string",
+            "description": "Configuration.",
+            "enum": [
+              "Debug",
+              "Release"
+            ],
+            "default": "Debug"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum results.",
+            "default": 60,
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "required": [
+          "projectId",
+          "path",
+          "action"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "Completion candidates and a single undoable source edit."
+          },
+          "definitions": {
+            "type": "array",
+            "description": "Source definition locations."
+          },
+          "diagnostics": {
+            "type": "array",
+            "description": "Roslyn errors and warnings."
+          },
+          "symbols": {
+            "type": "array",
+            "description": "Source declarations."
+          },
+          "edits": {
+            "type": "array",
+            "description": "Preview edits with before/text; apply only if every buffer remains unchanged."
+          },
+          "references": {
+            "type": "array",
+            "description": "Semantic references."
+          },
+          "notes": {
+            "type": "array",
+            "description": "Project model limitations."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn",
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_execute",
+      "name": "Build, test or run source project",
+      "description": "Run cancellable .NET SDK, MSBuild, CMake/CTest or JavaScript/TypeScript/npm jobs; return output and file/line diagnostics. Run and test execute code. A native library needs an executable/test harness.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "action": {
+            "type": "string",
+            "description": "Action.",
+            "enum": [
+              "build",
+              "rebuild",
+              "test",
+              "run"
+            ]
+          },
+          "configuration": {
+            "type": "string",
+            "description": "Configuration.",
+            "enum": [
+              "Debug",
+              "Release"
+            ],
+            "default": "Debug"
+          },
+          "targetProject": {
+            "type": "string",
+            "description": "Optional .csproj/.vcxproj path relative to the solution folder; run requires a startup project.",
+            "default": ""
+          },
+          "executable": {
+            "type": "string",
+            "description": "Native run: executable relative to workspace. Electron: absolute runtime executable.",
+            "default": ""
+          },
+          "arguments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Run arguments."
+          }
+        },
+        "required": [
+          "projectId",
+          "action"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "passed, failed or no-tests."
+          },
+          "exitCode": {
+            "type": "integer",
+            "description": "Exit code."
+          },
+          "output": {
+            "type": "string",
+            "description": "Compiler/program output."
+          },
+          "diagnostics": {
+            "type": "array",
+            "description": "File/line diagnostics."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal",
+        "processSpawn",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "workspace_dependencies",
+      "name": "Install recovered npm dependencies",
+      "description": "Explicit npm ci from the recovered lockfile, with lifecycle scripts disabled. Native modules may still require ABI rebuilds.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Install status."
+          },
+          "output": {
+            "type": "string",
+            "description": "npm output."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal",
+        "processSpawn",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "reconstruction_status",
+      "name": "Reconstruction report",
+      "description": "Read the last durable reconstruction report, build rounds, Git commits and scenario evidence.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Reconstruction status."
+          },
+          "attempts": {
+            "type": "array",
+            "description": "Build/repair/comparison rounds."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "reconstruction_run",
+      "name": "Reconstruct, repair, build and compare",
+      "description": "Create a workspace if necessary and perform up to ten build rounds. Optional AI source corrections use the configured provider, revision guards and private Git history. Compare original/rebuilt outputs, files, network and graphics with recorded scenarios. scenarios-matched applies only to observed scenarios; compiled-unverified is not equivalence.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "destination": {
+            "type": "string",
+            "description": "New absolute reconstruction folder if no workspace exists.",
+            "default": ""
+          },
+          "nativeTarget": {
+            "type": "string",
+            "description": "New native target.",
+            "enum": [
+              "auto",
+              "executable",
+              "shared",
+              "library"
+            ],
+            "default": "auto"
+          },
+          "entryFunction": {
+            "type": "string",
+            "description": "Optional native application entry function.",
+            "default": ""
+          },
+          "maxRounds": {
+            "type": "integer",
+            "description": "Maximum build rounds.",
+            "default": 3,
+            "minimum": 1,
+            "maximum": 10
+          },
+          "repair": {
+            "type": "boolean",
+            "description": "Apply bounded AI source repairs saved to Git.",
+            "default": false
+          },
+          "runTests": {
+            "type": "boolean",
+            "description": "Run the recovered project tests.",
+            "default": false
+          },
+          "verifyBehavior": {
+            "type": "boolean",
+            "description": "Capture and compare behavior after a successful build.",
+            "default": true
+          },
+          "configuration": {
+            "type": "string",
+            "description": "Build configuration.",
+            "enum": [
+              "Debug",
+              "Release"
+            ],
+            "default": "Debug"
+          },
+          "targetProject": {
+            "type": "string",
+            "description": "Startup project relative to workspace for multi-project .NET solutions.",
+            "default": ""
+          },
+          "scenarios": {
+            "type": "array",
+            "description": "Up to ten scenarios: name, arguments, stdin, timeout, seedFiles, assetsDirectory, observation (same behavior_capture contract), runtimeExecutable (absolute Electron/Chromium runtime), optional originalExecutable/originalArguments, rebuiltExecutable (relative to workspace)/rebuiltArguments, checks {stdout,stderr,exitCode,files,network,graphics} (default all true), normalizeApplicationPaths (default true for Electron file URLs). Empty chooses an inferred scenario if runnable."
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "scenarios-matched, compiled-unverified, compilation-failed, tests-failed, behavior-differs, blocked or cancelled."
+          },
+          "attempts": {
+            "type": "array",
+            "description": "Build results, repair evidence, comparisons and Git commits."
+          },
+          "unknowns": {
+            "type": "array",
+            "description": "Unverified behavior and missing evidence."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal",
+        "processSpawn",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "patch_prepare",
+      "name": "Prepare function patch",
+      "description": "Compile a native x86/x64 PE replacement. Default mode verifies a leaf function in place; extended mode appends linked code/data, resolves existing functions/imports, merges x64 unwind tables and ASLR relocations, and redirects the original entry. Preserve the original signature/ABI.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "function": {
+            "type": "string",
+            "description": "Unit to use: function id, original or renamed name, or address (0x401000). For .NET/Java units are fully qualified type names; shaders use the entry point name."
+          },
+          "engine": {
+            "type": "string",
+            "description": "Engine id. Empty selects the analysed (or best available) engine for the file.",
+            "enum": [
+              "",
+              "ghidra",
+              "cdec",
+              "native",
+              "ilspy",
+              "vineflower",
+              "jadx",
+              "python",
+              "shader",
+              "javascript"
+            ],
+            "default": ""
+          },
+          "source": {
+            "type": "string",
+            "description": "C source containing the replacement function and optional helpers in extended mode."
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Replacement C function name."
+          },
+          "extended": {
+            "type": "boolean",
+            "description": "Append linked code/data/unwind/ASLR tables and redirect the original entry. Supports calls and larger functions.",
+            "default": false
+          },
+          "bindings": {
+            "type": "object",
+            "description": "Optional C symbol to original virtual address mapping; only analyzed functions/exports/IAT slots."
+          }
+        },
+        "required": [
+          "projectId",
+          "function",
+          "source",
+          "symbol"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "description": "Prepared plan id."
+          },
+          "disassembly": {
+            "type": "string",
+            "description": "Compiled replacement."
+          },
+          "capacity": {
+            "type": "integer",
+            "description": "Original size."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "patch_apply",
+      "name": "Apply function patch to copy",
+      "description": "Revalidate a prepared patch and write a separate EXE/DLL copy with checksum and receipt. Never overwrite the original or an existing output. Authenticode signatures are invalidated.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "planId": {
+            "type": "string",
+            "description": "Plan id returned by patch_prepare or managed_patch_prepare."
+          },
+          "destination": {
+            "type": "string",
+            "description": "New absolute output filename; empty = persistent project patches/output.",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId",
+          "planId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Modified copy."
+          },
+          "sha256": {
+            "type": "string",
+            "description": "Output hash."
+          },
+          "originalPreserved": {
+            "type": "boolean",
+            "description": "Original preserved."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "patch_outputs",
+      "name": "Saved modified copies",
+      "description": "List persistent verified patch receipts and the last completed copy run.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "copies": {
+            "type": "array",
+            "description": "Modified copy receipts."
+          },
+          "lastRun": {
+            "type": "object",
+            "description": "Last run result."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "patch_run",
+      "name": "Run modified copy",
+      "description": "Execute a saved modified application copy after revalidating its hash and copied dependencies. Never run the original or load a DLL into the Tool. Stream stdout/stderr, kill the process tree on cancellation or timeout.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "receiptId": {
+            "type": "string",
+            "description": "Receipt id returned by patch_apply or patch_outputs."
+          },
+          "arguments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Application arguments."
+          },
+          "timeout": {
+            "type": "integer",
+            "description": "Maximum run duration in seconds.",
+            "default": 60,
+            "minimum": 1,
+            "maximum": 900
+          }
+        },
+        "required": [
+          "projectId",
+          "receiptId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "passed or failed (exit code, not behavior equivalence)."
+          },
+          "exitCode": {
+            "type": "integer",
+            "description": "Application exit code."
+          },
+          "output": {
+            "type": "string",
+            "description": "Console output."
+          },
+          "path": {
+            "type": "string",
+            "description": "Executed copy."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn",
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "managed_methods",
+      "name": "List .NET methods",
+      "description": "Read metadata tokens and exact method signatures without executing the assembly. Build the private dnlib helper from pinned, hash-locked NuGet dependencies when needed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "type": {
+            "type": "string",
+            "description": "Optional declaring type filter.",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "methods": {
+            "type": "array",
+            "description": "Methods and metadata tokens."
+          },
+          "signed": {
+            "type": "boolean",
+            "description": "Strong-name signed."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "managed_patch_prepare",
+      "name": "Prepare .NET method patch",
+      "description": "Build the edited C# project and replace a selected source method in a verified preview of the original assembly. Import isolated compiler-generated closures/local functions and async/iterator state machines. Remap IL and verify all existing other method bodies/tokens unchanged. Optionally import compatible new user-defined dependencies and emit remapped portable PDBs. Reject signature/layout/initializer changes, R2R and mixed mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "methodId": {
+            "type": "string",
+            "description": "Metadata token returned by managed_methods, e.g. 0x06000001."
+          },
+          "donor": {
+            "type": "string",
+            "description": "Rebuilt assembly path relative to source workspace; empty = unique matching bin output.",
+            "default": ""
+          },
+          "configuration": {
+            "type": "string",
+            "description": "Configuration.",
+            "enum": [
+              "Debug",
+              "Release"
+            ],
+            "default": "Debug"
+          },
+          "targetProject": {
+            "type": "string",
+            "description": "Optional startup/source .csproj relative to the solution folder.",
+            "default": ""
+          },
+          "build": {
+            "type": "boolean",
+            "description": "Build the attached source project before preparing.",
+            "default": true
+          },
+          "removeStrongName": {
+            "type": "boolean",
+            "description": "Explicitly allow removing an existing strong-name signature; may break dependent assemblies.",
+            "default": false
+          },
+          "allowNewMembers": {
+            "type": "boolean",
+            "description": "Import new reachable user-defined methods/types and compatible fields; existing constructors/layouts remain protected.",
+            "default": false
+          },
+          "symbols": {
+            "type": "boolean",
+            "description": "Build portable symbols and remap selected/imported method sequence points into the patched assembly.",
+            "default": false
+          }
+        },
+        "required": [
+          "projectId",
+          "methodId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "description": "Verified patch plan."
+          },
+          "disassembly": {
+            "type": "string",
+            "description": "Replacement IL."
+          },
+          "generatedTypes": {
+            "type": "array",
+            "description": "Isolated generated types added by this replacement."
+          },
+          "generatedMethods": {
+            "type": "array",
+            "description": "Isolated generated methods added by this replacement."
+          },
+          "addedTypes": {
+            "type": "array",
+            "description": "All added types."
+          },
+          "addedMethods": {
+            "type": "array",
+            "description": "All added methods."
+          },
+          "addedFields": {
+            "type": "array",
+            "description": "All added fields."
+          },
+          "symbols": {
+            "type": "boolean",
+            "description": "Regenerated portable PDB available."
+          },
+          "unchangedMethods": {
+            "type": "integer",
+            "description": "Other methods verified unchanged."
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal",
+        "processSpawn",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "workspace"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
       "id": "open_file",
       "name": "Open file",
       "description": "Open a binary, assembly, archive, bytecode or shader file as a project (deduplicated by SHA256), detect its format and, by default, analyze it with the best installed engine.",
@@ -90,12 +2330,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },
@@ -218,12 +2460,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },
@@ -372,12 +2616,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           }
@@ -461,12 +2707,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },
@@ -548,12 +2796,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           }
@@ -605,12 +2855,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },
@@ -691,12 +2943,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           }
@@ -748,12 +3002,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },
@@ -826,12 +3082,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },
@@ -904,12 +3162,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           }
@@ -966,12 +3226,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           }
@@ -1062,12 +3324,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },
@@ -1476,7 +3740,10 @@
               "vineflower",
               "jadx",
               "pydecompile",
-              "upx"
+              "upx",
+              "netcoredbg",
+              "typescript",
+              "electron"
             ]
           },
           "includeRequirements": {
@@ -1538,7 +3805,10 @@
               "vineflower",
               "jadx",
               "pydecompile",
-              "upx"
+              "upx",
+              "netcoredbg",
+              "typescript",
+              "electron"
             ]
           },
           "version": {
@@ -1592,7 +3862,10 @@
               "vineflower",
               "jadx",
               "pydecompile",
-              "upx"
+              "upx",
+              "netcoredbg",
+              "typescript",
+              "electron"
             ]
           },
           "path": {
@@ -1776,12 +4049,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },
@@ -1878,12 +4153,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },
@@ -1972,12 +4249,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },
@@ -2115,12 +4394,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },
@@ -2230,12 +4511,14 @@
             "enum": [
               "",
               "ghidra",
+              "cdec",
               "native",
               "ilspy",
               "vineflower",
               "jadx",
               "python",
-              "shader"
+              "shader",
+              "javascript"
             ],
             "default": ""
           },

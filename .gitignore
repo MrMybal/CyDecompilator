@@ -10,3 +10,5 @@ __pycache__/
 CyDecompilator.exe
 # Release archives built by app/scripts/make_release.py.
 dist/
+app/managed/bin/
+app/managed/obj/

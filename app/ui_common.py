@@ -307,7 +307,11 @@ def label(text):
         # Only an explicit ### intentionally replaces the identity.
         visible = text.partition('##')[0]
         identity = text
-    return tr(visible)+'###'+identity
+    translated = tr(visible)
+    # A visible trailing '#' must not merge with ImGui's hidden-ID delimiter (C#).
+    if translated.endswith('#'):
+        translated += ' '
+    return translated+'###'+identity
 
 class ImGuiFacade:
     texts = {'text', 'text_wrapped', 'text_disabled', 'text_unformatted', 'set_tooltip', 'bullet_text', 'separator_text'}

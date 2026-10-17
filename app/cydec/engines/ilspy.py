@@ -7,6 +7,9 @@ lets a newer installed runtime run it.
 """
 import re
 import time
+import shutil
+import xml.etree.ElementTree as ET
+from pathlib import Path
 
 from cytools_core import CyToolError
 
@@ -89,13 +92,42 @@ class IlspyEngine(Engine):
                               % (function['id'], process.tail(err, 10)))
         return {'code': out, 'language': 'il'}
 
-    def export_project(self, project, destination, context):
+    def export_project(self, project, destination, context, language_version=''):
         """Write a compilable C# project (csproj + one file per type) into `destination`."""
         self.require()
-        code, out, err = process.run(self._command('-p', '-o', str(destination), str(project.binary)),
+        arguments = ['-p', '-o', str(destination)]
+        if language_version:
+            arguments += ['--languageversion', language_version]
+        original_folder = Path(project.meta().get('sourcePath') or str(project.binary)).parent
+        if original_folder.is_dir() and original_folder.resolve() != project.binary.parent.resolve():
+            arguments += ['--referencepath', str(original_folder)]
+        code, out, err = process.run(self._command(*arguments, str(project.binary)),
                                      context=context, env=self._env(), timeout=3600,
                                      log_name='ilspy-project')
         if code != 0:
             raise CyToolError('EngineFailed', 'ilspycmd project export failed: %s'
                               % process.tail(err or out, 10))
+        # ILSpy resolves metadata through --referencepath but does not always emit
+        # usable HintPaths. Keep local dependencies with the reconstructed project.
+        for csproj in Path(destination).glob('*.csproj'):
+            tree = ET.parse(csproj)
+            for reference in tree.getroot().iter('Reference'):
+                name = reference.get('Include', '').split(',')[0]
+                if Path(name).name != name or not name:
+                    continue
+                dependency = original_folder / (name + '.dll')
+                if not dependency.is_file() or dependency.resolve() == Path(project.meta().get('sourcePath', '')).resolve():
+                    continue
+                folder = Path(destination) / 'references'
+                folder.mkdir(exist_ok=True)
+                shutil.copyfile(dependency, folder / dependency.name)
+                hint = reference.find('HintPath')
+                if hint is None:
+                    hint = ET.SubElement(reference, 'HintPath')
+                hint.text = 'references/' + dependency.name
+                private = reference.find('Private')
+                if private is None:
+                    private = ET.SubElement(reference, 'Private')
+                private.text = 'true'
+            tree.write(csproj, encoding='utf-8', xml_declaration=True)
         return destination

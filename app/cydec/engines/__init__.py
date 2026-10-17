@@ -6,10 +6,11 @@ from .java import JadxEngine, VineflowerEngine
 from .native import NativeEngine
 from .python import PythonEngine
 from .shader import ShaderEngine
+from .javascript import JavaScriptEngine
 
 ENGINES = {engine.id: engine for engine in (GhidraEngine(), CDecompilerEngine(), NativeEngine(), IlspyEngine(),
                                            VineflowerEngine(), JadxEngine(), PythonEngine(),
-                                           ShaderEngine())}
+                                           ShaderEngine(), JavaScriptEngine())}
 
 
 def get(engine_id):

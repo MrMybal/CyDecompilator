@@ -17,7 +17,219 @@ from .project import ProjectStore
 
 store = ProjectStore()
 
+
+def application_open(path, context):
+    from . import javascript
+    project = javascript.open_application(store, path, context)
+    return analyze(project.id, 'javascript', context, force=True)
+
+
+def investigation_native(project_id, function, context, refresh=False):
+    from . import native_investigation
+    project = store.get(project_id)
+    with project.lock:
+        return native_investigation.inspect(project, function, context, refresh)
+
+
+def investigation_query(project_id, query='', depth=2, limit=200):
+    from . import investigation
+    project = store.get(project_id)
+    with project.lock:
+        return investigation.query(project, query, depth, limit)
+
+
+def investigation_source(project_id, path):
+    from . import investigation
+    return investigation.source(store.get(project_id), path)
+
+
+def investigation_har(project_id, path, context):
+    from . import investigation
+    project = store.get(project_id)
+    with project.lock:
+        return investigation.import_har(project, path, context)
+
+
+def behavior_capture(project_id, context, executable, arguments=(), stdin='', assets_directory='', seed_files=None, timeout=60, observation=None):
+    from . import behavior
+    project = store.get(project_id)
+    with project.lock:
+        return behavior.capture(project, context, executable, arguments, stdin, assets_directory, seed_files, timeout, observation)
+
+
+def behavior_evidence(project_id,capture_id):
+    from . import behavior
+    return behavior.evidence(store.get(project_id),capture_id)
+
+
+def behavior_captures(project_id):
+    from . import behavior
+    return behavior.list_captures(store.get(project_id))
+
+
+def behavior_compare(project_id, left, right):
+    from . import behavior
+    return behavior.compare(store.get(project_id), left, right)
+
 MAX_PAGE = 200000
+
+
+# Source workspaces remain separate from immutable analysis caches.
+def workspace_history(project_id, action, context, message='', commit='', revision=''):
+    from . import history
+    from .debugger import ensure_editable
+    project = store.get(project_id)
+    if action in ('snapshot', 'restore'):
+        ensure_editable(project)
+    return history.history(project, action, context, message, commit, revision)
+
+
+def debug_status(project_id):
+    from . import debugger
+    return debugger.status(store.get(project_id))
+
+
+def debug_breakpoints(project_id, rows=None):
+    from . import debugger
+    return debugger.breakpoints(store.get(project_id), rows)
+
+
+def debug_start(project_id, context, target_project='', executable='', arguments=(), rows=None,
+                stop_at_entry=False, timeout=1800, receipt_id=''):
+    from . import debugger
+    return debugger.launch(store.get(project_id), context, target_project, executable, arguments,
+                           rows, stop_at_entry, timeout, receipt_id)
+
+
+def debug_control(project_id, session_id, action, context, stop_id=0, frame_id=0, thread_id=0,
+                  reference=0, rows=None):
+    from . import debugger
+    return debugger.control(store.get(project_id), session_id, action, context, stop_id,
+                            frame_id, thread_id, reference, rows)
+
+
+def workspace_info(project_id):
+    from . import workspace
+    return workspace.state(store.get(project_id))
+
+
+def workspace_evaluate(project_id, context, configuration='Debug'):
+    from . import project_model
+    from .debugger import ensure_editable
+    ensure_editable(store.get(project_id))
+    return project_model.evaluate(store.get(project_id), context, configuration)
+
+
+def workspace_refactor_check(project_id, revision):
+    from .workspace import root_for
+    from .managed_patching import source_stamp
+    from .debugger import ensure_editable
+    project = store.get(project_id)
+    ensure_editable(project)
+    with project.lock:
+        if source_stamp(root_for(project)[0]) != revision:
+            raise CyToolError('Conflict', 'Sources changed since the refactoring preview. Request it again.')
+    return {'projectId': project.id, 'valid': True}
+
+
+def workspace_create(project_id, destination='', functions=(), context=None,native_target='library',entry_function=''):
+    from . import workspace
+    from .debugger import ensure_editable
+    ensure_editable(store.get(project_id))
+    return workspace.create(store.get(project_id), destination, context, functions,native_target,entry_function)
+
+
+def workspace_open(project_id, directory):
+    from . import workspace
+    from .debugger import ensure_editable
+    ensure_editable(store.get(project_id))
+    return workspace.attach(store.get(project_id), directory)
+
+
+def workspace_read(project_id, path):
+    from . import workspace
+    return workspace.read_file(store.get(project_id), path)
+
+
+def workspace_save(project_id, path, text, revision):
+    from . import workspace
+    from .debugger import ensure_editable
+    ensure_editable(store.get(project_id))
+    return workspace.save_file(store.get(project_id), path, text, revision)
+
+
+def workspace_search(project_id, query, context=None, case_sensitive=False, whole_word=False, limit=100):
+    from . import workspace
+    return workspace.search(store.get(project_id), query, context, case_sensitive, whole_word, limit)
+
+
+def workspace_csharp(project_id, path, action, context=None, line=1, column=1, buffers=(),
+                     target_project='', configuration='Debug', limit=60, new_name=''):
+    from . import csharp
+    return csharp.analyze(store.get(project_id), path, action, context, line, column, buffers,
+                          target_project, configuration, limit, new_name)
+
+
+def workspace_execute(project_id, action, context=None, configuration='Debug', executable='', arguments=(), target_project=''):
+    from . import workspace
+    from .debugger import ensure_editable
+    ensure_editable(store.get(project_id))
+    return workspace.execute(store.get(project_id), action, context, configuration, executable, arguments, target_project)
+
+
+def reconstruction_run(project_id,context=None,options=None):
+    from . import reconstruction
+    return reconstruction.run(store.get(project_id),context,options)
+
+
+def reconstruction_status(project_id):
+    from . import reconstruction
+    return reconstruction.status(store.get(project_id))
+
+
+def workspace_dependencies(project_id,context=None):
+    from . import workspace,web_workspace
+    from .debugger import ensure_editable
+    project=store.get(project_id)
+    with project.lock:
+        ensure_editable(project)
+        _,value=workspace.root_for(project)
+        if value['kind'] not in ('node','web','electron'):
+            raise CyToolError('Unsupported','Dependency installation supports JavaScript projects.')
+        return web_workspace.execute(project,'install',context)
+
+
+def patch_prepare(project_id, function, source, symbol, context=None, engine_id='', extended=False, bindings=None):
+    from . import patching
+    return patching.prepare(store.get(project_id), function, source, symbol, context, engine_id, extended, bindings)
+
+
+def patch_apply(project_id, plan_id, destination='', context=None):
+    from . import patching
+    return patching.apply(store.get(project_id), plan_id, destination, context)
+
+
+def patch_outputs(project_id):
+    from . import execution
+    return execution.outputs(store.get(project_id))
+
+
+def patch_run(project_id, receipt_id, context=None, arguments=(), timeout=60):
+    from . import execution
+    return execution.run_copy(store.get(project_id), receipt_id, context, arguments, timeout)
+
+
+def managed_methods(project_id, context=None, type_name=''):
+    from . import managed_patching
+    return managed_patching.methods(store.get(project_id), context, type_name)
+
+
+def managed_patch_prepare(project_id, method_id, context=None, donor='', configuration='Debug', build=True,
+                          remove_strong_name=False, target_project='', allow_new_members=False, symbols=False):
+    from . import managed_patching
+    from .debugger import ensure_editable
+    ensure_editable(store.get(project_id))
+    return managed_patching.prepare(store.get(project_id), method_id, context, donor, configuration, build, remove_strong_name, target_project, allow_new_members, symbols)
 
 
 # ---------------------------------------------------------------------- engines

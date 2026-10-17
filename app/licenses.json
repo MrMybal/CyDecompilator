@@ -1,6 +1,27 @@
 [
   {
     "kind": "Engine",
+    "name": "Electron (downloaded on demand)",
+    "license": "MIT",
+    "url": "https://github.com/electron/electron/blob/main/LICENSE",
+    "notes": "Official platform archives are installed privately under runtime/engines/electron with a published SHA256. Not redistributed with CyDecompilator; bundled runtime license files remain in its installation."
+  },
+  {
+    "kind": "Engine",
+    "name": "TypeScript parser (downloaded on demand)",
+    "license": "Apache-2.0",
+    "url": "https://github.com/microsoft/TypeScript/blob/main/LICENSE.txt",
+    "notes": "Version 5.9.3 downloaded privately from the official npm registry and verified against dist.integrity SHA512. Node.js on PATH is caller installed; inspected modules are never required or executed."
+  },
+  {
+    "kind": "Engine",
+    "name": "NetCoreDbg (downloaded on demand)",
+    "license": "MIT",
+    "url": "https://github.com/Samsung/netcoredbg/blob/master/LICENSE",
+    "notes": "Installed from official Samsung GitHub releases under runtime/engines/netcoredbg with the published SHA256 when available. Runs as an isolated Debug Adapter Protocol process; not redistributed with CyDecompilator."
+  },
+  {
+    "kind": "Engine",
     "name": "Ghidra (downloaded on demand)",
     "license": "Apache-2.0",
     "url": "https://github.com/NationalSecurityAgency/ghidra/blob/master/LICENSE",
@@ -19,6 +40,20 @@
     "license": "MIT",
     "url": "https://github.com/icsharpcode/ILSpy/blob/master/doc/license.txt",
     "notes": "Downloaded from nuget.org."
+  },
+  {
+    "kind": "Component",
+    "name": "dnlib 4.5.0 (managed method patcher, restored on demand)",
+    "license": "MIT",
+    "url": "https://github.com/0xd4d/dnlib/blob/master/LICENSE.txt",
+    "notes": "Restored from official NuGet in locked mode, with the published SHA512 in app/managed/packages.lock.json. Built and cached under runtime/engines/managed-patcher; not installed into the Tool Python runtime."
+  },
+  {
+    "kind": "Component",
+    "name": "Roslyn C# editor services (from the installed .NET SDK)",
+    "license": "MIT",
+    "url": "https://github.com/dotnet/roslyn/blob/main/License.txt",
+    "notes": "Uses the compiler/workspace/features assemblies bundled with the local SDK dotnet-format. No NuGet package or analyzer is downloaded; the helper and SDK assemblies are cached under runtime/engines/csharp-services."
   },
   {
     "kind": "Engine",

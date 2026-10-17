@@ -153,7 +153,7 @@ class Jobs:
         self.tools = {}
         self.message = ''
 
-    def submit(self, operation, parameters, *, tag, done=None, failed=None, timeout=None, priority='Interactive'):
+    def submit(self, operation, parameters, *, tag, done=None, failed=None, streamed=None, timeout=None, priority='Interactive'):
         try:
             job = self.runtime.submit(self.actor, self.session, operation, parameters, priority=priority,
                                       execution_timeout=timeout)
@@ -162,11 +162,13 @@ class Jobs:
             if failed:
                 failed(str(exc))
             return None
-        self.jobs[job['jobId']] = {'job': job, 'tag': tag, 'done': done, 'failed': failed, 'operation': operation}
+        self.jobs[job['jobId']] = {'job': job, 'tag': tag, 'done': done, 'failed': failed,
+                                 'streamed': streamed, 'output': '', 'operation': operation}
         self.deltas[job['jobId']] = ''
         return job['jobId']
 
     def poll(self):
+        changed_output = set()
         try:
             events = self.runtime.events(self.actor, self.cursor)
             self.cursor = events['cursor']
@@ -178,8 +180,19 @@ class Jobs:
                     self.deltas[job_id] += data.get('text', '')
                 elif job_id in self.deltas and kind == 'AiTool':
                     self.tools.setdefault(job_id, []).append(data)
+                elif job_id in self.jobs and kind == 'ProcessOutput':
+                    record = self.jobs[job_id]
+                    record['output'] = (record['output'] + data.get('text', ''))[-200000:]
+                    changed_output.add(job_id)
         except Exception:
             pass
+        for job_id in changed_output:
+            record = self.jobs[job_id]
+            if record['streamed']:
+                try:
+                    record['streamed'](record['output'])
+                except Exception as exc:
+                    self.message = 'UI callback failed: %s' % exc
         for job_id in list(self.jobs):
             record = self.jobs[job_id]
             try:
@@ -240,6 +253,10 @@ class App:
     def __init__(self, runtime, actor, session):
         self.runtime = runtime
         self.jobs = Jobs(runtime, actor, session)
+        from project_ui import ProjectIDE
+        self.ide = ProjectIDE(self, make_editor, set_language, palette, render_editor)
+        from investigation_ui import InvestigationUI
+        self.investigation = InvestigationUI(self, make_editor, set_language, palette, render_editor)
         self.projects = []
         self.project = None           # project_info output
         self.engine = ''
@@ -486,11 +503,14 @@ class App:
     def draw(self):
         self.frames += 1
         self.jobs.poll()
+        self.ide.debug.tick()
         self.poll_dialogs()
+        requested_tab, self.force_tab = self.force_tab, ''
         if imgui.begin_tab_bar('###cydec-main'):
-            for key, caption, draw in (('workspace', 'Workspace', self.workspace), ('engines', 'Engines', self.engines_tab),
+            for key, caption, draw in (('workspace', 'Workspace', self.workspace), ('project', 'Project IDE', self.ide.draw),
+                                       ('investigation', 'Investigation', self.investigation.draw), ('engines', 'Engines', self.engines_tab),
                                        ('ai', 'AI assistant settings', self.ai_tab)):
-                flags = imgui.TabItemFlags_.set_selected if self.force_tab == key and self.frames < 4 else 0
+                flags = imgui.TabItemFlags_.set_selected if requested_tab == key else 0
                 opened, _ = imgui.begin_tab_item(label(caption), None, flags)
                 if opened:
                     draw()
@@ -964,6 +984,11 @@ class App:
         imgui.same_line()
         if imgui.small_button(label('Copy')):
             imgui.set_clipboard_text(self.code_editor.get_text())
+        imgui.same_line()
+        if imgui.small_button(label('Edit function / patch')):
+            self.ide.start_patch()
+            _, ide_session = self.ide.session()
+            ide_session['force_patch'] = True
         imgui.same_line()
         if imgui.small_button(label('Rename...')):
             word = self.code_editor.get_cursor_text() if hasattr(self.code_editor, 'get_cursor_text') else ''
@@ -1577,6 +1602,7 @@ def main():
         def gui():
             frames[0] += 1
             app.draw()
+            app.ide.exit_modal(runner)
             if test_open and frames[0] == 3:
                 app.open_path(test_open)
             if test_unit and app.functions and not getattr(app, '_test_unit_done', False):
@@ -1598,6 +1624,7 @@ def main():
 
         configure_generation(runtime, capture_config, restore_config)
         runner.callbacks.show_gui = gui
+        runner.callbacks.confirm_exit = app.ide.confirm_exit
         runner.callbacks.load_additional_fonts = load_fonts
         run(runner)
         if screenshot:

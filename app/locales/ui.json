@@ -8909,7 +8909,7 @@
  },
  "failed": {
   "en": "failed",
-  "fr": "échec"
+  "fr": "échoué"
  },
  "or paste a file path and press Enter": {
   "en": "or paste a file path and press Enter",
@@ -8925,7 +8925,7 @@
  },
  "passed": {
   "en": "passed",
-  "fr": "réussie"
+  "fr": "réussi"
  },
  "paste a key to store it (sealed with Windows DPAPI)": {
   "en": "paste a key to store it (sealed with Windows DPAPI)",
@@ -9110,5 +9110,1705 @@
  "paste a token to store it": {
   "en": "paste a token to store it",
   "fr": "collez un jeton pour l’enregistrer"
+ },
+ "Project IDE": {
+  "en": "Project IDE",
+  "fr": "IDE de projet"
+ },
+ "Source project": {
+  "en": "Source project",
+  "fr": "Projet source"
+ },
+ "Project folder": {
+  "en": "Project folder",
+  "fr": "Dossier du projet"
+ },
+ "Native export scope": {
+  "en": "Native export scope",
+  "fr": "Portée de l’export natif"
+ },
+ "Exported functions / entry point": {
+  "en": "Exported functions / entry point",
+  "fr": "Fonctions exportées / point d’entrée"
+ },
+ "Selected function and callees": {
+  "en": "Selected function and callees",
+  "fr": "Fonction sélectionnée et fonctions appelées"
+ },
+ "Create source project": {
+  "en": "Create source project",
+  "fr": "Créer le projet source"
+ },
+ "Open source project": {
+  "en": "Open source project",
+  "fr": "Ouvrir un projet source"
+ },
+ "Project editor": {
+  "en": "Project editor",
+  "fr": "Éditeur de projet"
+ },
+ "Function patch": {
+  "en": "Function patch",
+  "fr": "Modification de fonction"
+ },
+ "Save all": {
+  "en": "Save all",
+  "fr": "Tout enregistrer"
+ },
+ "Build": {
+  "en": "Build",
+  "fr": "Compiler"
+ },
+ "Rebuild": {
+  "en": "Rebuild",
+  "fr": "Recompiler"
+ },
+ "Test": {
+  "en": "Test",
+  "fr": "Tester"
+ },
+ "Run settings": {
+  "en": "Run settings",
+  "fr": "Réglages d’exécution"
+ },
+ "Executable relative to project": {
+  "en": "Executable relative to project",
+  "fr": "Exécutable relatif au projet"
+ },
+ "Arguments (JSON array)": {
+  "en": "Arguments (JSON array)",
+  "fr": "Arguments (tableau JSON)"
+ },
+ "Solution explorer": {
+  "en": "Solution explorer",
+  "fr": "Explorateur de solution"
+ },
+ "New file: src/example.c": {
+  "en": "New file: src/example.c",
+  "fr": "Nouveau fichier : src/example.c"
+ },
+ "Add file": {
+  "en": "Add file",
+  "fr": "Ajouter un fichier"
+ },
+ "Build output": {
+  "en": "Build output",
+  "fr": "Sortie de compilation"
+ },
+ "Problems": {
+  "en": "Problems",
+  "fr": "Problèmes"
+ },
+ "Edit selected function": {
+  "en": "Edit selected function",
+  "fr": "Modifier la fonction sélectionnée"
+ },
+ "Edit function / patch": {
+  "en": "Edit function / patch",
+  "fr": "Modifier la fonction / réinjecter"
+ },
+ "Replacement function name": {
+  "en": "Replacement function name",
+  "fr": "Nom de la fonction de remplacement"
+ },
+ "Compile and verify patch": {
+  "en": "Compile and verify patch",
+  "fr": "Compiler et vérifier la modification"
+ },
+ "Modified copy path (optional)": {
+  "en": "Modified copy path (optional)",
+  "fr": "Chemin de la copie modifiée (facultatif)"
+ },
+ "Replacement size: %d / %d bytes": {
+  "en": "Replacement size: %d / %d bytes",
+  "fr": "Taille du remplacement : %d / %d octets"
+ },
+ "Compiled instructions": {
+  "en": "Compiled instructions",
+  "fr": "Instructions compilées"
+ },
+ "Write modified copy": {
+  "en": "Write modified copy",
+  "fr": "Écrire la copie modifiée"
+ },
+ "Analyze modified copy": {
+  "en": "Analyze modified copy",
+  "fr": "Analyser la copie modifiée"
+ },
+ "no-tests": {
+  "en": "no-tests",
+  "fr": "aucun test exécuté"
+ },
+ "Building or running...": {
+  "en": "Building or running...",
+  "fr": "Compilation ou exécution…"
+ },
+ "Open and analyze an application in Workspace first.": {
+  "en": "Open and analyze an application in Workspace first.",
+  "fr": "Ouvrez et analysez d’abord une application dans Workspace."
+ },
+ "Create a reconstructed project or open an existing source folder.": {
+  "en": "Create a reconstructed project or open an existing source folder.",
+  "fr": "Créez un projet reconstruit ou ouvrez un dossier de sources existant."
+ },
+ "Select a function first.": {
+  "en": "Select a function first.",
+  "fr": "Sélectionnez d’abord une fonction."
+ },
+ "Save the edited file before closing its tab.": {
+  "en": "Save the edited file before closing its tab.",
+  "fr": "Enregistrez le fichier modifié avant de fermer son onglet."
+ },
+ "Source changed while saving. Save again before building.": {
+  "en": "Source changed while saving. Save again before building.",
+  "fr": "Le code a changé pendant la sauvegarde. Enregistrez à nouveau avant de compiler."
+ },
+ "Run arguments must be a JSON array of strings.": {
+  "en": "Run arguments must be a JSON array of strings.",
+  "fr": "Les arguments doivent être un tableau JSON de chaînes."
+ },
+ "Select a native function in Workspace, then choose Edit selected function.": {
+  "en": "Select a native function in Workspace, then choose Edit selected function.",
+  "fr": "Sélectionnez une fonction native dans Workspace, puis cliquez sur Modifier la fonction sélectionnée."
+ },
+ "Direct patches support native x86/x64 PE functions. Edit other formats in the source project.": {
+  "en": "Direct patches support native x86/x64 PE functions. Edit other formats in the source project.",
+  "fr": "La réinjection directe prend en charge les fonctions PE natives x86/x64. Modifiez les autres formats dans le projet source."
+ },
+ "Native x86/x64 PE: edit one autonomous C function, preserve its signature and calling convention, then compile and review before writing a modified copy.": {
+  "en": "Native x86/x64 PE: edit one autonomous C function, preserve its signature and calling convention, then compile and review before writing a modified copy.",
+  "fr": "PE natif x86/x64 : modifiez une fonction C autonome en conservant sa signature et sa convention d’appel, puis compilez et vérifiez avant d’écrire une copie modifiée."
+ },
+ "Recovered C# project. Missing references, resources or obfuscated source may require repairs.": {
+  "en": "Recovered C# project. Missing references, resources or obfuscated source may require repairs.",
+  "fr": "Projet C# reconstruit. Des références ou ressources manquantes et le code obfusqué peuvent nécessiter des corrections."
+ },
+ "Recovered native functions form a static library. Reconstruct the entry point, import bindings, resources and application framework to build the complete application.": {
+  "en": "Recovered native functions form a static library. Reconstruct the entry point, import bindings, resources and application framework to build the complete application.",
+  "fr": "Les fonctions natives reconstruites forment une bibliothèque statique. Pour recréer l’application complète, il faut reconstruire le point d’entrée, les imports, les ressources et la structure de l’application."
+ },
+ "Keep the original signature and calling convention. A successful compilation does not prove ABI or behavior equivalence. Authenticode signatures become invalid.": {
+  "en": "Keep the original signature and calling convention. A successful compilation does not prove ABI or behavior equivalence. Authenticode signatures become invalid.",
+  "fr": "Conservez la signature et la convention d’appel d’origine. Une compilation réussie ne garantit ni la compatibilité ABI ni un comportement équivalent. Les signatures Authenticode deviennent invalides."
+ },
+ "Result: ": {
+  "en": "Result: ",
+  "fr": "Résultat : "
+ },
+ "Modified copy: ": {
+  "en": "Modified copy: ",
+  "fr": "Copie modifiée : "
+ },
+ "Unsaved source files": {
+  "en": "Unsaved source files",
+  "fr": "Fichiers source non enregistrés"
+ },
+ "Save edited source files before exiting?": {
+  "en": "Save edited source files before exiting?",
+  "fr": "Enregistrer les fichiers source modifiés avant de quitter ?"
+ },
+ "Save all and exit": {
+  "en": "Save all and exit",
+  "fr": "Tout enregistrer et quitter"
+ },
+ "Discard edits and exit": {
+  "en": "Discard edits and exit",
+  "fr": "Abandonner les modifications et quitter"
+ },
+ "Run arguments": {
+  "en": "Run arguments",
+  "fr": "Arguments d’exécution"
+ },
+ "Invalid run arguments.": {
+  "en": "Invalid run arguments.",
+  "fr": "Arguments d’exécution incorrects."
+ },
+ ".NET: edit the C# project, select one method, then build and verify its replacement in the original assembly.": {
+  "en": ".NET: edit the C# project, select one method, then build and verify its replacement in the original assembly.",
+  "fr": ".NET : modifier le projet C#, sélectionner une méthode, puis compiler et vérifier son remplacement dans l’assembly original."
+ },
+ "Allow removing the strong-name signature": {
+  "en": "Allow removing the strong-name signature",
+  "fr": "Autoriser la suppression de la signature de nom fort"
+ },
+ "Build / startup project": {
+  "en": "Build / startup project",
+  "fr": "Projet à compiler / démarrer"
+ },
+ "Build and verify method patch": {
+  "en": "Build and verify method patch",
+  "fr": "Compiler et vérifier le remplacement de méthode"
+ },
+ "Edit declaring type": {
+  "en": "Edit declaring type",
+  "fr": "Modifier le type contenant la méthode"
+ },
+ "Entire solution": {
+  "en": "Entire solution",
+  "fr": "Solution entière"
+ },
+ "IL size: %d -> %d bytes; %d other methods verified unchanged": {
+  "en": "IL size: %d -> %d bytes; %d other methods verified unchanged",
+  "fr": "Taille IL : %d -> %d octets ; %d autres méthodes vérifiées inchangées"
+ },
+ "Load .NET methods": {
+  "en": "Load .NET methods",
+  "fr": "Charger les méthodes .NET"
+ },
+ "Method to replace": {
+  "en": "Method to replace",
+  "fr": "Méthode à remplacer"
+ },
+ "No methods found for this type. Load all .NET methods.": {
+  "en": "No methods found for this type. Load all .NET methods.",
+  "fr": "Aucune méthode trouvée pour ce type. Charger toutes les méthodes .NET."
+ },
+ "Only the selected IL method is replaced. Other method bodies are verified unchanged. Debug symbols and Authenticode signatures must be regenerated. Test the modified application before use.": {
+  "en": "Only the selected IL method is replaced. Other method bodies are verified unchanged. Debug symbols and Authenticode signatures must be regenerated. Test the modified application before use.",
+  "fr": "Seule la méthode IL sélectionnée est remplacée. Les corps des autres méthodes sont vérifiés inchangés. Les symboles de débogage et les signatures Authenticode doivent être régénérés. Tester l’application modifiée avant utilisation."
+ },
+ "Open the declaring type in Project editor to edit the method.": {
+  "en": "Open the declaring type in Project editor to edit the method.",
+  "fr": "Ouvrir le type contenant la méthode dans l’éditeur de projet pour la modifier."
+ },
+ "Rebuilt assembly relative to project (optional)": {
+  "en": "Rebuilt assembly relative to project (optional)",
+  "fr": "Assembly recompilé relatif au projet (facultatif)"
+ },
+ "Removing a strong-name signature can break dependent assemblies. Re-sign with the original key when required.": {
+  "en": "Removing a strong-name signature can break dependent assemblies. Re-sign with the original key when required.",
+  "fr": "Supprimer une signature de nom fort peut casser les assemblys dépendants. Resigner avec la clé originale si nécessaire."
+ },
+ "Save and prepare the patch again after source changes.": {
+  "en": "Save and prepare the patch again after source changes.",
+  "fr": "Après modification des sources, enregistrer et préparer à nouveau le remplacement."
+ },
+ "Filter files": {
+  "en": "Filter files",
+  "fr": "Filtrer les fichiers"
+ },
+ "Go": {
+  "en": "Go",
+  "fr": "Aller"
+ },
+ "Go to line": {
+  "en": "Go to line",
+  "fr": "Aller à la ligne"
+ },
+ "Match case": {
+  "en": "Match case",
+  "fr": "Respecter la casse"
+ },
+ "Reload file": {
+  "en": "Reload file",
+  "fr": "Recharger le fichier"
+ },
+ "Reload file from disk? Unsaved edits will be discarded.": {
+  "en": "Reload file from disk? Unsaved edits will be discarded.",
+  "fr": "Recharger le fichier depuis le disque ? Les modifications non enregistrées seront perdues."
+ },
+ "Run modified copy": {
+  "en": "Run modified copy",
+  "fr": "Lancer la copie modifiée"
+ },
+ "Run timeout (seconds)": {
+  "en": "Run timeout (seconds)",
+  "fr": "Durée maximale d’exécution (secondes)"
+ },
+ "Saved modified copies": {
+  "en": "Saved modified copies",
+  "fr": "Copies modifiées enregistrées"
+ },
+ "Search limit reached. Narrow the search.": {
+  "en": "Search limit reached. Narrow the search.",
+  "fr": "Limite de recherche atteinte. Préciser la recherche."
+ },
+ "Search saved source files. Save edits to include them.": {
+  "en": "Search saved source files. Save edits to include them.",
+  "fr": "Recherche dans les sources enregistrées. Enregistrer les modifications pour les inclure."
+ },
+ "Search source project": {
+  "en": "Search source project",
+  "fr": "Rechercher dans le projet source"
+ },
+ "Search text": {
+  "en": "Search text",
+  "fr": "Texte recherché"
+ },
+ "Skipped files: %d": {
+  "en": "Skipped files: %d",
+  "fr": "Fichiers ignorés : %d"
+ },
+ "Source matches: %d": {
+  "en": "Source matches: %d",
+  "fr": "Résultats dans les sources : %d"
+ },
+ "The editor changed while reloading. Try again.": {
+  "en": "The editor changed while reloading. Try again.",
+  "fr": "Le contenu de l’éditeur a changé pendant le rechargement. Réessayer."
+ },
+ "This copy is a library. Run it through a source project test harness.": {
+  "en": "This copy is a library. Run it through a source project test harness.",
+  "fr": "Cette copie est une bibliothèque. Lancer ses tests depuis un programme de test du projet source."
+ },
+ "Whole word": {
+  "en": "Whole word",
+  "fr": "Mot entier"
+ },
+ "C# assistance": {
+  "en": "C# assistance",
+  "fr": "Assistance C#"
+ },
+ "Complete (Ctrl+Space)": {
+  "en": "Complete (Ctrl+Space)",
+  "fr": "Compléter (Ctrl+Espace)"
+ },
+ "Go to definition (F12)": {
+  "en": "Go to definition (F12)",
+  "fr": "Aller à la définition (F12)"
+ },
+ "C# symbols": {
+  "en": "C# symbols",
+  "fr": "Symboles C#"
+ },
+ "Analyze C# while editing": {
+  "en": "Analyze C# while editing",
+  "fr": "Analyser le C# pendant l’édition"
+ },
+ "Analyze C# now": {
+  "en": "Analyze C# now",
+  "fr": "Analyser le C# maintenant"
+ },
+ "Generated files and custom build steps require a build for complete diagnostics.": {
+  "en": "Generated files and custom build steps require a build for complete diagnostics.",
+  "fr": "Les fichiers générés et les étapes de compilation personnalisées nécessitent une compilation pour un diagnostic complet."
+ },
+ "Completion suggestions: %d": {
+  "en": "Completion suggestions: %d",
+  "fr": "Suggestions de complétion : %d"
+ },
+ "C# diagnostics: %d": {
+  "en": "C# diagnostics: %d",
+  "fr": "Diagnostics C# : %d"
+ },
+ "The source changed. Request completion again.": {
+  "en": "The source changed. Request completion again.",
+  "fr": "Le code source a changé. Demander à nouveau la complétion."
+ },
+ "This definition belongs to a referenced assembly.": {
+  "en": "This definition belongs to a referenced assembly.",
+  "fr": "Cette définition appartient à un assembly référencé."
+ },
+ "Conditional project properties require a build for complete diagnostics.": {
+  "en": "Conditional project properties require a build for complete diagnostics.",
+  "fr": "Les propriétés conditionnelles du projet nécessitent une compilation pour un diagnostic complet."
+ },
+ "Imported targets, analyzers and generated sources require a build for complete diagnostics.": {
+  "en": "Imported targets, analyzers and generated sources require a build for complete diagnostics.",
+  "fr": "Les cibles importées, les analyseurs et les sources générées nécessitent une compilation pour un diagnostic complet."
+ },
+ "Target framework reference pack is unavailable; editor analysis uses an installed framework.": {
+  "en": "Target framework reference pack is unavailable; editor analysis uses an installed framework.",
+  "fr": "Les références du framework cible sont indisponibles ; l’analyse utilise un framework installé."
+ },
+ "A framework reference pack is missing: ": {
+  "en": "A framework reference pack is missing: ",
+  "fr": "Un pack de références de framework est absent : "
+ },
+ "A project reference outside the source workspace is unavailable to editor analysis.": {
+  "en": "A project reference outside the source workspace is unavailable to editor analysis.",
+  "fr": "Une référence de projet située hors du dossier source est indisponible pour l’analyse de l’éditeur."
+ },
+ "A referenced assembly is missing: ": {
+  "en": "A referenced assembly is missing: ",
+  "fr": "Un assembly référencé est absent : "
+ },
+ "Build or restore this project to make package reference metadata available.": {
+  "en": "Build or restore this project to make package reference metadata available.",
+  "fr": "Compiler ou restaurer ce projet pour rendre disponibles les références des packages."
+ },
+ "Debugger": {
+  "en": "Debugger",
+  "fr": "Débogueur"
+ },
+ "Debug (F5)": {
+  "en": "Debug (F5)",
+  "fr": "Déboguer (F5)"
+ },
+ "Stop debugging": {
+  "en": "Stop debugging",
+  "fr": "Arrêter le débogage"
+ },
+ "Continue (F5)": {
+  "en": "Continue (F5)",
+  "fr": "Continuer (F5)"
+ },
+ "Pause": {
+  "en": "Pause",
+  "fr": "Pause"
+ },
+ "Step over (F10)": {
+  "en": "Step over (F10)",
+  "fr": "Pas à pas principal (F10)"
+ },
+ "Step into (F11)": {
+  "en": "Step into (F11)",
+  "fr": "Pas à pas détaillé (F11)"
+ },
+ "Step out (Shift+F11)": {
+  "en": "Step out (Shift+F11)",
+  "fr": "Sortir de la fonction (Maj+F11)"
+ },
+ "Toggle breakpoint (F9)": {
+  "en": "Toggle breakpoint (F9)",
+  "fr": "Basculer le point d’arrêt (F9)"
+ },
+ "Breakpoint": {
+  "en": "Breakpoint",
+  "fr": "Point d’arrêt"
+ },
+ "Breakpoints": {
+  "en": "Breakpoints",
+  "fr": "Points d’arrêt"
+ },
+ "Current instruction": {
+  "en": "Current instruction",
+  "fr": "Instruction courante"
+ },
+ "Stop at entry": {
+  "en": "Stop at entry",
+  "fr": "Arrêter au point d’entrée"
+ },
+ "Debug assembly (optional)": {
+  "en": "Debug assembly (optional)",
+  "fr": "Assembly à déboguer (facultatif)"
+ },
+ "Debugger: ": {
+  "en": "Debugger: ",
+  "fr": "Débogueur : "
+ },
+ "Exit code: %d": {
+  "en": "Exit code: %d",
+  "fr": "Code de sortie : %d"
+ },
+ "Stack and variables": {
+  "en": "Stack and variables",
+  "fr": "Pile et variables"
+ },
+ "Call stack": {
+  "en": "Call stack",
+  "fr": "Pile d’appels"
+ },
+ "Local variables": {
+  "en": "Local variables",
+  "fr": "Variables locales"
+ },
+ "Thread": {
+  "en": "Thread",
+  "fr": "Fil d’exécution"
+ },
+ "Debug console": {
+  "en": "Debug console",
+  "fr": "Console de débogage"
+ },
+ "Verified": {
+  "en": "Verified",
+  "fr": "Vérifié"
+ },
+ "Pending": {
+  "en": "Pending",
+  "fr": "En attente"
+ },
+ "idle": {
+  "en": "idle",
+  "fr": "Inactif"
+ },
+ "building": {
+  "en": "building",
+  "fr": "Compilation en cours"
+ },
+ "starting": {
+  "en": "starting",
+  "fr": "Démarrage"
+ },
+ "running": {
+  "en": "running",
+  "fr": "En cours d’exécution"
+ },
+ "paused": {
+  "en": "paused",
+  "fr": "En pause"
+ },
+ "terminated": {
+  "en": "terminated",
+  "fr": "Terminé"
+ },
+ "cancelled": {
+  "en": "cancelled",
+  "fr": "Annulé"
+ },
+ "Save this file before setting a breakpoint.": {
+  "en": "Save this file before setting a breakpoint.",
+  "fr": "Enregistrer ce fichier avant de poser un point d’arrêt."
+ },
+ "Sources changed on disk. Restart debugging to restore source correspondence.": {
+  "en": "Sources changed on disk. Restart debugging to restore source correspondence.",
+  "fr": "Les sources ont changé sur le disque. Relancer le débogage pour retrouver la correspondance avec le code."
+ },
+ "Source files are read-only during debugging. Stop to edit and rebuild.": {
+  "en": "Source files are read-only during debugging. Stop to edit and rebuild.",
+  "fr": "Les sources sont en lecture seule pendant le débogage. Arrêter pour modifier et recompiler."
+ },
+ "Pause at a breakpoint to inspect the stack and local variables.": {
+  "en": "Pause at a breakpoint to inspect the stack and local variables.",
+  "fr": "Arrêter sur un point d’arrêt pour inspecter la pile et les variables locales."
+ },
+ "Install debugger": {
+  "en": "Install debugger",
+  "fr": "Installer le débogueur"
+ },
+ "Install NetCoreDbg to debug reconstructed .NET projects.": {
+  "en": "Install NetCoreDbg to debug reconstructed .NET projects.",
+  "fr": "Installer NetCoreDbg pour déboguer les projets .NET reconstruits."
+ },
+ "Debugger for reconstructed .NET projects: breakpoints, stepping, stack frames and variables.": {
+  "en": "Debugger for reconstructed .NET projects: breakpoints, stepping, stack frames and variables.",
+  "fr": "Débogueur des projets .NET reconstruits : points d’arrêt, pas à pas, pile d’appels et variables."
+ },
+ "Debugger status": {
+  "en": "Debugger status",
+  "fr": "État du débogueur"
+ },
+ "Source breakpoints": {
+  "en": "Source breakpoints",
+  "fr": "Points d’arrêt du code source"
+ },
+ "Debug reconstructed .NET project": {
+  "en": "Debug reconstructed .NET project",
+  "fr": "Déboguer le projet .NET reconstruit"
+ },
+ "Control .NET debugger": {
+  "en": "Control .NET debugger",
+  "fr": "Contrôler le débogueur .NET"
+ },
+ "Generated helper: select its owning source method.": {
+  "en": "Generated helper: select its owning source method.",
+  "fr": "Fonction générée : sélectionner sa méthode source."
+ },
+ "Generated helpers: %d types, %d methods": {
+  "en": "Generated helpers: %d types, %d methods",
+  "fr": "Fonctions générées : %d types, %d méthodes"
+ },
+ "Added generated dependencies": {
+  "en": "Added generated dependencies",
+  "fr": "Dépendances générées ajoutées"
+ },
+ "The selected method and its isolated generated helpers are imported. Existing other method bodies and tokens are verified unchanged. Debug symbols and Authenticode signatures must be regenerated. Test the modified application before use.": {
+  "en": "The selected method and its isolated generated helpers are imported. Existing other method bodies and tokens are verified unchanged. Debug symbols and Authenticode signatures must be regenerated. Test the modified application before use.",
+  "fr": "La méthode sélectionnée et ses fonctions générées isolées sont importées. Les corps et les tokens des autres méthodes existantes sont vérifiés inchangés. Les symboles de débogage et les signatures Authenticode doivent être régénérés. Tester l’application modifiée avant utilisation."
+ },
+ "Import new referenced .NET members": {
+  "en": "Import new referenced .NET members",
+  "fr": "Importer les nouveaux membres .NET référencés"
+ },
+ "Generate symbols for the modified copy": {
+  "en": "Generate symbols for the modified copy",
+  "fr": "Générer les symboles de la copie modifiée"
+ },
+ "All added .NET dependencies": {
+  "en": "All added .NET dependencies",
+  "fr": "Toutes les dépendances .NET ajoutées"
+ },
+ "Debug modified copy": {
+  "en": "Debug modified copy",
+  "fr": "Déboguer la copie modifiée"
+ },
+ "New symbol name": {
+  "en": "New symbol name",
+  "fr": "Nouveau nom du symbole"
+ },
+ "Preview semantic rename": {
+  "en": "Preview semantic rename",
+  "fr": "Aperçu du renommage sémantique"
+ },
+ "Find symbol references": {
+  "en": "Find symbol references",
+  "fr": "Rechercher les références du symbole"
+ },
+ "Preview C# formatting": {
+  "en": "Preview C# formatting",
+  "fr": "Aperçu du formatage C#"
+ },
+ "Refactoring changes %d files": {
+  "en": "Refactoring changes %d files",
+  "fr": "La refactorisation modifie %d fichiers"
+ },
+ "Apply preview to editor buffers": {
+  "en": "Apply preview to editor buffers",
+  "fr": "Appliquer l’aperçu aux fichiers ouverts"
+ },
+ "The source changed. Request refactoring again.": {
+  "en": "The source changed. Request refactoring again.",
+  "fr": "Le code source a changé. Demander à nouveau la refactorisation."
+ },
+ "Evaluate project with MSBuild": {
+  "en": "Evaluate project with MSBuild",
+  "fr": "Évaluer le projet avec MSBuild"
+ },
+ "Link larger native function with calls and unwind data": {
+  "en": "Link larger native function with calls and unwind data",
+  "fr": "Lier une fonction native plus grande avec appels et données d’exception"
+ },
+ "Native symbol bindings (JSON)": {
+  "en": "Native symbol bindings (JSON)",
+  "fr": "Correspondances des symboles natifs (JSON)"
+ },
+ "Invalid native binding JSON.": {
+  "en": "Invalid native binding JSON.",
+  "fr": "JSON des symboles natifs invalide."
+ },
+ "Appended native section: %d bytes; redirected entry: %d bytes": {
+  "en": "Appended native section: %d bytes; redirected entry: %d bytes",
+  "fr": "Section native ajoutée : %d octets ; entrée redirigée : %d octets"
+ },
+ "The function entry redirects to appended code. Calls use existing functions/imports; compiler unwind data and ASLR relocations are linked. Keep the original ABI and test the modified copy.": {
+  "en": "The function entry redirects to appended code. Calls use existing functions/imports; compiler unwind data and ASLR relocations are linked. Keep the original ABI and test the modified copy.",
+  "fr": "L’entrée de la fonction redirige vers le code ajouté. Les appels utilisent les fonctions et imports existants ; les données d’exception du compilateur et les relocalisations ASLR sont liées. Conserver l’ABI d’origine et tester la copie modifiée."
+ },
+ "The selected method and reviewed dependencies are imported. Other existing method bodies and tokens are verified unchanged. Portable symbols map imported methods to matching sources. Test the modified copy before use.": {
+  "en": "The selected method and reviewed dependencies are imported. Other existing method bodies and tokens are verified unchanged. Portable symbols map imported methods to matching sources. Test the modified copy before use.",
+  "fr": "La méthode sélectionnée et les dépendances examinées sont importées. Les corps et tokens des autres méthodes existantes sont vérifiés inchangés. Les symboles portables relient les méthodes importées aux sources correspondantes. Tester la copie modifiée avant utilisation."
+ },
+ "Evaluate C# project with MSBuild": {
+  "en": "Evaluate C# project with MSBuild",
+  "fr": "Évaluer le projet C# avec MSBuild"
+ },
+ "Verify refactoring preview": {
+  "en": "Verify refactoring preview",
+  "fr": "Vérifier l’aperçu de refactorisation"
+ },
+ "Git history": {
+  "en": "Git history",
+  "fr": "Historique Git"
+ },
+ "Git project history": {
+  "en": "Git project history",
+  "fr": "Historique Git du projet"
+ },
+ "Version description": {
+  "en": "Version description",
+  "fr": "Description de la version"
+ },
+ "Save Git version": {
+  "en": "Save Git version",
+  "fr": "Enregistrer une version Git"
+ },
+ "Refresh history": {
+  "en": "Refresh history",
+  "fr": "Actualiser l'historique"
+ },
+ "Saved version": {
+  "en": "Saved version",
+  "fr": "Version enregistrée"
+ },
+ "Compare with saved sources": {
+  "en": "Compare with saved sources",
+  "fr": "Comparer avec les sources enregistrées"
+ },
+ "Restore this version": {
+  "en": "Restore this version",
+  "fr": "Restaurer cette version"
+ },
+ "Current commit: ": {
+  "en": "Current commit: ",
+  "fr": "Commit actuel : "
+ },
+ "Source commit: ": {
+  "en": "Source commit: ",
+  "fr": "Commit des sources : "
+ },
+ "Changes since saved version": {
+  "en": "Changes since saved version",
+  "fr": "Modifications depuis la version enregistrée"
+ },
+ "Sources match saved version": {
+  "en": "Sources match saved version",
+  "fr": "Les sources correspondent à la version enregistrée"
+ },
+ "Binary file changed": {
+  "en": "Binary file changed",
+  "fr": "Fichier binaire modifié"
+ },
+ "Diff truncated": {
+  "en": "Diff truncated",
+  "fr": "Différences tronquées"
+ },
+ "No changes": {
+  "en": "No changes",
+  "fr": "Aucune modification"
+ },
+ "Save sources and compare again before restoring.": {
+  "en": "Save sources and compare again before restoring.",
+  "fr": "Enregistrez les sources et comparez à nouveau avant de restaurer."
+ },
+ "Git keeps local versions of sources, resources and dependencies. Restore saves the current version first.": {
+  "en": "Git keeps local versions of sources, resources and dependencies. Restore saves the current version first.",
+  "fr": "Git conserve des versions locales des sources, ressources et dépendances. La restauration enregistre d'abord la version actuelle."
+ },
+ "added": {
+  "en": "added",
+  "fr": "ajouté"
+ },
+ "deleted": {
+  "en": "deleted",
+  "fr": "supprimé"
+ },
+ "modified": {
+  "en": "modified",
+  "fr": "modifié"
+ },
+ "History cannot include reserved folders.": {
+  "en": "History cannot include reserved folders.",
+  "fr": "L’historique ne peut pas inclure les dossiers réservés."
+ },
+ "History requires regular files and paths.": {
+  "en": "History requires regular files and paths.",
+  "fr": "L’historique nécessite des fichiers ordinaires et des chemins sans liens."
+ },
+ "History supports regular files up to 32 MiB.": {
+  "en": "History supports regular files up to 32 MiB.",
+  "fr": "L’historique accepte des fichiers ordinaires de 32 Mio maximum."
+ },
+ "History supports up to 4000 files and 128 MiB per snapshot.": {
+  "en": "History supports up to 4000 files and 128 MiB per snapshot.",
+  "fr": "L’historique accepte jusqu’à 4 000 fichiers et 128 Mio par version."
+ },
+ "Install Git and add it to PATH to use project history.": {
+  "en": "Install Git and add it to PATH to use project history.",
+  "fr": "Installez Git et ajoutez-le au PATH pour utiliser l’historique du projet."
+ },
+ "Git history requires a job workdir.": {
+  "en": "Git history requires a job workdir.",
+  "fr": "L’historique Git nécessite un dossier de travail de tâche."
+ },
+ "Git history failed: ": {
+  "en": "Git history failed: ",
+  "fr": "Échec de l’historique Git : "
+ },
+ "Choose a full commit id from project history.": {
+  "en": "Choose a full commit id from project history.",
+  "fr": "Choisissez un identifiant de commit complet dans l’historique du projet."
+ },
+ "History commit not found.": {
+  "en": "History commit not found.",
+  "fr": "Commit de l’historique introuvable."
+ },
+ "History snapshot exceeds supported limits.": {
+  "en": "History snapshot exceeds supported limits.",
+  "fr": "Cette version dépasse les limites prises en charge."
+ },
+ "Use a version description up to 500 characters.": {
+  "en": "Use a version description up to 500 characters.",
+  "fr": "Utilisez une description de version de 500 caractères maximum."
+ },
+ "Git did not save every source file.": {
+  "en": "Git did not save every source file.",
+  "fr": "Git n’a pas enregistré tous les fichiers sources."
+ },
+ "Sources changed while saving history. Save a version again.": {
+  "en": "Sources changed while saving history. Save a version again.",
+  "fr": "Les sources ont changé pendant l’enregistrement. Enregistrez à nouveau une version."
+ },
+ "Unknown history action.": {
+  "en": "Unknown history action.",
+  "fr": "Action d’historique inconnue."
+ },
+ "Choose a source folder separate from the persistent analysis store.": {
+  "en": "Choose a source folder separate from the persistent analysis store.",
+  "fr": "Choisissez un dossier source distinct du stockage persistant des analyses."
+ },
+ "Sources changed since the history preview. Compare again before restoring.": {
+  "en": "Sources changed since the history preview. Compare again before restoring.",
+  "fr": "Les sources ont changé depuis l’aperçu. Comparez à nouveau avant de restaurer."
+ },
+ "History cannot overwrite the original application.": {
+  "en": "History cannot overwrite the original application.",
+  "fr": "L’historique ne peut pas écraser l’application originale."
+ },
+ "A file/directory layout conflicts with this version. Move it before restoring.": {
+  "en": "A file/directory layout conflicts with this version. Move it before restoring.",
+  "fr": "Un conflit entre fichiers et dossiers empêche cette restauration. Déplacez l’élément concerné avant de restaurer."
+ },
+ "Sources changed while preparing restoration. Compare again.": {
+  "en": "Sources changed while preparing restoration. Compare again.",
+  "fr": "Les sources ont changé pendant la préparation de la restauration. Comparez à nouveau."
+ },
+ "Investigation": {
+  "en": "Investigation",
+  "fr": "Investigation"
+ },
+ "Application folder or ASAR": {
+  "en": "Application folder or ASAR",
+  "fr": "Dossier d’application ou ASAR"
+ },
+ "Choose application folder": {
+  "en": "Choose application folder",
+  "fr": "Choisir le dossier de l’application"
+ },
+ "Analyze application": {
+  "en": "Analyze application",
+  "fr": "Analyser l’application"
+ },
+ "Install JS parser": {
+  "en": "Install JS parser",
+  "fr": "Installer l’analyseur JS"
+ },
+ "Feature evidence": {
+  "en": "Feature evidence",
+  "fr": "Preuves par fonctionnalité"
+ },
+ "Version behavior": {
+  "en": "Version behavior",
+  "fr": "Comportement des versions"
+ },
+ "Feature, symbol or endpoint": {
+  "en": "Feature, symbol or endpoint",
+  "fr": "Fonctionnalité, symbole ou endpoint"
+ },
+ "Relation depth": {
+  "en": "Relation depth",
+  "fr": "Profondeur des liens"
+ },
+ "Trace evidence": {
+  "en": "Trace evidence",
+  "fr": "Rechercher les preuves"
+ },
+ "Inspect selected native function": {
+  "en": "Inspect selected native function",
+  "fr": "Examiner la fonction native sélectionnée"
+ },
+ "HAR recording path": {
+  "en": "HAR recording path",
+  "fr": "Chemin de la capture HAR"
+ },
+ "Correlate HAR": {
+  "en": "Correlate HAR",
+  "fr": "Rapprocher la capture HAR"
+ },
+ "Cancel investigation": {
+  "en": "Cancel investigation",
+  "fr": "Annuler l’investigation"
+ },
+ "Limits and unknowns": {
+  "en": "Limits and unknowns",
+  "fr": "Limites et inconnues"
+ },
+ "Evidence nodes: %d | Matching nodes: %d": {
+  "en": "Evidence nodes: %d | Matching nodes: %d",
+  "fr": "Éléments de preuve : %d | Correspondances : %d"
+ },
+ "Evidence status: ": {
+  "en": "Evidence status: ",
+  "fr": "Statut de la preuve : "
+ },
+ "Source evidence: ": {
+  "en": "Source evidence: ",
+  "fr": "Source de la preuve : "
+ },
+ "Static analysis": {
+  "en": "Static analysis",
+  "fr": "Analyse statique"
+ },
+ "Inference": {
+  "en": "Inference",
+  "fr": "Déduction"
+ },
+ "Runtime observation": {
+  "en": "Runtime observation",
+  "fr": "Observation à l’exécution"
+ },
+ "Relationship path": {
+  "en": "Relationship path",
+  "fr": "Chaîne des relations"
+ },
+ "Analysis details": {
+  "en": "Analysis details",
+  "fr": "Détails de l’analyse"
+ },
+ "Version executable": {
+  "en": "Version executable",
+  "fr": "Exécutable de la version"
+ },
+ "Arguments (JSON)": {
+  "en": "Arguments (JSON)",
+  "fr": "Arguments (JSON)"
+ },
+ "Capture version %d": {
+  "en": "Capture version %d",
+  "fr": "Capturer la version %d"
+ },
+ "Scenario input (stdin)": {
+  "en": "Scenario input (stdin)",
+  "fr": "Entrée du scénario (stdin)"
+ },
+ "Scenario assets folder": {
+  "en": "Scenario assets folder",
+  "fr": "Dossier de fichiers du scénario"
+ },
+ "Seed files (JSON)": {
+  "en": "Seed files (JSON)",
+  "fr": "Fichiers initiaux (JSON)"
+ },
+ "Capture timeout": {
+  "en": "Capture timeout",
+  "fr": "Délai de capture"
+ },
+ "Refresh captures": {
+  "en": "Refresh captures",
+  "fr": "Actualiser les captures"
+ },
+ "Recording %d": {
+  "en": "Recording %d",
+  "fr": "Capture %d"
+ },
+ "Compare recordings": {
+  "en": "Compare recordings",
+  "fr": "Comparer les captures"
+ },
+ "Exit codes: %s / %s": {
+  "en": "Exit codes: %s / %s",
+  "fr": "Codes de retour : %s / %s"
+ },
+ "Same scenario: %s | Complete captures: %s | Matching observations: %s": {
+  "en": "Same scenario: %s | Complete captures: %s | Matching observations: %s",
+  "fr": "Même scénario : %s | Captures complètes : %s | Observations identiques : %s"
+ },
+ "Use a JSON argument array and a JSON seed-file object.": {
+  "en": "Use a JSON argument array and a JSON seed-file object.",
+  "fr": "Utilisez un tableau JSON pour les arguments et un objet JSON pour les fichiers initiaux."
+ },
+ "Partial result: a query or analysis limit was reached.": {
+  "en": "Partial result: a query or analysis limit was reached.",
+  "fr": "Résultat partiel : une limite de recherche ou d’analyse a été atteinte."
+ },
+ "Open an application or a binary to investigate features and compare versions.": {
+  "en": "Open an application or a binary to investigate features and compare versions.",
+  "fr": "Ouvrez une application ou un binaire pour examiner ses fonctionnalités et comparer les versions."
+ },
+ "Analyze JavaScript artifacts or inspect a function from a Ghidra analysis, then trace a feature.": {
+  "en": "Analyze JavaScript artifacts or inspect a function from a Ghidra analysis, then trace a feature.",
+  "fr": "Analysez des fichiers JavaScript ou examinez une fonction analysée avec Ghidra, puis recherchez une fonctionnalité."
+ },
+ "Captures use a fresh working directory. External files, network and GUI interactions are outside the observation scope.": {
+  "en": "Captures use a fresh working directory. External files, network and GUI interactions are outside the observation scope.",
+  "fr": "Les captures utilisent un dossier de travail neuf. Les fichiers externes, le réseau et les interactions graphiques restent hors du périmètre observé."
+ },
+ "Run an investigation before querying evidence.": {
+  "en": "Run an investigation before querying evidence.",
+  "fr": "Lancez une investigation avant de rechercher des preuves."
+ },
+ "The source is not part of this application snapshot.": {
+  "en": "The source is not part of this application snapshot.",
+  "fr": "Cette source ne fait pas partie de la copie analysée de l’application."
+ },
+ "The application snapshot has changed; open it again.": {
+  "en": "The application snapshot has changed; open it again.",
+  "fr": "La copie analysée de l’application a changé ; ouvrez-la à nouveau."
+ },
+ "The source is too large to display.": {
+  "en": "The source is too large to display.",
+  "fr": "La source est trop volumineuse pour être affichée."
+ },
+ "Select a HAR recording smaller than 32 MB.": {
+  "en": "Select a HAR recording smaller than 32 MB.",
+  "fr": "Choisissez une capture HAR de moins de 32 Mo."
+ },
+ "Invalid HAR recording.": {
+  "en": "Invalid HAR recording.",
+  "fr": "Capture HAR invalide."
+ },
+ "Unsafe application artifact path.": {
+  "en": "Unsafe application artifact path.",
+  "fr": "Chemin de fichier d’application non sûr."
+ },
+ "Select a regular application folder without links.": {
+  "en": "Select a regular application folder without links.",
+  "fr": "Choisissez un dossier d’application ordinaire sans liens."
+ },
+ "The application changed during capture; retry.": {
+  "en": "The application changed during capture; retry.",
+  "fr": "L’application a changé pendant la capture ; réessayez."
+ },
+ "Invalid ASAR header.": {
+  "en": "Invalid ASAR header.",
+  "fr": "En-tête ASAR invalide."
+ },
+ "Invalid ASAR directory.": {
+  "en": "Invalid ASAR directory.",
+  "fr": "Dossier ASAR invalide."
+ },
+ "Invalid ASAR file bounds.": {
+  "en": "Invalid ASAR file bounds.",
+  "fr": "Limites de fichier ASAR invalides."
+ },
+ "ASAR file integrity verification failed.": {
+  "en": "ASAR file integrity verification failed.",
+  "fr": "Échec de la vérification d’intégrité d’un fichier ASAR."
+ },
+ "Select an application artifact smaller than 16 MB.": {
+  "en": "Select an application artifact smaller than 16 MB.",
+  "fr": "Choisissez un fichier d’application de moins de 16 Mo."
+ },
+ "Select an application folder, ASAR, JavaScript, TypeScript or HTML file.": {
+  "en": "Select an application folder, ASAR, JavaScript, TypeScript or HTML file.",
+  "fr": "Choisissez un dossier d’application, une archive ASAR ou un fichier JavaScript, TypeScript ou HTML."
+ },
+ "No application artifacts could be captured.": {
+  "en": "No application artifacts could be captured.",
+  "fr": "Aucun fichier d’application n’a pu être capturé."
+ },
+ "Open an application snapshot first.": {
+  "en": "Open an application snapshot first.",
+  "fr": "Ouvrez d’abord une copie d’application à analyser."
+ },
+ "Install the TypeScript parser component and Node.js to analyze application sources.": {
+  "en": "Install the TypeScript parser component and Node.js to analyze application sources.",
+  "fr": "Installez le composant d’analyse TypeScript et Node.js pour analyser les sources de l’application."
+ },
+ "JavaScript AST analysis failed: ": {
+  "en": "JavaScript AST analysis failed: ",
+  "fr": "Échec de l’analyse AST JavaScript : "
+ },
+ "Native investigation failed: ": {
+  "en": "Native investigation failed: ",
+  "fr": "Échec de l’investigation native : "
+ },
+ "Select an absolute executable path for the capture.": {
+  "en": "Select an absolute executable path for the capture.",
+  "fr": "Choisissez un chemin absolu d’exécutable pour la capture."
+ },
+ "Capture arguments must be a bounded array of strings.": {
+  "en": "Capture arguments must be a bounded array of strings.",
+  "fr": "Les arguments de capture doivent être un tableau de chaînes de taille limitée."
+ },
+ "Capture input must be smaller than 64 KB.": {
+  "en": "Capture input must be smaller than 64 KB.",
+  "fr": "L’entrée de capture doit faire moins de 64 Ko."
+ },
+ "Capture seed files must be a bounded object of text files.": {
+  "en": "Capture seed files must be a bounded object of text files.",
+  "fr": "Les fichiers initiaux de capture doivent être un objet de fichiers texte de taille limitée."
+ },
+ "Invalid capture identifier.": {
+  "en": "Invalid capture identifier.",
+  "fr": "Identifiant de capture invalide."
+ },
+ "The capture does not belong to this project.": {
+  "en": "The capture does not belong to this project.",
+  "fr": "La capture n’appartient pas à ce projet."
+ },
+ "Execution output exceeded the capture limit.": {
+  "en": "Execution output exceeded the capture limit.",
+  "fr": "La sortie d’exécution a dépassé la limite de capture."
+ },
+ "Invalid official parser release metadata.": {
+  "en": "Invalid official parser release metadata.",
+  "fr": "Métadonnées de version officielle de l’analyseur invalides."
+ },
+ "SHA512 of the downloaded component does not match the published value.": {
+  "en": "SHA512 of the downloaded component does not match the published value.",
+  "fr": "Le SHA512 du composant téléchargé ne correspond pas à la valeur publiée."
+ },
+ "Static application analysis; consult Investigation for evidence and unknowns.": {
+  "en": "Static application analysis; consult Investigation for evidence and unknowns.",
+  "fr": "Analyse statique de l’application ; consultez Investigation pour les preuves et les inconnues."
+ },
+ "Inert AST analysis of JavaScript, TypeScript, Electron IPC, preload and local web artifacts.": {
+  "en": "Inert AST analysis of JavaScript, TypeScript, Electron IPC, preload and local web artifacts.",
+  "fr": "Analyse AST sans exécution de JavaScript, TypeScript, IPC Electron, preload et fichiers web locaux."
+ },
+ "Static JavaScript and TypeScript parser for Electron and web investigations. Requires Node.js on PATH.": {
+  "en": "Static JavaScript and TypeScript parser for Electron and web investigations. Requires Node.js on PATH.",
+  "fr": "Analyseur statique JavaScript et TypeScript pour les investigations Electron et web. Nécessite Node.js dans le PATH."
+ },
+ "Static relationships do not prove execution.": {
+  "en": "Static relationships do not prove execution.",
+  "fr": "Les relations statiques ne prouvent pas l’exécution."
+ },
+ "Dynamic code and framework routing are not fully resolved.": {
+  "en": "Dynamic code and framework routing are not fully resolved.",
+  "fr": "Le code dynamique et les routes des frameworks ne sont pas entièrement résolus."
+ },
+ "Native types come from Ghidra analysis and may need correction.": {
+  "en": "Native types come from Ghidra analysis and may need correction.",
+  "fr": "Les types natifs proviennent de l’analyse Ghidra et peuvent nécessiter des corrections."
+ },
+ "Aliases, indirect calls and values across functions remain unresolved.": {
+  "en": "Aliases, indirect calls and values across functions remain unresolved.",
+  "fr": "Les alias, appels indirects et valeurs entre fonctions restent non résolus."
+ },
+ "External files, network traffic and GUI interactions are not captured.": {
+  "en": "External files, network traffic and GUI interactions are not captured.",
+  "fr": "Les fichiers externes, le trafic réseau et les interactions graphiques ne sont pas capturés."
+ },
+ "Input is a finite stdin batch; timed interactions are not captured.": {
+  "en": "Input is a finite stdin batch; timed interactions are not captured.",
+  "fr": "L’entrée est un lot stdin fini ; les interactions temporisées ne sont pas capturées."
+ },
+ "Matching observations do not prove application equivalence.": {
+  "en": "Matching observations do not prove application equivalence.",
+  "fr": "Des observations identiques ne prouvent pas l’équivalence des applications."
+ },
+ "HAR correlations do not prove handler execution.": {
+  "en": "HAR correlations do not prove handler execution.",
+  "fr": "Les rapprochements HAR ne prouvent pas l’exécution des gestionnaires."
+ },
+ "Directory excluded from the snapshot.": {
+  "en": "Directory excluded from the snapshot.",
+  "fr": "Dossier exclu de la copie analysée."
+ },
+ "Link excluded from the snapshot.": {
+  "en": "Link excluded from the snapshot.",
+  "fr": "Lien exclu de la copie analysée."
+ },
+ "Artifact omitted because the snapshot limit was reached.": {
+  "en": "Artifact omitted because the snapshot limit was reached.",
+  "fr": "Fichier omis car la limite de capture a été atteinte."
+ },
+ "Source omitted because the parser limit was reached.": {
+  "en": "Source omitted because the parser limit was reached.",
+  "fr": "Source omise car la limite de l’analyseur a été atteinte."
+ },
+ "The evidence graph reached its node limit.": {
+  "en": "The evidence graph reached its node limit.",
+  "fr": "Le graphe de preuves a atteint sa limite d’éléments."
+ },
+ "The source reached its AST fact limit.": {
+  "en": "The source reached its AST fact limit.",
+  "fr": "La source a atteint sa limite de faits AST."
+ },
+ "The native dossier reached its instruction or value limit.": {
+  "en": "The native dossier reached its instruction or value limit.",
+  "fr": "Le dossier natif a atteint sa limite d’instructions ou de valeurs."
+ },
+ "Ghidra could not recover value dependencies.": {
+  "en": "Ghidra could not recover value dependencies.",
+  "fr": "Ghidra n’a pas pu reconstruire les dépendances de valeurs."
+ },
+ "Artifact reference could not be resolved uniquely.": {
+  "en": "Artifact reference could not be resolved uniquely.",
+  "fr": "La référence de fichier n’a pas pu être résolue de manière unique."
+ },
+ "The IPC handler is missing or ambiguous.": {
+  "en": "The IPC handler is missing or ambiguous.",
+  "fr": "Le gestionnaire IPC est absent ou ambigu."
+ },
+ "A shadowed receiver cannot be attributed reliably.": {
+  "en": "A shadowed receiver cannot be attributed reliably.",
+  "fr": "Un récepteur masqué ne peut pas être attribué de manière fiable."
+ },
+ "Dynamic module reference remains unresolved.": {
+  "en": "Dynamic module reference remains unresolved.",
+  "fr": "La référence de module dynamique reste non résolue."
+ },
+ "Dynamic IPC channel remains unresolved.": {
+  "en": "Dynamic IPC channel remains unresolved.",
+  "fr": "Le canal IPC dynamique reste non résolu."
+ },
+ "Dynamic preload path remains unresolved.": {
+  "en": "Dynamic preload path remains unresolved.",
+  "fr": "Le chemin preload dynamique reste non résolu."
+ },
+ "Dynamic route or endpoint remains unresolved.": {
+  "en": "Dynamic route or endpoint remains unresolved.",
+  "fr": "La route ou l’endpoint dynamique reste non résolu."
+ },
+ "The source contains a syntax error.": {
+  "en": "The source contains a syntax error.",
+  "fr": "La source contient une erreur de syntaxe."
+ },
+ "The source map could not be decoded.": {
+  "en": "The source map could not be decoded.",
+  "fr": "La source map n’a pas pu être décodée."
+ },
+ "Indexed source maps are not supported.": {
+  "en": "Indexed source maps are not supported.",
+  "fr": "Les source maps indexées ne sont pas prises en charge."
+ },
+ "Source map is absent or external; it was not fetched.": {
+  "en": "Source map is absent or external; it was not fetched.",
+  "fr": "La source map est absente ou externe ; elle n’a pas été téléchargée."
+ },
+ "An ASAR unpacked file is missing.": {
+  "en": "An ASAR unpacked file is missing.",
+  "fr": "Un fichier ASAR externe est manquant."
+ },
+ "The HAR recording reached its entry limit.": {
+  "en": "The HAR recording reached its entry limit.",
+  "fr": "La capture HAR a atteint sa limite d’entrées."
+ },
+ "A capture file could not be observed within the limits.": {
+  "en": "A capture file could not be observed within the limits.",
+  "fr": "Un fichier de capture n’a pas pu être observé dans les limites prévues."
+ },
+ "A capture link was not followed.": {
+  "en": "A capture link was not followed.",
+  "fr": "Un lien de capture n’a pas été suivi."
+ },
+ "The executable changed during capture.": {
+  "en": "The executable changed during capture.",
+  "fr": "L’exécutable a changé pendant la capture."
+ },
+ "An argument file changed during capture.": {
+  "en": "An argument file changed during capture.",
+  "fr": "Un fichier passé en argument a changé pendant la capture."
+ },
+ "The snapshot reached its exclusion reporting limit.": {
+  "en": "The snapshot reached its exclusion reporting limit.",
+  "fr": "La copie analysée a atteint la limite de signalement des exclusions."
+ },
+ "The evidence graph reached its relationship limit.": {
+  "en": "The evidence graph reached its relationship limit.",
+  "fr": "Le graphe de preuves a atteint sa limite de relations."
+ },
+ "The exposed bridge API is ambiguous.": {
+  "en": "The exposed bridge API is ambiguous.",
+  "fr": "L’API exposée par le bridge est ambiguë."
+ },
+ "Cannot own the capture process tree: ": {
+  "en": "Cannot own the capture process tree: ",
+  "fr": "Impossible de gérer les processus enfants de la capture : "
+ },
+ "Network and graphical scenario": {
+  "en": "Network and graphical scenario",
+  "fr": "Scénario réseau et graphique"
+ },
+ "Graphical driver": {
+  "en": "Graphical driver",
+  "fr": "Pilote graphique"
+ },
+ "No graphical scenario": {
+  "en": "No graphical scenario",
+  "fr": "Sans scénario graphique"
+ },
+ "Windows controls": {
+  "en": "Windows controls",
+  "fr": "Contrôles Windows"
+ },
+ "Chromium browser": {
+  "en": "Chromium browser",
+  "fr": "Navigateur Chromium"
+ },
+ "Electron renderer": {
+  "en": "Electron renderer",
+  "fr": "Rendu Electron"
+ },
+ "Record network": {
+  "en": "Record network",
+  "fr": "Enregistrer le réseau"
+ },
+ "Headless browser": {
+  "en": "Headless browser",
+  "fr": "Navigateur sans fenêtre"
+ },
+ "Scenario URL": {
+  "en": "Scenario URL",
+  "fr": "URL du scénario"
+ },
+ "Renderer target URL": {
+  "en": "Renderer target URL",
+  "fr": "URL du rendu ciblé"
+ },
+ "Insert scenario example": {
+  "en": "Insert scenario example",
+  "fr": "Insérer un exemple de scénario"
+ },
+ "Settle delay (ms)": {
+  "en": "Settle delay (ms)",
+  "fr": "Délai de stabilisation (ms)"
+ },
+ "Graphical steps (JSON)": {
+  "en": "Graphical steps (JSON)",
+  "fr": "Étapes graphiques (JSON)"
+ },
+ "Load captured screens": {
+  "en": "Load captured screens",
+  "fr": "Charger les écrans capturés"
+ },
+ "Captured state": {
+  "en": "Captured state",
+  "fr": "État capturé"
+ },
+ "Graphical step %d": {
+  "en": "Graphical step %d",
+  "fr": "Étape graphique %d"
+ },
+ "HTTP requests: %d | TCP observations: %d": {
+  "en": "HTTP requests: %d | TCP observations: %d",
+  "fr": "Requêtes HTTP : %d | Observations TCP : %d"
+ },
+ "Network match: %s | Graphical match: %s": {
+  "en": "Network match: %s | Graphical match: %s",
+  "fr": "Réseau identique : %s | Graphisme identique : %s"
+ },
+ "Observed differences": {
+  "en": "Observed differences",
+  "fr": "Différences observées"
+ },
+ "Captured screens": {
+  "en": "Captured screens",
+  "fr": "Écrans capturés"
+ },
+ "Network and console differences": {
+  "en": "Network and console differences",
+  "fr": "Différences réseau et console"
+ },
+ "Use JSON arrays for arguments and steps, and a JSON object for seed files.": {
+  "en": "Use JSON arrays for arguments and steps, and a JSON object for seed files.",
+  "fr": "Utiliser des tableaux JSON pour les arguments et étapes, et un objet JSON pour les fichiers initiaux."
+ },
+ "Load recordings to view the retained screenshots and step results.": {
+  "en": "Load recordings to view the retained screenshots and step results.",
+  "fr": "Charger les enregistrements pour voir les captures d’écran et résultats des étapes."
+ },
+ "Captures use a fresh working directory. Enable network recording and replay the same graphical scenario for both versions.": {
+  "en": "Captures use a fresh working directory. Enable network recording and replay the same graphical scenario for both versions.",
+  "fr": "Les captures utilisent un dossier de travail neuf. Activer l’enregistrement réseau et rejouer le même scénario graphique pour les deux versions."
+ },
+ "Steps: click, fill, waitFor, assertText, snapshot, wait. Use CSS selectors for web or automationId/name/controlType for Windows. The application stops after the scenario.": {
+  "en": "Steps: click, fill, waitFor, assertText, snapshot, wait. Use CSS selectors for web or automationId/name/controlType for Windows. The application stops after the scenario.",
+  "fr": "Étapes : click, fill, waitFor, assertText, snapshot, wait. Utiliser des sélecteurs CSS pour le web ou automationId/name/controlType pour Windows. L’application s’arrête après le scénario."
+ },
+ "Files outside the working directory are not observed.": {
+  "en": "Files outside the working directory are not observed.",
+  "fr": "Les fichiers hors du dossier de travail ne sont pas observés."
+ },
+ "Network and graphical recording were disabled.": {
+  "en": "Network and graphical recording were disabled.",
+  "fr": "L’enregistrement réseau et graphique était désactivé."
+ },
+ "TCP sampling can miss short connections; UDP and payloads are not recorded.": {
+  "en": "TCP sampling can miss short connections; UDP and payloads are not recorded.",
+  "fr": "L’échantillonnage TCP peut manquer les connexions courtes ; UDP et les contenus ne sont pas enregistrés."
+ },
+ "HTTP recording covers the selected renderer; other processes and pages are outside its scope.": {
+  "en": "HTTP recording covers the selected renderer; other processes and pages are outside its scope.",
+  "fr": "L’enregistrement HTTP couvre le rendu sélectionné ; les autres processus et pages sont hors de son périmètre."
+ },
+ "Electron activity before renderer attachment is not observed.": {
+  "en": "Electron activity before renderer attachment is not observed.",
+  "fr": "L’activité Electron avant la connexion au rendu n’est pas observée."
+ },
+ "Windows screenshots depend on the application window provider.": {
+  "en": "Windows screenshots depend on the application window provider.",
+  "fr": "Les captures Windows dépendent du fournisseur de fenêtre de l’application."
+ },
+ "The operating system denied network observation.": {
+  "en": "The operating system denied network observation.",
+  "fr": "Le système a refusé l’observation du réseau."
+ },
+ "The TCP connection recording reached its limit.": {
+  "en": "The TCP connection recording reached its limit.",
+  "fr": "L’enregistrement des connexions TCP a atteint sa limite."
+ },
+ "The HTTP request recording reached its limit.": {
+  "en": "The HTTP request recording reached its limit.",
+  "fr": "L’enregistrement des requêtes HTTP a atteint sa limite."
+ },
+ "Some HTTP requests were still pending at the end of the scenario.": {
+  "en": "Some HTTP requests were still pending at the end of the scenario.",
+  "fr": "Certaines requêtes HTTP étaient encore en cours à la fin du scénario."
+ },
+ "The DOM snapshot reached its element limit.": {
+  "en": "The DOM snapshot reached its element limit.",
+  "fr": "L’état DOM a atteint sa limite d’éléments."
+ },
+ "The page text snapshot reached its character limit.": {
+  "en": "The page text snapshot reached its character limit.",
+  "fr": "Le texte de la page a atteint sa limite de caractères."
+ },
+ "The renderer console recording reached its entry limit.": {
+  "en": "The renderer console recording reached its entry limit.",
+  "fr": "La console du rendu a atteint sa limite d’entrées."
+ },
+ "The Windows control snapshot reached its element limit.": {
+  "en": "The Windows control snapshot reached its element limit.",
+  "fr": "L’état des contrôles Windows a atteint sa limite d’éléments."
+ },
+ "The window snapshot reached its window limit.": {
+  "en": "The window snapshot reached its window limit.",
+  "fr": "La capture a atteint sa limite de fenêtres."
+ },
+ "A screenshot could not be captured.": {
+  "en": "A screenshot could not be captured.",
+  "fr": "Une capture d’écran n’a pas pu être réalisée."
+ },
+ "Network recordings": {
+  "en": "Network recordings",
+  "fr": "Enregistrements réseau"
+ },
+ "TCP connections": {
+  "en": "TCP connections",
+  "fr": "Connexions TCP"
+ },
+ "Renderer console": {
+  "en": "Renderer console",
+  "fr": "Console du rendu"
+ },
+ "Advanced scenario JSON": {
+  "en": "Advanced scenario JSON",
+  "fr": "JSON avancé du scénario"
+ },
+ "Step action": {
+  "en": "Step action",
+  "fr": "Action de l’étape"
+ },
+ "Automation ID": {
+  "en": "Automation ID",
+  "fr": "Identifiant d’automatisation"
+ },
+ "Control name": {
+  "en": "Control name",
+  "fr": "Nom du contrôle"
+ },
+ "Control type": {
+  "en": "Control type",
+  "fr": "Type de contrôle"
+ },
+ "CSS selector": {
+  "en": "CSS selector",
+  "fr": "Sélecteur CSS"
+ },
+ "Step text": {
+  "en": "Step text",
+  "fr": "Texte de l’étape"
+ },
+ "Wait duration (ms)": {
+  "en": "Wait duration (ms)",
+  "fr": "Durée d’attente (ms)"
+ },
+ "Navigation URL": {
+  "en": "Navigation URL",
+  "fr": "URL de navigation"
+ },
+ "Scenario key": {
+  "en": "Scenario key",
+  "fr": "Touche du scénario"
+ },
+ "Step timeout (ms)": {
+  "en": "Step timeout (ms)",
+  "fr": "Délai maximal de l’étape (ms)"
+ },
+ "Add step": {
+  "en": "Add step",
+  "fr": "Ajouter l’étape"
+ },
+ "Apply step": {
+  "en": "Apply step",
+  "fr": "Appliquer l’étape"
+ },
+ "New step": {
+  "en": "New step",
+  "fr": "Nouvelle étape"
+ },
+ "Remove step": {
+  "en": "Remove step",
+  "fr": "Retirer l’étape"
+ },
+ "Click control": {
+  "en": "Click control",
+  "fr": "Cliquer sur le contrôle"
+ },
+ "Fill text": {
+  "en": "Fill text",
+  "fr": "Saisir le texte"
+ },
+ "Wait for control": {
+  "en": "Wait for control",
+  "fr": "Attendre le contrôle"
+ },
+ "Check text": {
+  "en": "Check text",
+  "fr": "Vérifier le texte"
+ },
+ "Take screenshot": {
+  "en": "Take screenshot",
+  "fr": "Capturer l’écran"
+ },
+ "Wait": {
+  "en": "Wait",
+  "fr": "Attendre"
+ },
+ "Toggle control": {
+  "en": "Toggle control",
+  "fr": "Basculer le contrôle"
+ },
+ "Select control": {
+  "en": "Select control",
+  "fr": "Sélectionner le contrôle"
+ },
+ "Press key": {
+  "en": "Press key",
+  "fr": "Appuyer sur une touche"
+ },
+ "Navigate": {
+  "en": "Navigate",
+  "fr": "Naviguer"
+ },
+ "Selector must match exactly one element": {
+  "en": "Selector must match exactly one element",
+  "fr": "Le sélecteur doit correspondre à un seul élément"
+ },
+ "Control not found before the deadline": {
+  "en": "Control not found before the deadline",
+  "fr": "Contrôle introuvable avant le délai maximal"
+ },
+ "Selector is ambiguous": {
+  "en": "Selector is ambiguous",
+  "fr": "Le sélecteur est ambigu"
+ },
+ "Text assertion timed out": {
+  "en": "Text assertion timed out",
+  "fr": "La vérification du texte a dépassé le délai"
+ },
+ "Element or text assertion timed out": {
+  "en": "Element or text assertion timed out",
+  "fr": "L’attente de l’élément ou du texte a dépassé le délai"
+ },
+ "Reconstruction": {
+  "en": "Reconstruction",
+  "fr": "Reconstruction"
+ },
+ "Native project target": {
+  "en": "Native project target",
+  "fr": "Cible du projet natif"
+ },
+ "Automatic target": {
+  "en": "Automatic target",
+  "fr": "Cible automatique"
+ },
+ "Executable application": {
+  "en": "Executable application",
+  "fr": "Application exécutable"
+ },
+ "Shared library": {
+  "en": "Shared library",
+  "fr": "Bibliothèque partagée"
+ },
+ "Static library": {
+  "en": "Static library",
+  "fr": "Bibliothèque statique"
+ },
+ "Native application entry (optional)": {
+  "en": "Native application entry (optional)",
+  "fr": "Entrée de l’application native (facultative)"
+ },
+ "Maximum build rounds": {
+  "en": "Maximum build rounds",
+  "fr": "Nombre maximal de compilations"
+ },
+ "Automatic AI repairs with Git history": {
+  "en": "Automatic AI repairs with Git history",
+  "fr": "Corrections IA automatiques avec historique Git"
+ },
+ "Run project tests": {
+  "en": "Run project tests",
+  "fr": "Exécuter les tests du projet"
+ },
+ "Compare with the original application": {
+  "en": "Compare with the original application",
+  "fr": "Comparer avec l’application originale"
+ },
+ "Electron / browser runtime": {
+  "en": "Electron / browser runtime",
+  "fr": "Exécutable Electron / navigateur"
+ },
+ "Use investigation scenario": {
+  "en": "Use investigation scenario",
+  "fr": "Utiliser le scénario d’investigation"
+ },
+ "Comparison scenarios (JSON)": {
+  "en": "Comparison scenarios (JSON)",
+  "fr": "Scénarios de comparaison (JSON)"
+ },
+ "Reconstruct and validate": {
+  "en": "Reconstruct and validate",
+  "fr": "Reconstruire et valider"
+ },
+ "Refresh reconstruction report": {
+  "en": "Refresh reconstruction report",
+  "fr": "Actualiser le rapport de reconstruction"
+ },
+ "Install locked npm dependencies": {
+  "en": "Install locked npm dependencies",
+  "fr": "Installer les dépendances npm verrouillées"
+ },
+ "Invalid comparison scenarios.": {
+  "en": "Invalid comparison scenarios.",
+  "fr": "Scénarios de comparaison invalides."
+ },
+ "Recorded scenarios match": {
+  "en": "Recorded scenarios match",
+  "fr": "Les scénarios enregistrés concordent"
+ },
+ "Compiled; behavior unverified": {
+  "en": "Compiled; behavior unverified",
+  "fr": "Compilé ; comportement non vérifié"
+ },
+ "Compilation failed": {
+  "en": "Compilation failed",
+  "fr": "Échec de la compilation"
+ },
+ "Behavior differs": {
+  "en": "Behavior differs",
+  "fr": "Le comportement diffère"
+ },
+ "Reconstruction blocked": {
+  "en": "Reconstruction blocked",
+  "fr": "Reconstruction bloquée"
+ },
+ "Round %d": {
+  "en": "Round %d",
+  "fr": "Passe %d"
+ },
+ "Inspect recorded comparison": {
+  "en": "Inspect recorded comparison",
+  "fr": "Examiner la comparaison enregistrée"
+ },
+ "Not started": {
+  "en": "Not started",
+  "fr": "Non démarré"
+ },
+ "Reconstruct, build, repair and compare the recorded behavior.": {
+  "en": "Reconstruct, build, repair and compare the recorded behavior.",
+  "fr": "Reconstruire, compiler, corriger et comparer le comportement enregistré."
+ },
+ "Matching scenarios validate only the recorded interactions.": {
+  "en": "Matching scenarios validate only the recorded interactions.",
+  "fr": "La concordance valide uniquement les interactions enregistrées."
+ },
+ "Recovered JavaScript project. Review its entry, dependencies and build script.": {
+  "en": "Recovered JavaScript project. Review its entry, dependencies and build script.",
+  "fr": "Projet JavaScript récupéré. Vérifiez son entrée, ses dépendances et son script de compilation."
+ },
+ "Recovered native image project. Review its startup, exports, types and initialization.": {
+  "en": "Recovered native image project. Review its startup, exports, types and initialization.",
+  "fr": "Projet natif récupéré. Vérifiez son démarrage, ses exports, ses types et son initialisation."
+ },
+ "Runtime for rebuilt Electron applications. Native modules require a matching version and architecture.": {
+  "en": "Runtime for rebuilt Electron applications. Native modules require a matching version and architecture.",
+  "fr": "Runtime pour les applications Electron reconstruites. Les modules natifs exigent une version et une architecture correspondantes."
+ },
+ "Excluded comparison checks: ": {
+  "en": "Excluded comparison checks: ",
+  "fr": "Critères de comparaison exclus : "
+ },
+ "Application file URLs are compared relative to each version.": {
+  "en": "Application file URLs are compared relative to each version.",
+  "fr": "Les URL des fichiers d’application sont comparées relativement à chaque version."
+ },
+ "Project tests failed": {
+  "en": "Project tests failed",
+  "fr": "Échec des tests du projet"
  }
 }

@@ -115,7 +115,7 @@ class GhidraEngine(Engine):
                                      timeout=analysis_timeout + 3600, log_name='ghidra-analyze',
                                      on_line=self._progress_parser(context, 60, 35))
         program = read_json(export / 'program.json', None)
-        if not isinstance(program, dict):
+        if not isinstance(program, dict) or not isinstance(program.get('functions'), list) or not program.get('program'):
             hint = process.tail(out + '\n' + err, 30)
             raise CyToolError('EngineFailed', 'Ghidra did not produce an export (exit %s).\n%s' % (code, hint))
         context.progress(96, 'Storing results')

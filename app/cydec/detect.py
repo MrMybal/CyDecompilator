@@ -21,6 +21,7 @@ MACHO_CPUS = {7: ('x86', 32), 0x01000007: ('x86_64', 64), 12: ('arm', 32),
               0x0100000c: ('arm64', 64)}
 
 ENGINES_BY_FORMAT = {
+    'javascript-app': ['javascript'],
     'pe': ['ghidra', 'cdec', 'native'],
     'pe-dotnet': ['ilspy', 'ghidra', 'cdec', 'native'],
     'elf': ['ghidra', 'cdec', 'native'],
@@ -37,6 +38,7 @@ ENGINES_BY_FORMAT = {
 }
 
 FORMAT_NAMES = {
+    'javascript-app': 'JavaScript / Electron / Web',
     'pe': 'Windows PE (native)', 'pe-dotnet': 'Windows PE (.NET assembly)',
     'elf': 'ELF', 'macho': 'Mach-O', 'java-class': 'Java class', 'jar': 'Java archive',
     'apk': 'Android package', 'dex': 'Dalvik executable', 'pyc': 'Python bytecode',
