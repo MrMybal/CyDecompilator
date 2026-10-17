@@ -9,6 +9,8 @@ Décompilateur multi-moteurs assisté par IA — Windows, Linux · x86, x64, ARM
 <img src="https://img.shields.io/badge/licence-GPL--3.0-1f4e8c" alt="GPL-3.0">
 </p>
 
+[English](README.md) · **Français**
+
 CyDecompilator ouvre presque n'importe quel binaire, montre son code reconstruit, et une IA aide à
 le comprendre, à le renommer et à le réécrire en vrai code source. Il fonctionne aussi comme
 serveur MCP, pour qu'une IA (Claude Code, Codex…) l'utilise directement.

@@ -3,325 +3,324 @@
 <h1 align="center">CyDecompilator</h1>
 
 <p align="center">
-Décompilateur multi-moteurs assisté par IA — Windows, Linux · x86, x64, ARM64 · .NET, Java, Android, Python, shaders
+AI-assisted multi-engine decompiler — Windows, Linux · x86, x64, ARM64 · .NET, Java, Android, Python, shaders
 <br>
 <img src="https://img.shields.io/badge/version-1.4.0-1f4e8c" alt="version 1.4.0">
-<img src="https://img.shields.io/badge/licence-GPL--3.0-1f4e8c" alt="GPL-3.0">
+<img src="https://img.shields.io/badge/license-GPL--3.0-1f4e8c" alt="GPL-3.0">
 </p>
 
-CyDecompilator ouvre presque n'importe quel binaire, montre son code reconstruit, et une IA aide à
-le comprendre, à le renommer et à le réécrire en vrai code source. Il fonctionne aussi comme
-serveur MCP, pour qu'une IA (Claude Code, Codex…) l'utilise directement.
+**English** · [Français](LISEZ-MOI.md)
 
-## Lancer
+CyDecompilator opens a wide range of binaries and displays their reconstructed code. An AI
+assistant helps explain, rename and rewrite that code into editable source. It also works
+as an MCP server, so AI clients such as Claude Code and Codex can use it directly.
 
-- **Windows** : double-cliquer sur `CyDecompilator.exe`.
-- **Linux** : `./CyDecompilator.sh` (nécessite un `runtime/python` créé sous Linux, voir
-  [`app/README.md`](app/README.md)).
+## Launch
 
-L'interface est en anglais par défaut. Menu latéral **Options** → *Language* : English, Français,
-Deutsch, Español, Italiano, Português, Русский, 简体中文, 日本語, 한국어 (changement immédiat,
-sans redémarrage). L'assistant IA répond dans la langue choisie.
+- **Windows**: double-click `CyDecompilator.exe`.
+- **Linux**: run `./CyDecompilator.sh` (requires a `runtime/python` environment created on Linux;
+  see the [developer guide](app/README.md)).
 
-L’interface utilise **CyUI** : navigation permanente à gauche, barres d’outils avec infobulles,
-explorateur et code redimensionnables, état des tâches en bas. **Options** propose cinq thèmes
-(gris moyen, gris clair, nuit ambrée, violet, bleu nuit), une densité compacte ou confortable
-et la taille du texte. Les anciennes préférences de thème sont reprises automatiquement.
-Sur une petite fenêtre, l’IA reste accessible depuis son entrée dédiée du menu et
-les détails de la fonction depuis un onglet près du code.
+The application requires its private Python runtime. Release archives contain the application
+and Windows launcher; keep the existing `runtime/` and `data/` folders when updating.
+For a new installation, follow the [runtime setup instructions](app/README.md#set-up-a-development-runtime-windows).
 
-## Ce qu'il sait ouvrir
+The interface defaults to English. In the **Options** sidebar page, select *Language*: English,
+Français, Deutsch, Español, Italiano, Português, Русский, 简体中文, 日本語 or 한국어.
+Changes take effect immediately, without restarting. The AI assistant responds in the selected language.
 
-| Fichier | Moteur | Résultat |
+The interface uses **CyUI**: permanent sidebar navigation, toolbars with tooltips, resizable
+explorer and code panes, and a task status bar. **Options** provides five themes (Mid grey,
+Light grey, Amber night, Violet and Navy), compact or comfortable density, and text scaling.
+Existing theme preferences migrate automatically. In smaller windows, AI remains available
+from its dedicated sidebar page, and function details move into a tab beside the code.
+
+## Supported inputs
+
+| File | Engine | Output |
 |---|---|---|
-| `.exe`, `.dll`, ELF / `.so` Android (x86, x64, ARM64) | **CyDecompilator C** (intégré) | C structuré et recompilable, sans dépendance |
-| `.exe`, `.dll`, `.so`, ELF, Mach-O, firmware brut | **Ghidra** | pseudo-code C (prioritaire s'il est installé) |
-| `.exe`, `.dll`, ELF (x86, x64, ARM64) | **Désassembleur intégré** (Capstone) | assembleur annoté, appels, chaînes, imports |
-| Assembly .NET (`.dll`, `.exe` managés) | **ILSpy** | C# |
+| `.exe`, `.dll`, ELF / Android `.so` (x86, x64, ARM64) | **CyDecompilator C** (built in) | Structured, recompilable C without additional engine dependencies |
+| `.exe`, `.dll`, `.so`, ELF, Mach-O, raw firmware | **Ghidra** | C pseudocode; preferred when installed |
+| `.exe`, `.dll`, ELF (x86, x64, ARM64) | **Built-in disassembler** (Capstone) | Annotated assembly, calls, strings and imports |
+| .NET assemblies (managed `.dll`, `.exe`) | **ILSpy** | C# |
 | `.class`, `.jar` | **Vineflower** | Java |
-| `.apk`, `.dex` (et `.jar`) | **JADX** | Java + AndroidManifest |
-| `.pyc` | **Python** (xdis, uncompyle6, decompyle3) | source jusqu'à Python 3.8, bytecode pour toutes les versions |
-| Shaders DXBC (`.cso`, `.fxc`), DXIL SM6, SPIR-V (`.spv`) | **Moteur shader de CyDecompilator** | HLSL (SM4/5 et SM6), GLSL |
+| `.apk`, `.dex` and `.jar` | **JADX** | Java + AndroidManifest |
+| `.pyc` | **Python** (xdis, uncompyle6, decompyle3) | Source through Python 3.8; bytecode for all versions |
+| DXBC shaders (`.cso`, `.fxc`), DXIL SM6, SPIR-V (`.spv`) | **CyDecompilator shader engine** | HLSL (SM4/5 and SM6), GLSL |
 
-Le format est reconnu à partir du contenu du fichier, pas de son extension.
+Formats are detected from file contents rather than extensions.
 
-## Le décompilateur C intégré
+## Built-in C decompiler
 
-- x86 (cdecl, stdcall, thiscall, helpers MSVC), x64 (Win64, System V) et ARM64 (AAPCS64,
-  Windows ARM64), fichiers PE et ELF.
-- `if` / `else`, boucles, `switch` (tables de saut), flottants (SSE, x87, VFP), SIMD (SSE et
-  NEON exprimés en intrinsèques SSE), prototypes des fonctions appelées déduits de leur code.
-- Onglet *Program* : *Exported functions* / *This function and its callees* écrivent un fichier
-  `.c` unique fait pour être recompilé (MSVC, clang) : variables globales initialisées depuis
-  le binaire, constantes intégrées, imports reliés.
-- Vérifié en recompilant le C produit et en comparant son exécution avec l'original (x86/x64 :
-  120/120 ; ARM64 en émulation : 120/120) ; le C de vrais binaires Windows (cmd.exe, msvcrt,
-  python311, vcruntime ARM64…) recompile sans erreur.
+- x86 (cdecl, stdcall, thiscall, MSVC helpers), x64 (Win64, System V) and ARM64 (AAPCS64,
+  Windows ARM64), with PE and ELF support.
+- `if` / `else`, loops, `switch` jump tables, floating point (SSE, x87, VFP), SIMD (SSE and
+  NEON expressed as SSE intrinsics), and called-function prototypes inferred from their code.
+- In the *Program* tab, *Exported functions* / *This function and its callees* export a single
+  `.c` file for recompilation with MSVC or clang: initialized globals recovered from the binary,
+  embedded constants and linked imports.
+- Verified by recompiling generated C and comparing execution with the original: x86/x64
+  120/120; emulated ARM64 120/120. Generated C from real Windows binaries (cmd.exe, msvcrt,
+  python311, ARM64 vcruntime and others) compiles without errors.
 
-## Applications Windows (x86, x64, ARM64, DLL)
+## Windows applications (x86, x64, ARM64, DLL)
 
-- **Symboles PDB** : le PDB d'un EXE/DLL est cherché dans les dossiers locaux puis téléchargé
-  depuis le serveur de symboles Microsoft (vérifié GUID + âge, mis en cache dans
-  `data/symbols`). Les vrais noms de fonctions et de classes apparaissent partout.
-- **Détails de l'exécutable** (onglet *Program*) : protections (ASLR, DEP, CFG…), version,
-  manifeste, outils de compilation (Rich header), exports, callbacks TLS, entropie des sections,
-  overlay, signature, et ce qui a servi à le construire (Go, Rust, Delphi, Electron, Nuitka…).
-- **Contenu embarqué** : bouton *Extract* pour les bundles **PyInstaller**, les applications
-  **.NET single-file**, les fichiers **UPX** et les archives zip ajoutées. Chaque fichier extrait
-  s'ouvre comme un nouveau projet.
+- **PDB symbols**: searches local folders, then the Microsoft symbol server. GUID and age are
+  verified, and symbols are cached in `data/symbols`. Recovered function and class names are
+  used throughout the application.
+- **Executable details** (*Program* tab): protections (ASLR, DEP, CFG), version, manifest,
+  build tools (Rich header), exports, TLS callbacks, section entropy, overlay, signature and
+  indicators of the original toolchain (Go, Rust, Delphi, Electron, Nuitka and others).
+- **Embedded content**: *Extract* handles **PyInstaller** bundles, **.NET single-file**
+  applications, **UPX** files and appended ZIP archives. Each extracted file can open as a new project.
 
-## Premiers pas
+## Getting started
 
-1. Menu **Engines** : installer les moteurs voulus (*Install*). Ils sont téléchargés depuis
-   leurs sources officielles et vérifiés. Un Java 21+, un .NET ou un Ghidra déjà présents
-   peuvent être utilisés via *Browse* / *Use*.
-2. Menu **Workspace** : *Open file...*, **Ctrl+O** ou coller un chemin et Entrée.
-3. Cliquer sur une fonction à gauche : son code s'affiche au centre. Double-clic sur un nom pour
-   y aller, clic droit pour renommer ou chercher, boutons `<` `>` pour revenir.
-4. Panneau **AI** à droite ou menu **AI** : choisir **Autonomous workflow** pour une tâche
-   complète, **Conversation** pour poser une question, ou **Function** pour les actions ciblées :
-   - **Explain** : explication de la fonction ;
-   - **Suggest names** (+ *Apply*) : noms parlants pour la fonction et ses variables ;
-   - **Convert to source** : réécriture en vrai code (C, C++, C#, Java, Python, Rust, Go, HLSL,
-     GLSL…), vérification par compilation et réparation automatique des erreurs ;
-   - **Conversation → Send** : questions libres ; l'assistant parcourt lui-même le programme avant de répondre ;
-   - **Name functions** : nomme en lot les fonctions générées (`FUN_*`, `sub_*`).
+1. Open **Engines** and *Install* the engines you need. Downloads come from official sources
+   and are verified. An existing Java 21+, .NET or Ghidra installation can be selected with *Browse* / *Use*.
+2. Open **Workspace**, then *Open file...*, press **Ctrl+O**, or paste a path and press Enter.
+3. Select a function on the left to display its code. Double-click a name to navigate to it,
+   right-click for rename and search actions, and use the back/forward buttons to navigate history.
+4. In the right-hand **AI** pane or dedicated **AI** page, select **Autonomous workflow** for
+   a complete task, **Conversation** for questions, or **Function** for focused actions:
+   - **Explain**: explains the selected function.
+   - **Suggest names** (+ *Apply*): proposes meaningful names for the function and its variables.
+   - **Convert to source**: rewrites code into C, C++, C#, Java, Python, Rust, Go, HLSL, GLSL
+     and other supported targets, with compilation checks and automatic error repair.
+   - **Conversation → Send**: asks an open-ended question; the assistant can inspect the program before answering.
+   - **Name functions**: names batches of automatically named functions (`FUN_*`, `sub_*`).
 
-## Éditer, reconstruire et tester un projet
+## Edit, reconstruct and test a project
 
-L’onglet **Historique Git** du Project IDE conserve les versions locales du projet reconstruit.
-Git doit être installé et accessible dans le PATH. Saisir une description, puis **Enregistrer une
-version Git** sauvegarde les sources, ressources et dépendances locales. **Comparer avec les
-sources enregistrées** affiche les modifications avant de choisir **Restaurer cette version**.
-La restauration sauvegarde d’abord l’état actuel dans un commit récupérable, puis crée un nouveau
-commit de restauration. Les fichiers ouverts sont rechargés ; enregistrer leurs modifications avant
-la comparaison. Les copies .NET affichent le commit des sources lorsqu’une version correspondante
-a été enregistrée avant leur création.
+The **Git history** tab in Project IDE keeps local versions of the reconstructed project.
+Git must be installed and available on PATH. Enter a description and select **Save Git version**
+to snapshot sources, resources and local dependencies. **Compare with saved sources** shows
+changes before you choose **Restore this version**. Restoration first saves the current state
+in a recoverable commit, then creates a restoration commit. Open files are reloaded; save
+their edits before comparing. Modified .NET copies display the source commit when a matching
+version was saved before they were created.
 
-Le dépôt Git local est conservé dans les données d’analyse, séparément d’un éventuel dépôt déjà
-présent dans les sources. Les dossiers de compilation, caches et métadonnées Git sont exclus ;
-les fichiers binaires sont versionnés mais leurs différences ne sont pas affichées comme du texte.
-Les versions sont limitées à 4 000 fichiers, 128 Mio au total et 32 Mio par fichier. La restauration
-vérifie que les sources n’ont pas changé depuis l’aperçu et protège l’application originale.
+The private Git repository lives in the analysis data, separately from any repository already
+present in the source folder. Build directories, caches and Git metadata are excluded.
+Binary files are versioned, but their differences are not displayed as text. Snapshots are
+limited to 4,000 files, 128 MiB total and 32 MiB per file. Restoration checks that sources
+have not changed since the preview and protects the original application.
 
-Après avoir ouvert une application, l’onglet **Project IDE** propose **Create source project** :
+After opening an application, **Project IDE → Create source project** provides:
 
-- **.NET** : projet C# ILSpy, ressources récupérées et solution `.sln` ouvrable dans Visual Studio.
-- **PE/ELF natif** : code C des fonctions exportées ou d’une fonction sélectionnée et de ses appels,
-  cible EXE, DLL ou bibliothèque statique, projet `.vcxproj`, solution `.sln` et configuration CMake.
-  Les entrées récupérées, imports, exports et ressources sont reconstruits ; les éléments inconnus
-  restent des blocages explicites. ELF demande une chaîne de compilation et un environnement adaptés.
-- **JavaScript, TypeScript, web et Electron** : sources et ressources éditables, configuration de
-  compilation, sorties séparées et archive ASAR pour Electron. Les dépendances et le runtime doivent
-  être disponibles ; les modules natifs exigent une version et une architecture compatibles.
+- **.NET**: an ILSpy C# project, recovered resources and a `.sln` solution that opens in Visual Studio.
+- **Native PE/ELF**: C sources for exported functions, or a selected function and its callees;
+  executable, DLL or static-library targets; a `.vcxproj` project, `.sln` solution and CMake
+  configuration. Recovered entry points, imports, exports and resources are reconstructed;
+  unknown elements remain explicit blockers. ELF requires a suitable toolchain and environment.
+- **JavaScript, TypeScript, web and Electron**: editable sources and resources, build
+  configuration, separate output folders and an Electron ASAR archive. Dependencies and the
+  runtime must be available; native modules require a compatible runtime version and architecture.
 
-**Project IDE → Reconstruction → Reconstruire et valider** enchaîne la création du projet,
-la compilation, les tests optionnels et les comparaisons avec l’original. Activer les corrections IA
-pour effectuer plusieurs tentatives, conservées dans Git, jusqu’à la limite choisie. Les scénarios
-d’investigation peuvent être repris pour comparer interfaces, fichiers, sorties et réseau.
-Le rapport distingue une compilation réussie d’un comportement validé sur les scénarios enregistrés.
-Voir le [guide de reconstruction](app/Docs/Reconstruction.md) pour la configuration et les limites.
+**Project IDE → Reconstruction → Reconstruct and validate** chains project creation, builds,
+optional tests and comparisons with the original. Enable AI repairs for multiple attempts,
+saved in Git, up to the selected limit. Investigation scenarios can be reused to compare
+interfaces, files, output and network activity. Reports distinguish a successful build from
+behavior validated against recorded scenarios.
+See the [reconstruction guide](app/Docs/Reconstruction.md) for setup and limitations.
 
-L’explorateur de solution permet d’ouvrir plusieurs fichiers dans des onglets éditables avec coloration
-syntaxique. **Save all**, **Build**, **Rebuild**, **Test** et **Run** utilisent des tâches annulables.
-Les erreurs de compilation figurent dans **Problems** ; cliquer dessus ouvre le fichier à la ligne indiquée.
-**Open source project** rattache aussi un dossier C#, VC++ ou CMake existant. Une modification externe
-du fichier empêche son écrasement ; les onglets modifiés sont protégés à la fermeture.
-Les solutions `.sln`/`.slnx` contenant plusieurs projets sont prises en charge : **Build / startup project**
-choisit le projet à compiler ou démarrer. **Entire solution** compile ou teste la solution entière ;
-sélectionner un projet C# exécutable pour **Run**.
-**Search source project** recherche dans les fichiers enregistrés, avec options de casse et de mot entier ;
-un clic sur un résultat ouvre sa ligne. **Filter files** filtre l’explorateur et **Go to line** navigue dans
-le fichier actif. **Reload file** recharge un fichier modifié sur disque, après confirmation si des
-modifications non enregistrées doivent être abandonnées.
+The solution explorer opens multiple files in editable tabs with syntax highlighting.
+**Save all**, **Build**, **Rebuild**, **Test** and **Run** use cancellable jobs.
+Compiler errors appear in **Problems**; selecting an error opens its source location.
+**Open source project** can also attach an existing C#, VC++ or CMake folder. External file
+changes prevent accidental overwrites, and edited tabs are protected when closing.
+Multi-project `.sln`/`.slnx` solutions are supported: **Build / startup project** selects
+the project to build or launch. **Entire solution** builds or tests the complete solution;
+select an executable C# project to use **Run**.
+**Search source project** searches saved files with case and whole-word options; selecting
+a result opens its line. **Filter files** filters the explorer, and **Go to line** navigates
+the active file. **Reload file** reloads changes from disk, with confirmation before
+discarding unsaved edits.
 
-La compilation C# nécessite un **SDK .NET**, distinct du runtime installé pour ILSpy. Le C natif utilise
-les outils C++ de Visual Studio sous Windows, ou CMake et un compilateur ailleurs. **Test** nécessite
-des tests réellement définis ; **Run** d’une bibliothèque native nécessite un exécutable de test.
-L’éditeur C# utilise **Roslyn**, fourni par un **SDK .NET 8 ou plus récent** avec ses composants
-dotnet-format. **Compléter (Ctrl+Espace)** propose les membres accessibles du type et leurs signatures ;
-cliquer sur une suggestion l’insère avec possibilité d’annuler. **Aller à la définition (F12)** retrouve
-les déclarations, y compris dans un autre fichier ou un projet C# référencé. **Symboles C#** liste les
-types et les membres du projet. **Assistance C#** affiche les diagnostics pendant l’édition et permet
-de lancer l’analyse manuellement. Les modifications C# non enregistrées sont prises en compte sans
-modifier les fichiers sur disque ; une suggestion périmée est rejetée si le code ou le curseur a changé.
-**Aperçu du renommage sémantique** renomme le symbole choisi et ses références dans les fichiers/projets
-concernés, sans toucher les homonymes. **Rechercher les références du symbole** affiche ses usages.
-**Aperçu du formatage C#** propose le formatage Roslyn. Examiner les différences puis **Appliquer l’aperçu
-aux fichiers ouverts** : les modifications restent dans l’éditeur, sont annulables et doivent être enregistrées.
-Une modification des sources ou des buffers invalide l’aperçu avant toute application.
+C# builds require a **.NET SDK**, separate from the runtime installed for ILSpy. Native C
+uses Visual Studio C++ tools on Windows, or CMake and a compiler elsewhere. **Test** requires
+actual project tests; **Run** on a native library requires a test executable.
+The C# editor uses **Roslyn** from a **.NET 8 or newer SDK** with dotnet-format components.
+**Complete (Ctrl+Space)** lists accessible members and signatures; selecting a suggestion
+inserts it with undo support. **Go to definition (F12)** finds declarations, including those
+in another file or referenced C# project. **C# symbols** lists project types and members.
+**C# assistance** displays diagnostics while editing and supports manual analysis. Unsaved C#
+edits are included without changing files on disk; stale suggestions are rejected if the code
+or cursor has changed.
+**Preview semantic rename** renames the selected symbol and its references in affected files
+and projects without touching unrelated symbols with the same name. **Find symbol references**
+lists usages. **Preview C# formatting** proposes Roslyn formatting. Review the differences,
+then **Apply preview to editor buffers**: changes remain in the editor, can be undone, and
+must be saved. Source or buffer changes invalidate the preview before application.
 
-Les références restaurées des packages et les assemblies référencés sont utilisés lorsqu’ils sont
-disponibles. Les étapes de compilation personnalisées, les propriétés conditionnelles, les analyseurs
-et les sources générées peuvent demander une compilation pour un diagnostic complet ; le panneau
-signale les références manquantes. Le helper d’édition est compilé localement sans téléchargement de
-package. **Évaluer le projet avec MSBuild** exécute explicitement la résolution des références et prend en
-compte les imports, propriétés conditionnelles et éléments Compile du projet. Les requêtes d’édition
-suivantes lisent ce modèle sans relancer les targets ; une modification de la configuration ou des fichiers
-du projet nécessite une nouvelle évaluation. Les projets multi-cibles utilisent leur première cible.
-Les services sémantiques des autres langages restent à développer.
+Restored package references and referenced assemblies are used when available. Custom build
+steps, conditional properties, analyzers and generated sources may require a build for complete
+diagnostics; missing references are reported. The editor helper is built locally without
+downloading packages. **Evaluate project with MSBuild** explicitly resolves references and
+accounts for imports, conditional properties and Compile items. Subsequent editor queries
+read that model without rerunning targets; configuration or project-file changes require
+reevaluation. Multi-target projects use their first target. Semantic services for other
+languages remain to be implemented.
 
-Pour modifier directement une fonction, choisir **Edit function / patch** dans Workspace, ou
-**Function patch** dans Project IDE :
+To replace a function directly, choose **Edit function / patch** in Workspace or
+**Function patch** in Project IDE:
 
-- **.NET** : **Load .NET methods**, sélectionner la méthode, puis **Edit declaring type** pour ouvrir
-  son C# dans l’éditeur. **Build and verify method patch** recompile le projet et remplace uniquement
-  le corps IL choisi dans l’assembly original. La nouvelle méthode peut être plus grande ; variables
-  locales, branches, chaînes, appels internes et blocs try/catch sont pris en charge. Les lambdas, closures,
-  fonctions locales, méthodes async et itérateurs sont pris en charge : leurs dépendances générées sont
-  ajoutées sous des noms isolés, puis affichées dans l’aperçu. Choisir la méthode source plutôt qu’une
-  fonction générée. Les corps des autres méthodes et les tokens existants sont vérifiés inchangés,
-  même après plusieurs remplacements. Si plusieurs sorties existent, préciser l’assembly recompilé relatif au
-  projet. Le SDK .NET et le helper dnlib 4.5.0, restauré automatiquement depuis NuGet officiel avec empreinte
-  verrouillée, sont utilisés. **Importer les nouveaux membres .NET référencés** permet d’ajouter les helpers,
-  types et champs compatibles utilisés par le remplacement. Les nouveaux types gardent leurs constructeurs,
-  propriétés et événements. L’aperçu liste chaque ajout. Ajouter un champ d’instance à un type existant ou
-  modifier son initialiseur reste réservé à une reconstruction complète, comme les changements de signature,
-  images mixtes ou ReadyToRun. Les dépendances incompatibles ou dépassant les limites sont refusées.
-  Une signature de nom fort doit être conservée par une reconstruction signée, ou supprimée explicitement
-  via la case proposée ; sa suppression peut casser les dépendances. **Générer les symboles de la copie
-  modifiée** produit un PDB portable correspondant aux méthodes importées.
-- **PE natif x86/x64** : modifier son C, conserver sa signature et sa convention d’appel, puis
-  **Compile and verify patch**. Les fonctions autonomes sans appels externes, réadressages ni métadonnées
-  d’unwind sont acceptées si leur code tient dans l’emplacement d’origine. Clang (ou LLVM dans Visual Studio)
-  est requis. Les cas incompatibles sont refusés.
-  Le mode **Lier une fonction native plus grande avec appels et données d’exception** ajoute une section
-  PE et redirige l’entrée d’origine : helpers, appels à des fonctions/imports existants, données, relocalisations
-  ASLR et tables d’exception x64 sont liés. Les symboles connus sont résolus automatiquement ; le champ JSON
-  permet d’associer un nom C à l’adresse d’une fonction ou d’un import existant. L’entrée doit fournir cinq
-  octets complets, et le PE doit avoir un emplacement d’en-tête libre. CFG, nouveau TLS, symboles externes
-  non résolus et relocalisations incompatibles nécessitent un lien complet.
+- **.NET**: select **Load .NET methods**, choose a method, then **Edit declaring type** to open
+  its C# source. **Build and verify method patch** rebuilds the project and replaces only the
+  selected IL body in the original assembly. The new method may be larger; locals, branches,
+  strings, internal calls and try/catch blocks are supported. Lambdas, closures, local
+  functions, async methods and iterators are supported: generated dependencies are imported
+  under isolated names and listed in the preview. Select the source method rather than a
+  generated function. Other method bodies and existing tokens are checked for preservation,
+  including after repeated replacements. If the build produces multiple assemblies, specify
+  the rebuilt assembly path relative to the project. This uses the .NET SDK and a dnlib 4.5.0
+  helper, restored automatically from official NuGet with a pinned hash.
+  **Import referenced new .NET members** can add compatible helpers, types and fields used
+  by the replacement. New types retain their constructors, properties and events; the preview
+  lists every addition. Adding instance fields to an existing type or changing its initializer
+  requires full reconstruction, as do signature changes, mixed-mode images and ReadyToRun.
+  Incompatible dependencies or imports exceeding configured limits are refused. A strong-name
+  signature must be retained through a signed rebuild or explicitly removed using the offered
+  option; removal may break dependencies. **Generate symbols for modified copy** produces a
+  portable PDB matching the imported methods.
+- **Native x86/x64 PE**: edit its C while preserving the signature and calling convention,
+  then select **Compile and verify patch**. Self-contained functions without external calls,
+  relocations or unwind metadata are accepted when the code fits the original location.
+  Clang, including LLVM supplied with Visual Studio, is required. Incompatible cases are refused.
+  **Link a larger native function with calls and exception data** adds a PE section and redirects
+  the original entry: helpers, calls to existing functions/imports, data, ASLR relocations and
+  x64 exception tables are linked. Known symbols resolve automatically; the JSON field maps
+  C names to existing function or import addresses. The original entry must provide five complete
+  bytes, and the PE must have room for another section header. CFG, new TLS, unresolved external
+  symbols and incompatible relocations require a full link.
 
-**Write modified copy** crée une copie séparée avec un reçu SHA-256 ; l’original et les sorties existantes
-ne peuvent pas être écrasés. Pour .NET, garder le nom du fichier original dans un nouveau dossier copie
-également la configuration d’exécution et les dépendances produites par la compilation, si elles n’existent
-pas déjà. Enregistrer puis préparer à nouveau le remplacement après un changement des sources.
-**Analyze modified copy** permet de réouvrir le résultat. Une compilation réussie ne prouve pas
-la compatibilité ABI ni l’équivalence du comportement ; une signature Authenticode existante est invalidée.
+**Write modified copy** creates a separate copy with a SHA-256 receipt; the original and
+existing outputs cannot be overwritten. For .NET, keeping the original filename in a new
+folder also copies the runtime configuration and build-produced dependencies when those
+files do not already exist. Save sources and prepare the replacement again after any source
+change. **Analyze modified copy** reopens the result. A successful build does not establish
+ABI compatibility or equivalent behavior; any existing Authenticode signature is invalidated.
 
-**Saved modified copies** retrouve les copies déjà créées, y compris après avoir relancé le logiciel.
-**Run modified copy** lance la copie choisie avec ses arguments et une durée maximale réglable de 1 à
-900 secondes. Les empreintes de l’exécutable et des dépendances copiées sont revérifiées avant le lancement.
-Les sorties standard et d’erreur des compilations et des applications apparaissent pendant leur exécution.
-**Cancel** et le délai maximal arrêtent également les processus enfants. Une DLL doit passer par un programme
-de test ; elle n’est pas chargée dans le décompilateur. Un statut réussi indique un code de sortie nul,
-sans garantir que le comportement est correct. La console capture la sortie ; elle ne fournit pas encore
-de saisie interactive au programme. Le runtime .NET correspondant à l’application doit être installé.
+**Saved modified copies** lists previously created copies, including after restarting.
+**Run modified copy** launches a selected copy with arguments and a configurable 1–900 second
+timeout. Executable and copied-dependency hashes are rechecked before launch. Build and
+application stdout/stderr appear while they run. **Cancel** and timeouts also stop child
+processes. DLLs require a test harness and are not loaded into the decompiler. A successful
+status means a zero exit code; it does not establish correct behavior. The console captures
+output but does not yet provide interactive input. The application's matching .NET runtime
+must be installed.
 
-Le panneau **Débogueur** permet maintenant de déboguer le projet .NET recompilé. Installer **NetCoreDbg**
-depuis ce panneau ou l’onglet des moteurs, sélectionner le projet C# de démarrage, puis **Déboguer (F5)**.
-Les sources sont enregistrées et recompilées en Debug avec leurs symboles PDB avant le lancement.
-**F9** pose ou retire un point d’arrêt à la ligne du curseur dans un fichier enregistré ; les points d’arrêt
-restent disponibles après un redémarrage. **F5** poursuit l’exécution, **F10** avance sans entrer dans
-la fonction, **F11** entre dans la fonction, **Maj+F11** en sort et **Maj+F5** arrête le débogage.
-Le panneau affiche la pile d’appels, les variables locales et les membres des objets. Cliquer sur un cadre
-de pile ouvre sa ligne source ; la console de débogage affiche les sorties de l’application.
+The **Debugger** panel supports rebuilt .NET projects. Install **NetCoreDbg** from that panel
+or Engines, select a C# startup project, then choose **Debug (F5)**. Sources are saved and rebuilt
+in Debug with PDB symbols before launch. **F9** toggles a breakpoint at the cursor line in a
+saved file; breakpoints persist across restarts. **F5** continues, **F10** steps over,
+**F11** steps in, **Shift+F11** steps out and **Shift+F5** stops debugging.
+The panel displays call stacks, local variables and object members. Selecting a stack frame
+opens its source line; the debug console displays application output.
 
-Les sources sont en lecture seule pendant la session : arrêter le débogage pour modifier et recompiler.
-L’arrêt, l’annulation, le délai maximal et la fermeture du logiciel arrêtent aussi les processus enfants.
-Un SDK .NET 8+ et le runtime de l’application sont nécessaires. Cette étape couvre les projets exécutables
-.NET Core recompilés avec PDB portable ; les bibliothèques nécessitent un programme de test.
-**Déboguer la copie modifiée** lance directement une copie .NET préparée avec ses symboles, sans la
-recompiler. Les points d’arrêt, variables et machines d’état async utilisent les correspondances régénérées
-des méthodes importées. Les méthodes non remplacées restent sans correspondance source régénérée.
-Les sources et empreintes de la copie/dépendances doivent toujours correspondre au reçu ; conserver le
-nom d’assembly original dans un nouveau dossier. Le débogage natif et .NET Framework restent à ajouter.
-La console ne fournit pas de saisie interactive ni de modification des variables.
+Sources are read-only during a debug session; stop debugging to edit and rebuild. Stopping,
+cancellation, timeouts and application shutdown also stop child processes. A .NET 8+ SDK
+and the application's runtime are required. This covers rebuilt .NET Core executable projects
+with portable PDBs; libraries need a test harness. **Debug modified copy** launches a prepared
+.NET copy with its symbols directly, without rebuilding it. Breakpoints, variables and async
+state machines use regenerated mappings for imported methods. Unchanged methods have no
+regenerated source mapping. Sources and copy/dependency hashes must still match the receipt;
+keep the original assembly filename in a new folder. Native and .NET Framework debugging
+remain to be added. The console does not support interactive input or variable modification.
 
-Les vérifications incluent des applications de test WinForms et WPF avec ressources intégrées, BAML,
-dépendance locale et noms courts : décompilation, reconstruction, exécution et réinjection sont exercées.
-Les dépendances locales sont copiées dans le projet exporté avec des HintPath relatifs. Les fichiers XAML
-sont éditables lorsqu’ils sont présents ; cela ne garantit pas la récupération de toutes les interfaces
-ou protections d’applications tierces obfusquées.
+Verification includes WinForms and WPF test applications with embedded resources, BAML,
+local dependencies and short names: decompilation, reconstruction, execution and method
+reinjection are exercised. Local dependencies are copied into exported projects using relative
+HintPath entries. XAML files are editable when present; this does not guarantee recovery of
+every interface or protection in third-party obfuscated applications.
 
-## Examiner les preuves et comparer deux versions
+## Investigate evidence and compare versions
 
-L’onglet **Investigation** permet maintenant d’analyser un dossier JavaScript/Electron,
-une archive ASAR ou des fichiers JS/TS/HTML. Installer l’analyseur JS depuis cet onglet
-(Node.js requis), puis rechercher une fonctionnalité, un canal IPC ou une URL : les
-résultats relient fichiers, fonctions, preload, ressources et appels avec leurs preuves.
-Les source maps locales et captures HAR importées complètent ces rapprochements.
+**Investigation** analyzes JavaScript/Electron folders, ASAR archives and JS/TS/HTML files.
+Install the JS analyzer from this page (Node.js required), then search for a feature, IPC
+channel or URL. Results link files, functions, preload scripts, resources and calls with
+supporting evidence. Local source maps and imported HAR captures provide additional links.
 
-Pour le natif, sélectionner une fonction analysée avec Ghidra puis **Examiner la fonction
-native sélectionnée** : types, sites d’appel, instructions et dépendances de valeurs.
+For native code, select a Ghidra-analyzed function and choose **Inspect selected native
+function** to examine types, call sites, instructions and value dependencies.
 
-Dans **Comportement des versions**, capturer deux exécutables avec les mêmes entrées et
-fichiers initiaux pour comparer sorties, codes de retour et fichiers créés/modifiés/supprimés.
-Ouvrir **Scénario réseau et graphique** pour enregistrer les connexions TCP et rejouer des
-étapes sur les contrôles Windows ou un rendu Chromium/Electron (Node.js 22+). La comparaison
-inclut les requêtes HTTP du rendu, la console, les états graphiques et les captures d’écran.
-**Écrans capturés** affiche les versions côte à côte. Les résultats incomplets et limites
-du périmètre sont affichés ; les fichiers extérieurs au dossier de travail restent hors observation.
+In **Version behavior**, capture two executables with the same inputs and initial files to
+compare output, exit codes and created/modified/deleted files. Open **Network and graphical
+scenario** to record TCP connections and replay steps against Windows controls or a
+Chromium/Electron renderer (Node.js 22+). Comparisons include renderer HTTP requests, console
+output, graphical states and screenshots. **Captured screens** displays versions side by side.
+Incomplete results and scope limits are reported; files outside the working directory are
+not observed.
 
-Voir le [guide d’investigation](app/Docs/Investigation.md) pour les limites et le mode d’emploi.
+See the [investigation guide](app/Docs/Investigation.md) for instructions and limitations.
 
-## Choisir l'IA
+## Choose an AI provider
 
-Onglet **AI assistant settings** :
+Open **AI assistant settings**:
 
-- **Claude Code**, **Codex**, **Antigravity**, **OpenCode** : utilisent le compte déjà connecté
-  dans ces programmes ; aucune clé à saisir. Ils sont lancés en lecture seule.
-- **Anthropic**, **OpenAI**, **OpenRouter**, **serveur compatible OpenAI** (LM Studio, vLLM…),
-  **Ollama** : clé d'API (enregistrée chiffrée avec DPAPI sous Windows) ou URL locale.
+- **Claude Code**, **Codex**, **Antigravity**, **OpenCode** use the account already signed
+  into those programs; no API key is needed. Provider processes run in read-only mode.
+- **Anthropic**, **OpenAI**, **OpenRouter**, **OpenAI-compatible servers** (LM Studio, vLLM),
+  and **Ollama** use an API key or local URL. Keys are encrypted with Windows DPAPI when stored.
 
-Le code envoyé à l'IA est celui de la fonction étudiée et ce que l'assistant demande via ses
-outils. Avec un fournisseur en ligne, ce code quitte la machine.
+The AI receives the selected function's code and information requested through its tools.
+With an online provider, that code leaves your machine.
 
-## Utiliser depuis une IA (MCP)
+## Use from an AI client (MCP)
 
-```
-claude mcp add cydecompilator -- "<dossier>\runtime\python\Scripts\python.exe" "<dossier>\app\tool.py" mcp
+```text
+claude mcp add cydecompilator -- "<folder>\runtime\python\Scripts\python.exe" "<folder>\app\tool.py" mcp
 ```
 
-Les opérations métier déclarées sont disponibles, dont l'analyse, la reconstruction,
-la compilation, Git, la réinjection, le débogage .NET et les comparaisons réseau/graphiques.
-Le [guide MCP et IA](app/Docs/AIIntegration.md) détaille la connexion et les parcours.
-Un [skill dédié `cydecompilator`](app/skills/cydecompilator/SKILL.md) est livré :
+Declared operations are available over MCP, including analysis, reconstruction, builds, Git,
+method reinjection, .NET debugging and network/graphical comparisons. The [MCP and AI guide](app/Docs/AIIntegration.md)
+documents connections and workflows. A dedicated [cydecompilator skill](app/skills/cydecompilator/SKILL.md)
+is included:
 
 ```powershell
 runtime/python/Scripts/python.exe app/scripts/install_skill.py
 ```
 
-Il installe les instructions dans le dossier de skills de Codex ; la connexion MCP
-se configure séparément. Les tests vérifient le catalogue complet et des parcours
-réels via MCP ; ils ne certifient pas toutes les combinaisons de moteurs et d'options.
+This installs instructions into the Codex skills folder; configure the MCP connection
+separately. Tests cover the full catalog and real MCP workflows, not every possible engine
+and option combination.
 
-Le panneau **AI** propose aussi **Lancer la tâche autonome** : choisir le parcours,
-donner l'objectif et laisser l'assistant analyser, corriger, compiler et tester.
-Les outils MCP `ai_agent` et `ai_agent_status` offrent le même mode, avec suivi,
-reprise, sauvegardes Git et validation obligatoire avant de conclure.
+The **AI** panel also offers **Run autonomous task**: choose a workflow, enter an objective,
+and let the assistant investigate, repair, build and test. MCP tools `ai_agent` and
+`ai_agent_status` expose the same mode, with progress tracking, resume support, Git backups
+and mandatory validation before completion.
 
-## Mises à jour
+## Application updates
 
-Onglet *Engines*, section *Application updates* : *Check for updates* interroge les
-[releases](https://github.com/MrMybal/CyDecompilator/releases) de ce dépôt, *Download and verify*
-prépare la nouvelle version (empreinte SHA-256, identité, compilation), *Apply update* l'active en
-gardant l'ancienne (*Restore previous version*). `data/` n'est jamais remplacé. Tant que le
-dépôt est privé, il faut un jeton GitHub en lecture (champ *GitHub token* ou variable
-d'environnement `GITHUB_TOKEN`).
+In **Engines → Application updates**, **Check for updates** queries this repository's
+[releases](https://github.com/MrMybal/CyDecompilator/releases). **Download and verify** stages
+the update and verifies its SHA-256 digest, identity and Python compilation. **Apply update**
+activates it while retaining the previous version for **Restore previous version**.
+`data/` is never replaced. While the repository is private, a GitHub token with read access
+is required in the **GitHub token** field or the `GITHUB_TOKEN` environment variable.
 
-## Où sont les choses
+## File locations
 
-- `data/projects/` : un dossier par fichier ouvert (analyse, code en cache, renommages,
-  commentaires, résultats IA).
-- `data/settings/` : préférences, réglages IA, clés et jetons chiffrés.
-- `data/logs/` : journal (aussi visible dans l'onglet *Application log*).
-- `runtime/` : Python privé, moteurs téléchargés, mises à jour préparées.
-- [`app/README.md`](app/README.md) : guide développeur (architecture, tests, releases).
+- `data/projects/`: a folder per opened file, containing analysis, cached code, renames,
+  comments and AI results.
+- `data/settings/`: preferences, AI settings, encrypted keys and tokens.
+- `data/logs/`: logs, also available from **Application log**.
+- `runtime/`: private Python environment, downloaded engines and staged updates.
+- [Developer guide](app/README.md): architecture, tests and releases.
 
-## Limites connues
+## Known limitations
 
-- Python ≥ 3.9 : pas de décompilateur libre complet ; bytecode + reconstruction par l'IA.
-- DXIL : les bibliothèques de shaders (`lib_6_x`, raytracing) ne montrent que leur première fonction.
-- Archives PyInstaller chiffrées (`--key`) et installeurs NSIS/Inno : détectés, pas extraits.
-- Décompilateur C intégré : peu de reconstruction de types (structures vues comme
-  `*(type *)(p + décalage)`) ; en ARM64 les paramètres entiers sont listés avant les flottants.
-- Les gros binaires prennent du temps sous Ghidra ; le nombre de fonctions décompilées pendant
-  l'analyse est réglable (onglet *Engines*).
+- Python 3.9+: no complete open-source source decompiler; bytecode and AI reconstruction are available.
+- DXIL libraries (`lib_6_x`, ray tracing) currently expose only their first function.
+- Encrypted PyInstaller archives (`--key`) and NSIS/Inno installers are detected but not extracted.
+- The built-in C decompiler has limited type reconstruction: structures may appear as
+  `*(type *)(p + offset)`. On ARM64, integer parameters are listed before floating-point parameters.
+- Large binaries take time in Ghidra; adjust the number of functions decompiled during
+  analysis in **Engines**.
 
-## Licence
+## License
 
-[GPL-3.0](LICENSE). Les moteurs téléchargés gardent leur propre licence (affichée dans l'onglet
-*Engines* et dans *Options* → *Licenses*).
+[GPL-3.0](LICENSE). Downloaded engines retain their own licenses, displayed in **Engines**
+and **Options → Licenses**.
 
-Ne décompiler que des logiciels que l'on a le droit d'analyser.
+Only decompile software you have the right to analyze.

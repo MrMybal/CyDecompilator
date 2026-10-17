@@ -3,7 +3,7 @@
 # CyDecompilator — developer guide
 
 AI-assisted multi-engine decompiler built on CyToolsCore 0.10 (Python 3.11, Dear ImGui).
-User guide (French): `../README.md` (same text as `../LISEZ-MOI.md`, kept for the CyTools delivery layout).
+User guides: [English](../README.md) (default on GitHub) · [Français](../LISEZ-MOI.md).
 
 ## Native interface (CyUI)
 
