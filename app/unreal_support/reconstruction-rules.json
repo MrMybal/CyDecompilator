@@ -1,0 +1,1379 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "enforcement": "guidance-only",
+  "categories": {
+    "inputs": {
+      "en": "Inputs and provenance",
+      "fr": "Sources et traçabilité"
+    },
+    "geometry": {
+      "en": "Geometry and UVs",
+      "fr": "Géométrie et UV"
+    },
+    "materials": {
+      "en": "Materials and lighting",
+      "fr": "Matériaux et éclairage"
+    },
+    "animation": {
+      "en": "Skeletons and animation",
+      "fr": "Squelettes et animations"
+    },
+    "navigation": {
+      "en": "Collision and navigation",
+      "fr": "Collisions et navigation"
+    },
+    "gameplay": {
+      "en": "Player and weapons",
+      "fr": "Joueur et armes"
+    },
+    "ai": {
+      "en": "AI and squads",
+      "fr": "IA et escouades"
+    },
+    "vehicles": {
+      "en": "Vehicles and seats",
+      "fr": "Véhicules et places"
+    },
+    "effects": {
+      "en": "Effects and audio",
+      "fr": "Effets et audio"
+    },
+    "campaign": {
+      "en": "Campaign and cinematics",
+      "fr": "Campagne et cinématiques"
+    },
+    "validation": {
+      "en": "Validation and recovery",
+      "fr": "Validation et reprise"
+    }
+  },
+  "profiles": {
+    "generic": {
+      "id": "generic",
+      "name": {
+        "en": "General reconstruction",
+        "fr": "Reconstruction générale"
+      },
+      "description": {
+        "en": "General reconstruction methodology; no game-specific decoder is implied.",
+        "fr": "Méthode générale de reconstruction ; aucun décodeur spécifique à un jeu n’est implicite."
+      },
+      "missions": [],
+      "limits": [
+        {
+          "en": "Rules are guidance and validation requirements, not an automatic converter or enforcement engine.",
+          "fr": "Les règles sont des consignes et contrôles à appliquer, pas un convertisseur automatique ni un moteur de vérification."
+        },
+        {
+          "en": "Source formats, engine semantics and content extraction require a matching adapter and actual evidence.",
+          "fr": "Formats source, fonctionnement du moteur et extraction demandent un adaptateur adapté et des preuves réelles."
+        }
+      ]
+    },
+    "halo-cea-x360": {
+      "id": "halo-cea-x360",
+      "name": {
+        "en": "Halo CEA Xbox 360 → Unreal 5.8",
+        "fr": "Halo CEA Xbox 360 → Unreal 5.8"
+      },
+      "description": {
+        "en": "Methods recovered from the ten-mission Anniversary prototype; native C++ Unreal gameplay, source assets kept separate.",
+        "fr": "Méthodes issues du prototype des dix missions Anniversary ; gameplay C++ Unreal natif, ressources source conservées séparément."
+      },
+      "visualEdition": "anniversary",
+      "gameplayImplementation": "native-unreal-cpp",
+      "targetEngine": "5.8",
+      "xexSha256": "1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19",
+      "missions": [
+        {
+          "map": "a10",
+          "title": "The Pillar of Autumn",
+          "xexSha256": "1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19",
+          "templates": {
+            "cryotube": "cryotube_a10__h",
+            "door small": "door_small_a10__h",
+            "door small no glass": "door_small_no_glass_a10__h",
+            "door cryo chamber": "door_cryo_chamber_a10__h",
+            "door airlock": "door_airlock_a10__h",
+            "door blast": "door_blast_a10__h",
+            "door blast closed": "door_blast_closed_a10__h",
+            "door jeff tube": "door_jeff_tube_a10__h",
+            "door blast half": "door_blast_half_a10__h",
+            "door small burnt": "door_small_burnt_a10__h",
+            "door jeff tube burnt": "door_jeff_tube_burnt_a10__h",
+            "cryo vis test": "cryo_vis_test_a10__h",
+            "lifepod device": "lifepod_device_a10__h",
+            "shield charge": "shield_charge_a10__h",
+            "command display": "command_display_a10__h",
+            "alert_light": "alert_light_a10__h",
+            "hushed_casket": "hushed_casket_a10__h",
+            "hushed casket-on": "hushed_casket_on_a10__h",
+            "hushed casket-off": "hushed_casket_off_a10__h",
+            "h_barricade_large": "h_barricade_large__h",
+            "h_barricade_large_gap": "h_barricade_large_gap__h",
+            "h_barricade_small_visor": "h_barricade_small_visor__h",
+            "c_field_generator": "c_field_generator__h",
+            "h computer bank": "h_computer_bank_a10__h",
+            "h oxy tank": "h_oxy_tank_a10__h",
+            "h gun rack": "h_gun_rack_a10__h",
+            "bulletin board": "bulletin_board_a10__h",
+            "door_blast_collision": "door_blast_collision_a10__h"
+          },
+          "source": {
+            "path": "modules/unreal-reconstruction/profiles/halo-a10.json",
+            "sha256": "fada61d19f9eb82febf3b01a3fdd71ef9cac229a34a671d269b93cd8211e6d94"
+          }
+        },
+        {
+          "map": "a30",
+          "title": "Halo",
+          "xexSha256": "1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19",
+          "templates": {
+            "holo control": "holo_control_b30__h",
+            "lifepod_crashed": "lifepod_crashed__h",
+            "tree_pine_tall": "tree_pine_tall__h",
+            "tree_pine": "tree_pine__h",
+            "boulder_granite_large": "boulder_granite_large__h",
+            "boulder_granite_small": "boulder_granite_small__h",
+            "boulder_granite_gigantic": "boulder_granite_gigantic__h",
+            "holo control indicator": "holo_control_indicator_a30__h",
+            "light blink orange dynamic": "orange_point_light_c10__h",
+            "blue landing beacon": "blue_landing_beacon__h",
+            "landing beacon": "landing_beacon__h",
+            "beam emitter": "beam_emitter_a30__h",
+            "torpedo_bridge": "torpedo_bridge_a30__h",
+            "c_dropship": "c_dropship__h",
+            "pelican": "pelican__h",
+            "banshee": "banshee__h",
+            "lifepod": "lifepod__h",
+            "lifepod_entry": "lifepod_entry__h"
+          },
+          "source": {
+            "path": "modules/unreal-reconstruction/profiles/halo-a30.json",
+            "sha256": "139998d9dd2be2e7b75f0511fdde2e3f069ee171db1e2085f5f7a211da32cdfc"
+          }
+        },
+        {
+          "map": "a50",
+          "title": "The Truth and Reconciliation",
+          "xexSha256": "1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19",
+          "templates": {
+            "plasma_rifle": "plasma_rifle",
+            "holo command control": "holo_command_control_a50__h",
+            "holo control dual": "holo_control_dual_a50__h",
+            "holo control sphere": "holo_control_sphere_a50__h",
+            "holo control": "holo_control_a50__h",
+            "holo map": "holo_map_a50__h",
+            "mustering_door": "mustering_door_a50__h",
+            "prison door": "prison_door_a50__h",
+            "shuttle bay doors": "shuttle_bay_doors_a50__h",
+            "small door": "small_door_a50__h",
+            "a50_nutblocker": "a50_nutblocker_a50__h",
+            "c_field_generator": "c_field_generator__h",
+            "c_storage": "c_storage__h",
+            "a50_rock_large": "a50_rock_large__h",
+            "boulder_redrock_large": "boulder_granite_large__h",
+            "boulder_redrock_medium": "boulder_granite_medium__h",
+            "boulder_redrock_small": "boulder_granite_small__h",
+            "rock_sharpcurly": "rock_sharpcurly__h",
+            "rock_sharphole": "rock_sharphole__h",
+            "rock_sharptall": "rock_sharptall__h",
+            "rock_sharpwedge": "rock_sharpwedge__h",
+            "shrub_large": "shrub_large__shrub",
+            "shrubsmall": "shrubsmall__h",
+            "tree_desert_dead": "tree_desert_dead__h",
+            "tree_desert_whitebark": "tree_desert_whitebark__tree_act",
+            "tree_wall": "tree_wall1__h",
+            "tree_wallbig": "tree_wallbig__h",
+            "wraith": "wraith__h",
+            "c gun turret": "c_gun_turret__h",
+            "c_dropship": "c_dropship__h",
+            "pelican": "pelican__h"
+          },
+          "source": {
+            "path": "modules/unreal-reconstruction/profiles/halo-a50.json",
+            "sha256": "220acf8a1c3492f689cf1455bc41799d72ca5a281b6ab6f4ec21dcc3dc658255"
+          }
+        },
+        {
+          "map": "b30",
+          "title": "The Silent Cartographer",
+          "xexSha256": "1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19",
+          "templates": {
+            "open lens": "single_marker_forward__h",
+            "shaft open lens": "shaft_open_lens__h",
+            "door_blast_collision": "door_blast_collision_a10__h",
+            "door small": "door_small_b30__h",
+            "door small platform": "door_small_b30__h",
+            "holo beam tube": "holo_beam_tube_b30__h",
+            "holo control equipment": "holo_control_equipment_b30__h",
+            "holo control ring": "holo_control_ring_b30__h",
+            "holo control room display": "holo_control_room_display_b30__h",
+            "holo control": "holo_control_b30__h",
+            "holo display square": "holo_display_square_b30__h",
+            "holo display tall": "holo_display_tall_b30__h",
+            "holo display wide": "holo_display_wide_b30__h",
+            "holo panel": "holo_panel_b30__h",
+            "c_field_generator": "c_field_generator__h",
+            "c_storage": "c_storage__h",
+            "c_uplink": "c_uplink__h",
+            "cutscene_small_rock": "cutscene_small_rock_empty__h",
+            "rocks_smoldering": "rocks_smoldering__h",
+            "boulder": "boulder__h",
+            "boulder_crouch": "boulder_crouch__h",
+            "boulder_doublewide": "boulder_doublewide__h",
+            "shrub_large": "shrub_large__shrub",
+            "tree_leafy": "tree_leafy__h",
+            "tree_leafy_doublewide": "tree_leafy_doublewide__h",
+            "tree_leafy_fallentrunk": "tree_leafy_fallentrunk__h",
+            "tree_leafy_fallentrunk_short": "tree_leafy_fallentrunk_short__h",
+            "tree_leafy_medium": "tree_leafy_medium__h",
+            "tree_leafy_sapling": "tree_leafy_sapling__h",
+            "tree_leafy_stump": "tree_leafy_stump__h",
+            "tree_leafy_stump_crouch": "tree_leafy_stump_crouch__h",
+            "tree_leafydense_doublewide": "tree_leafydense_doublewide__h",
+            "pelican_crashed": "pelican_crashed__h",
+            "banshee": "banshee__h",
+            "c_dropship": "c_dropship__h",
+            "ghost": "ghost__h",
+            "lifepod": "lifepod__h",
+            "pelican": "pelican__h",
+            "warthog": "warthog__h"
+          },
+          "source": {
+            "path": "modules/unreal-reconstruction/profiles/halo-b30.json",
+            "sha256": "0ed37498520d357105c1d22c40fa0501f050d7a89512a92bc5a3eef84cf0b30d"
+          }
+        },
+        {
+          "map": "b40",
+          "title": "Assault on the Control Room",
+          "xexSha256": "1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19",
+          "templates": {
+            "door_blast_collision": "door_blast_collision_a10__h",
+            "door small": "door_small_b30__h",
+            "holo control": "holo_control_b30__h",
+            "holo state control": "holo_control_b30__h",
+            "b40_garagedoor": "b40_garagedoor_b40__h",
+            "b40_giantdoor": "b40_giantdoor_b40__h",
+            "b40_lift1600": "b40_lift1600_b40__h",
+            "b40_lift4800": "b40_lift4800_b40__h",
+            "b40_outerdoor": "b40_outerdoor_b40__h",
+            "holo halo control": "holo_halo_control_b40__h",
+            "holo halo ring": "holo_halo_ring_b40__h",
+            "holo halo solar system": "holo_halo_solar_system_b40__h",
+            "b40_cpanel": "b40_cpanel_b40__h",
+            "ctorch": "b40_ctorch_b40__h",
+            "doorblinker": "b40_doorblinker_b40__h",
+            "metal_small": "b40_metal_small_b40__h",
+            "metal_tall": "b40_metal_tall_b40__h",
+            "metal_wide": "b40_metal_wide_b40__h",
+            "b40_shaftring": "b40_shaftring_b40__h",
+            "b40_snowbush": "b40_snowbush_b40__h",
+            "b40_snowbushsmall": "b40_snowbushsmall_b40__h",
+            "bridge lightning": "bridge_lightning_markers_b40__h",
+            "c_field_generator": "c_field_generator__h",
+            "c_storage": "c_storage__h",
+            "cortana_chip": "cortana_chip__h",
+            "sparks constant": "single_marker_forward__h",
+            "steam jets": "single_marker_forward__h",
+            "landing beacon": "landing_beacon__h",
+            "boulder_granite_large": "boulder_granite_large__h",
+            "boulder_snow_gigantic": "boulder_snow_gigantic__h",
+            "boulder_snow_large": "boulder_snow_large__h",
+            "boulder_snow_small": "boulder_snow_small__h",
+            "tree_pine_snow": "tree_pine_snow__h",
+            "tree_pine_snowsmall": "tree_pine_snowsmall__h",
+            "banshee": "banshee__h",
+            "c gun turret": "c_gun_turret__h",
+            "c_dropship": "c_dropship__h",
+            "ghost": "ghost__h",
+            "pelican": "pelican__h",
+            "scorpion": "scorpion__h",
+            "warthog": "warthog__h",
+            "wraith": "wraith__h"
+          },
+          "source": {
+            "path": "modules/unreal-reconstruction/profiles/halo-b40.json",
+            "sha256": "05b26a46978903cd68cfc46220f7d3600101d608a371739db87b8fe103e1b685"
+          }
+        },
+        {
+          "map": "c10",
+          "title": "343 Guilty Spark",
+          "xexSha256": "1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19",
+          "templates": {
+            "elite_corpse": "elite_corpse__h",
+            "teleportation": "teleportation__h",
+            "teleportation short": "teleport_device__h",
+            "shotgun": "shotgun",
+            "door_blast_collision": "door_blast_collision_a10__h",
+            "door small": "door_small_b30__h",
+            "door small platform": "door_small_b30__h",
+            "holo control": "holo_control_b30__h",
+            "holo display square": "holo_display_square_b30__h",
+            "holo display tall": "holo_display_tall_b30__h",
+            "holo display wide": "holo_display_wide_b30__h",
+            "metal_small": "b40_metal_small_b40__h",
+            "metal_tall": "b40_metal_tall_b40__h",
+            "metal_wide": "b40_metal_wide_b40__h",
+            "bridge": "bridge_c10__h",
+            "bridge fast": "bridge_c10__h",
+            "door_small_bashed": "door_small_bashed_c10__h",
+            "falling lift": "falling_lift_c10__h",
+            "helmet": "helmet_c10__h",
+            "lift": "lift_c10__h",
+            "c10_bigplant": "c10_bigplant_c10__h",
+            "c10_lilypad": "c10_lilypad_c10__h",
+            "c10_lilypadbunch": "c10_lilypadbunch_c10__h",
+            "c10_lilypadbunchb": "c10_lilypadbunchb_c10__h",
+            "c10_lilypadcluster": "c10_lilypadcluster_c10__h",
+            "c10_lilypadclusterb": "c10_lilypadclusterb_c10__h",
+            "c10_plantclump": "c10_plantclump_c10__h",
+            "c10_smallplant": "c10_smallplant_c10__h",
+            "light cyan": "cyan_point_light_c10__h",
+            "light jitter cyan": "cyan_point_light_c10__h",
+            "light blink green": "green_point_light_c10__h",
+            "light blink green dynamic": "green_point_light_c10_blink__h",
+            "light green": "green_point_light_c10__h",
+            "light green dynamic": "green_point_light_c10__h",
+            "mri lightning": "mri_lightning_c10__h",
+            "light blink orange": "orange_point_light_c10__h",
+            "light blink orange dynamic": "orange_point_light_c10__h",
+            "light jitter red dynamic": "red_point_light_c10_blink__h",
+            "light red": "red_point_light_c10__h",
+            "light red dynamic": "red_point_light_c10__h",
+            "blood_pool": "blood_pool__h",
+            "c_field_generator": "c_field_generator__h",
+            "c_storage": "c_storage__h",
+            "c_storage_large": "c_storage_large__h",
+            "c_uplink": "c_uplink__h",
+            "burning_flame": "burning_flame__h",
+            "glowingdrip": "single_marker_forward__h",
+            "sparks constant": "single_marker_forward__h",
+            "sparks spurt": "single_marker_forward__h",
+            "helmet_chip": "helmet_chip__h",
+            "landing beacon": "landing_beacon__h",
+            "lockpick": "lockpick__h",
+            "plant fern": "plant_fern__h",
+            "boulder_moss_gigantic": "boulder_moss_gigantic__h",
+            "boulder_moss_large": "boulder_moss_large__h",
+            "boulder_moss_small": "boulder_moss_small__h",
+            "c_dropship_crashed": "c_dropship_crashed__h",
+            "pelican_crashed": "pelican_crashed__h",
+            "c gun turret": "c_gun_turret__h",
+            "pelican": "pelican__h"
+          },
+          "source": {
+            "path": "modules/unreal-reconstruction/profiles/halo-c10.json",
+            "sha256": "7930b1009d950e488731142eac4737dfb3a58aceba30c031abe09a99ebdccaca"
+          }
+        },
+        {
+          "map": "c20",
+          "title": "The Library",
+          "xexSha256": "1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19",
+          "templates": {
+            "teleportation": "teleport_device__h",
+            "shotgun": "shotgun",
+            "door_blast_collision": "door_blast_collision_a10__h",
+            "holo control equipment": "holo_control_equipment_b30__h",
+            "holo control": "holo_control_c20__h",
+            "holo display square": "holo_display_square_b30__h",
+            "holo display tall": "holo_display_tall_b30__h",
+            "holo display wide": "holo_display_wide_b30__h",
+            "holo panel": "holo_panel_b30__h",
+            "door_mainshaft": "door_mainshaft_c20__h",
+            "holo radial control": "holo_radial_control_c20__h",
+            "holo tri control": "holo_tri_control_c20__h",
+            "index platform": "index_platform_c20__h",
+            "platform": "platform_c20__h",
+            "c_field_generator": "c_field_generator__h",
+            "glowingdrip": "single_marker_forward__h",
+            "heavysmoke": "single_marker_forward__h",
+            "sparks constant": "single_marker_forward__h",
+            "sparks friction": "single_marker_forward__h",
+            "index": "index__h",
+            "index_hold": "index_hold__h"
+          },
+          "source": {
+            "path": "modules/unreal-reconstruction/profiles/halo-c20.json",
+            "sha256": "2ef6b0461b0fb57d8df97d090f90e4190d027869f7dcd42cb81576cf9cbfa2b9"
+          }
+        },
+        {
+          "map": "c40",
+          "title": "Two Betrayals",
+          "xexSha256": "1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19",
+          "templates": {
+            "cortana powerup fx": "cortana_powerup_fx__h",
+            "teleportation": "teleportation__h",
+            "teleportation short": "teleport_device__h",
+            "shotgun": "shotgun",
+            "door_blast_collision": "door_blast_collision_a10__h",
+            "door small": "door_small_b30__h",
+            "holo control": "holo_control_b30__h",
+            "holo state control": "holo_control_b30__h",
+            "b40_garagedoor": "b40_garagedoor_b40__h",
+            "generator fx": "b40_generator_fx_b40__h",
+            "b40_giantdoor": "b40_giantdoor_b40__h",
+            "b40_lift1600": "b40_lift1600_b40__h",
+            "b40_lift4800": "b40_lift4800_b40__h",
+            "b40_outerdoor": "b40_outerdoor_b40__h",
+            "b40_holo control": "holo_control_b30__h",
+            "holo halo control": "holo_halo_control_b40__h",
+            "holo halo ring": "holo_halo_ring_b40__h",
+            "holo halo solar system": "holo_halo_solar_system_b40__h",
+            "b40_cpanel": "b40_cpanel_b40__h",
+            "ctorch": "b40_ctorch_b40__h",
+            "doorblinker": "b40_doorblinker_b40__h",
+            "metal_small": "b40_metal_small_b40__h",
+            "metal_tall": "b40_metal_tall_b40__h",
+            "metal_wide": "b40_metal_wide_b40__h",
+            "b40_shaftring": "b40_shaftring_b40__h",
+            "bridge lightning": "bridge_lightning_markers_b40__h",
+            "c40_brokendoor": "c40_brokendoor_c40__h",
+            "c40_snowbush_dark": "c40_snowbush_dark_c40__h",
+            "c40_snowbushsmall_dark": "c40_snowbushsmall_dark_c40__h",
+            "blue landing beacon": "blue_landing_beacon__h",
+            "c_field_generator": "c_field_generator__h",
+            "c_storage": "c_storage__h",
+            "cortana_chip": "cortana_chip__h",
+            "sparks constant": "single_marker_forward__h",
+            "steam jets": "single_marker_forward__h",
+            "index_hold": "index_hold__h",
+            "index_hold_hologram": "index_hold_hologram__h",
+            "landing beacon": "landing_beacon__h",
+            "boulder_granite_large": "boulder_granite_large__h",
+            "boulder_snow_gigantic": "boulder_snow_gigantic__h",
+            "boulder_snow_large": "boulder_snow_large__h",
+            "boulder_snow_small": "boulder_snow_small__h",
+            "tree_pine_snow": "tree_pine_snow__h",
+            "tree_pine_snowsmall": "tree_pine_snowsmall__h",
+            "banshee": "banshee__h",
+            "c gun turret": "c_gun_turret__h",
+            "c_dropship": "c_dropship__h",
+            "ghost": "ghost__h",
+            "warthog": "warthog__h",
+            "wraith": "wraith__h"
+          },
+          "source": {
+            "path": "modules/unreal-reconstruction/profiles/halo-c40.json",
+            "sha256": "5d52076fae827c466f2868451dfdbd264f16d9008b6517cf1bdd6ca50624788e"
+          }
+        },
+        {
+          "map": "d20",
+          "title": "Keyes",
+          "xexSha256": "1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19",
+          "templates": {
+            "flood_captain": "flood_captain",
+            "teleportation short": "teleport_device__h",
+            "pipe": "pipe__h",
+            "shotgun": "shotgun",
+            "holo command control": "holo_command_control_a50__h",
+            "holo control sphere": "holo_control_sphere_a50__h",
+            "holo control": "holo_control_a50__h",
+            "holo map": "holo_map_a50__h",
+            "mustering_door": "mustering_door_a50__h",
+            "small door": "small_door_a50__h",
+            "small end door": "small_door_a50__h",
+            "a50_nutblocker": "a50_nutblocker_a50__h",
+            "c_field_generator": "c_field_generator__h",
+            "c_metalsmall": "c_metalsmall__h",
+            "c_metaltall": "c_metaltall__h",
+            "c_metalwide": "c_metalwide__h",
+            "c_storage": "c_storage__h",
+            "captain_implant": "captain_implant__h",
+            "banshee_crashed": "banshee_crashed__h",
+            "rocks_smoldering": "rocks_smoldering__h",
+            "burning_flame": "burning_flame__h",
+            "condensation": "single_marker_forward__h",
+            "glowingdrip": "single_marker_forward__h",
+            "heavysmoke": "single_marker_forward__h",
+            "plasma_flame": "plasma_flame__h",
+            "sparks constant": "single_marker_forward__h",
+            "plant_yellowbig": "plant_yellowbig__plant",
+            "plant_yellowsmall": "plant_yellowsmall__plant",
+            "rock_shardlong": "rock_shardlong__h",
+            "rock_shardmed": "rock_shardmed__h",
+            "rock_shardrubble": "rock_shardrubble__h",
+            "rock_shardsmall": "rock_shardsmall__h",
+            "rock_shardwide": "rock_shardwide__h",
+            "ghost": "ghost__h",
+            "wraith": "wraith__h",
+            "white dynamic light": "single_marker_forward__h",
+            "banshee": "banshee__h",
+            "c gun turret": "c_gun_turret__h",
+            "c_dropship": "c_dropship__h"
+          },
+          "source": {
+            "path": "modules/unreal-reconstruction/profiles/halo-d20.json",
+            "sha256": "169e2dd3aeb2be3913afc1da21ac42d59ff98d711fde33b637d783ffac193d4e"
+          }
+        },
+        {
+          "map": "d40",
+          "title": "The Maw",
+          "xexSha256": "1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19",
+          "templates": {
+            "shotgun": "shotgun",
+            "alert_light": "alert_light_a10__h",
+            "door airlock burnt": "door_airlock_burnt_a10__h",
+            "door blast closed": "door_blast_closed_a10__h",
+            "door blast half": "door_blast_half_a10__h",
+            "door blast": "door_blast_a10__h",
+            "door cryo chamber": "door_cryo_chamber_a10__h",
+            "door engineering": "door_cryo_chamber_a10__h",
+            "door jeff tube burnt": "door_jeff_tube_burnt_a10__h",
+            "door jeff tube": "door_jeff_tube_a10__h",
+            "door small burnt": "door_small_burnt_a10__h",
+            "door small no glass": "door_small_no_glass_a10__h",
+            "door small": "door_small_a10__h",
+            "door_blast_collision": "door_blast_collision_a10__h",
+            "elevator": "elevator_a10__h",
+            "engine louvre": "engine_louvre_a10__h",
+            "engine piston": "engine_piston_a10__h",
+            "h computer bank burnt": "h_computer_bank_burnt_a10__h",
+            "h computer bank": "h_computer_bank_a10__h",
+            "h gun rack": "h_gun_rack_a10__h",
+            "h oxy tank": "h_oxy_tank_a10__h",
+            "signal light": "d40_console_lamps__h",
+            "poa_fire_emitter": "single_marker_forward__h",
+            "poa_fire_emitter large": "single_marker_forward__h",
+            "abort": "sd_abort_text_d40__h",
+            "background": "sd_background_d40__h",
+            "countdown": "sd_countdown_display_d40__h",
+            "d40_door_small_bashed": "d40_door_small_bashed_d40__h",
+            "d40_door_small_bashed_platformed": "d40_door_small_bashed_d40__h",
+            "d40_door_small_noglass_bashed": "d40_door_small_noglass_bashed_d40__h",
+            "d40_door_small_noglass_bashed_platformed": "d40_door_small_noglass_bashed_d40__h",
+            "invisible manifold control": "invisible_manifold_control_d40__h",
+            "temp critical": "temp_critical_d40__h",
+            "c_field_generator": "c_field_generator__h",
+            "cortana_chip": "cortana_chip__h",
+            "cyborg_helmet": "cyborg_helmet__h",
+            "burning_flame": "burning_flame__h",
+            "glowingdrip": "single_marker_forward__h",
+            "heavysmoke": "single_marker_forward__h",
+            "sparks constant": "single_marker_forward__h",
+            "sparks spurt": "single_marker_forward__h",
+            "h_barricade_large": "h_barricade_large__h",
+            "h_barricade_large_gap": "h_barricade_large_gap__h",
+            "h_barricade_small": "h_barricade_small__h",
+            "h_barricade_small_visor": "h_barricade_small_visor__h",
+            "halo_destroyed": "halo_destroyed__h",
+            "banshee": "banshee__h",
+            "c gun turret": "c_gun_turret__h",
+            "c_dropship": "c_dropship__h",
+            "fighterbomber_scenery": "fighterbomber__h",
+            "warthog": "warthog__h"
+          },
+          "source": {
+            "path": "modules/unreal-reconstruction/profiles/halo-d40.json",
+            "sha256": "b5717439b2e1434162054b158df9225b9987da3a2b36f2dda3d8e5ea38317f7c"
+          }
+        }
+      ],
+      "limits": [
+        {
+          "en": "The integrated scope is rules and profiles. Extraction, import, compilation and execution remain in the separate module.",
+          "fr": "L’intégration couvre règles et profils. Extraction, import, compilation et exécution restent dans le module séparé."
+        },
+        {
+          "en": "Full retail AI, rigid-body vehicle physics and some Saber shader/effect controllers are not certified equivalent.",
+          "fr": "L’IA commerciale complète, la physique rigide des véhicules et certains contrôleurs de shaders/effets Saber ne sont pas certifiés équivalents."
+        },
+        {
+          "en": "This profile does not establish support for arbitrary games or other executable identities.",
+          "fr": "Ce profil ne prouve pas la prise en charge d’autres jeux ou d’exécutables différents."
+        }
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "originals",
+      "category": "inputs",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Preserve original inputs",
+        "fr": "Conserver les sources originales"
+      },
+      "requirement": {
+        "en": "Hash the executable and resource inputs before extraction. Write reconstructed assets, code and reports to a separate project.",
+        "fr": "Calculer les empreintes de l’exécutable et des ressources avant extraction. Écrire assets, code et rapports reconstruits dans un projet séparé."
+      },
+      "validation": {
+        "en": "Compare original input hashes before and after the run; bind each receipt to the inputs actually consumed.",
+        "fr": "Comparer les empreintes originales avant et après le traitement ; lier chaque reçu aux entrées réellement utilisées."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/unreal_reconstruction/core.py",
+          "sha256": "4d4cb088b6514a67dd1e3dab6099a898a05cf85600c348b6e60500967f2f53a7"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/FULL_GAMEPLAY.md",
+          "sha256": "63a91ad68dbf7b2d6fcffda0bb3a9562741e89eb7b1bfba2f3d8543140d73bcb"
+        }
+      ]
+    },
+    {
+      "id": "exact-profile",
+      "category": "inputs",
+      "profiles": [
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Match the source edition and executable",
+        "fr": "Identifier l’édition et l’exécutable"
+      },
+      "requirement": {
+        "en": "Apply the Halo profile only to its recorded Xbox 360 XEX SHA-256. Visual resources must come from Anniversary; runtime map/tag data may supply gameplay and placements.",
+        "fr": "Appliquer le profil Halo uniquement au SHA-256 XEX Xbox 360 enregistré. Les ressources visuelles doivent venir d’Anniversary ; les maps et tags runtime fournissent gameplay et placements."
+      },
+      "validation": {
+        "en": "Reject mismatching executable identity and report unsupported formats; do not substitute Classic meshes or textures.",
+        "fr": "Refuser une identité d’exécutable différente et signaler les formats inconnus ; conserver les modèles et textures Anniversary."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/profiles/halo-a10.json",
+          "sha256": "fada61d19f9eb82febf3b01a3fdd71ef9cac229a34a671d269b93cd8211e6d94"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/ANNIVERSARY_UV_FIXES.md",
+          "sha256": "4230f82408fcac73ac19e17321f93237af52df07faef7c97406a3d4841d5e80c"
+        }
+      ]
+    },
+    {
+      "id": "axes-units",
+      "category": "geometry",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Convert coordinate systems once",
+        "fr": "Convertir les axes et les unités une seule fois"
+      },
+      "requirement": {
+        "en": "Define source-to-Unreal units, handedness, quaternion and normal transforms consistently. Preserve placement scale and source instance transforms.",
+        "fr": "Définir des conversions cohérentes vers Unreal pour les unités, axes, quaternions et normales. Conserver échelles et matrices des instances source."
+      },
+      "validation": {
+        "en": "Compare known positions, facing, normals and bounding boxes; check that model and instance rotations are not applied twice.",
+        "fr": "Comparer positions connues, orientations, normales et boîtes englobantes ; vérifier que les rotations ne sont pas appliquées deux fois."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/A10_A30_CORRECTIONS.md",
+          "sha256": "92074358e3418eb8b35cd21e3d18acc6b8d504c587fc6c46ea68631c10abaa6e"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/SURFACE_IMPORT_FIXES.md",
+          "sha256": "986bcca84136c701fc67ab576897ed1f296693936777357115dcf3bbe8874fb8"
+        }
+      ]
+    },
+    {
+      "id": "lod-permutations",
+      "category": "geometry",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Separate LODs and permutations",
+        "fr": "Séparer les LOD et les variantes"
+      },
+      "requirement": {
+        "en": "Select the permutation requested by each source placement. Keep lower LODs separate instead of merging alternatives into one visible mesh.",
+        "fr": "Choisir la variante demandée par chaque placement source. Garder les LOD inférieurs séparés au lieu de superposer les alternatives dans un mesh visible."
+      },
+      "validation": {
+        "en": "Audit instance counts and chosen mesh parts; the A30 pine placements use base00 rather than all four base variants.",
+        "fr": "Auditer le nombre d’instances et les parties retenues ; les sapins A30 utilisent base00, pas les quatre variantes superposées."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/ANNIVERSARY_UV_FIXES.md",
+          "sha256": "4230f82408fcac73ac19e17321f93237af52df07faef7c97406a3d4841d5e80c"
+        }
+      ]
+    },
+    {
+      "id": "vertex-declaration",
+      "category": "geometry",
+      "profiles": [
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Decode the actual vertex declaration",
+        "fr": "Décoder la déclaration réelle des sommets"
+      },
+      "requirement": {
+        "en": "For Saber CEA, decode the 46-bit interleaved declaration and per-component compression; stride alone cannot identify the UV layout.",
+        "fr": "Pour Saber CEA, décoder la déclaration interleaved de 46 bits et les compressions par composante ; le stride seul ne permet pas d’identifier les UV."
+      },
+      "validation": {
+        "en": "Validate the consumed vertex stride, channel presence and RGBA byte order against binary samples.",
+        "fr": "Contrôler le stride consommé, la présence des canaux et l’ordre RGBA sur des échantillons binaires."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/ANNIVERSARY_UV_FIXES.md",
+          "sha256": "4230f82408fcac73ac19e17321f93237af52df07faef7c97406a3d4841d5e80c"
+        },
+        {
+          "path": "modules/unreal-reconstruction/scripts/audit_vertex_encoding.py",
+          "sha256": "de468e2af53b0f2eff6dbe2fc4e0aa93ce224aad736e476d08519c7498b143e6"
+        }
+      ]
+    },
+    {
+      "id": "uv-channels",
+      "category": "geometry",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Preserve UV channels and source scaling",
+        "fr": "Conserver les canaux UV et leur échelle source"
+      },
+      "requirement": {
+        "en": "Preserve all required UV channels and linear layer weights. Apply each source UV scale once; for CEA use block 0x2F01, without reapplying export-only compression metadata.",
+        "fr": "Conserver les canaux UV requis et les poids de couche linéaires. Appliquer chaque facteur UV une fois ; pour CEA utiliser le bloc 0x2F01, sans réappliquer les métadonnées de compression d’export."
+      },
+      "validation": {
+        "en": "Compare exported UV corners to source samples and verify Unreal material channel connections; retain the foliage audit.",
+        "fr": "Comparer les coins UV exportés aux données source et contrôler les canaux des matériaux Unreal ; conserver l’audit des sapins."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/ANNIVERSARY_UV_FIXES.md",
+          "sha256": "4230f82408fcac73ac19e17321f93237af52df07faef7c97406a3d4841d5e80c"
+        },
+        {
+          "path": "modules/unreal-reconstruction/scripts/audit_foliage_blender.py",
+          "sha256": "6f05219f5291aafdbd3cd954803bd9798cbe74923201e845cde43447d76ab09d"
+        }
+      ]
+    },
+    {
+      "id": "texture-padding",
+      "category": "materials",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Respect platform texture layout",
+        "fr": "Respecter l’organisation des textures de la plateforme"
+      },
+      "requirement": {
+        "en": "Decode tiling, compression, physical row pitch and padding before writing pixels. Small Xbox BC textures may retain a minimum physical pitch of 32 blocks.",
+        "fr": "Décoder tiling, compression, pas physique et padding avant d’écrire les pixels. Les petites textures BC Xbox peuvent garder un pas physique minimal de 32 blocs."
+      },
+      "validation": {
+        "en": "Check reference pixels and remove padding, not useful blocks; reimport changed textures by content hash.",
+        "fr": "Contrôler les pixels de référence et retirer le padding, sans supprimer les blocs utiles ; réimporter les textures corrigées selon leur empreinte."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/ANNIVERSARY_UV_FIXES.md",
+          "sha256": "4230f82408fcac73ac19e17321f93237af52df07faef7c97406a3d4841d5e80c"
+        }
+      ]
+    },
+    {
+      "id": "alpha-surfaces",
+      "category": "materials",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Classify transparent surfaces and foliage",
+        "fr": "Classifier les transparences et le feuillage"
+      },
+      "requirement": {
+        "en": "Read surface flags and texture alpha to choose masked, translucent, decal or additive rendering. Preserve alpha coverage for foliage mipmaps.",
+        "fr": "Lire les indicateurs de surface et l’alpha pour choisir rendu masqué, translucide, decal ou additif. Préserver la couverture alpha des mipmaps du feuillage."
+      },
+      "validation": {
+        "en": "Inspect foliage at several distances and effects against light and dark backgrounds; reject opaque flare cards.",
+        "fr": "Vérifier le feuillage à plusieurs distances et les effets sur fonds clairs et sombres ; détecter les plans de flare opaques."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/ANNIVERSARY_UV_FIXES.md",
+          "sha256": "4230f82408fcac73ac19e17321f93237af52df07faef7c97406a3d4841d5e80c"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/SURFACE_IMPORT_FIXES.md",
+          "sha256": "986bcca84136c701fc67ab576897ed1f296693936777357115dcf3bbe8874fb8"
+        }
+      ]
+    },
+    {
+      "id": "lighting",
+      "category": "materials",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Keep shader and lighting limitations visible",
+        "fr": "Rendre visibles les limites des shaders et de l’éclairage"
+      },
+      "requirement": {
+        "en": "Translate supported source material inputs, UV channels, normal maps and blend weights explicitly. Record fallback shaders and approximated lighting separately.",
+        "fr": "Traduire explicitement les entrées de matériaux supportées, les UV, les normales et les poids de mélange. Consigner séparément shaders de repli et éclairage approximatif."
+      },
+      "validation": {
+        "en": "Compare matched camera views and inspect material bindings; a similar screenshot does not certify the original shader pipeline.",
+        "fr": "Comparer des vues avec la même caméra et contrôler les matériaux ; une image proche ne certifie pas le pipeline de shaders original."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/PRESENTATION_REPORT.md",
+          "sha256": "f9b042d2d8ee71c515a7ed29172cee35f7a975cb6855a2572f3e4441c2f0ed33"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/FULL_GAMEPLAY.md",
+          "sha256": "63a91ad68dbf7b2d6fcffda0bb3a9562741e89eb7b1bfba2f3d8543140d73bcb"
+        }
+      ]
+    },
+    {
+      "id": "skeleton-space",
+      "category": "animation",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Convert animation in bone-local space",
+        "fr": "Convertir les animations dans l’espace local des os"
+      },
+      "requirement": {
+        "en": "Map source and target bone names and local axes, preserve hierarchy and skin weights, and account for different reference poses without adding rest rotations twice.",
+        "fr": "Associer noms et axes locaux des os, préserver hiérarchie et poids de skinning, et traiter les différences de pose de référence sans ajouter deux fois les rotations de repos."
+      },
+      "validation": {
+        "en": "Compare sampled limb directions and animated keys against the source; verify all skin influence indices.",
+        "fr": "Comparer les directions des membres et les clés échantillonnées aux sources ; contrôler les indices des influences de skinning."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/ANNIVERSARY_UV_FIXES.md",
+          "sha256": "4230f82408fcac73ac19e17321f93237af52df07faef7c97406a3d4841d5e80c"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/A10_A30_CORRECTIONS.md",
+          "sha256": "92074358e3418eb8b35cd21e3d18acc6b8d504c587fc6c46ea68631c10abaa6e"
+        }
+      ]
+    },
+    {
+      "id": "animation-locomotion",
+      "category": "animation",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Reconstruct directional locomotion and actions",
+        "fr": "Reconstituer locomotion directionnelle et actions"
+      },
+      "requirement": {
+        "en": "Recover idle, forward, backward and lateral clips and blend by local movement direction. Handle overlays relative to a compatible base pose and retain action timing.",
+        "fr": "Récupérer attente, avant, arrière et déplacements latéraux puis mélanger selon le mouvement local. Appliquer les overlays sur une pose de base compatible et conserver le timing des actions."
+      },
+      "validation": {
+        "en": "Test four-direction movement, transitions, fire/reload, melee, seat poses and death while attached props follow their markers.",
+        "fr": "Tester les quatre directions, transitions, tir/rechargement, mêlée, poses assises et mort ; vérifier les objets attachés aux repères."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/COMBAT_PRESENTATION.md",
+          "sha256": "38183995a13b0a2e53ae3977d90138da894dfd6436229fe2d0867f0206f02055"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/A10_A30_CORRECTIONS.md",
+          "sha256": "92074358e3418eb8b35cd21e3d18acc6b8d504c587fc6c46ea68631c10abaa6e"
+        }
+      ]
+    },
+    {
+      "id": "collision-sections",
+      "category": "navigation",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Build collisions from physical source sections",
+        "fr": "Construire les collisions depuis les sections physiques"
+      },
+      "requirement": {
+        "en": "Separate visual sections from physical geometry using source flags. Flare, decal, particle and foliage cards must not block movement or alter navigation; tree trunks may collide.",
+        "fr": "Séparer sections visuelles et géométrie physique selon les indicateurs source. Les plans de flare, decal, particules et feuillage ne doivent bloquer ni mouvement ni navigation ; les troncs peuvent avoir une collision."
+      },
+      "validation": {
+        "en": "Audit collision triangles by section and test traversal through visual effects and around solid geometry.",
+        "fr": "Auditer les triangles de collision par section et tester le passage à travers les effets et autour des obstacles solides."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/ANNIVERSARY_UV_FIXES.md",
+          "sha256": "4230f82408fcac73ac19e17321f93237af52df07faef7c97406a3d4841d5e80c"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/SURFACE_IMPORT_FIXES.md",
+          "sha256": "986bcca84136c701fc67ab576897ed1f296693936777357115dcf3bbe8874fb8"
+        }
+      ]
+    },
+    {
+      "id": "navmesh",
+      "category": "navigation",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Validate navigation across every encounter",
+        "fr": "Valider la navigation sur chaque rencontre"
+      },
+      "requirement": {
+        "en": "Generate a NavMesh covering encounter positions and routes with the actual agent dimensions; rebuild after physical geometry changes.",
+        "fr": "Générer un NavMesh couvrant les rencontres et trajets avec les dimensions réelles des agents ; le reconstruire après modification de la géométrie physique."
+      },
+      "validation": {
+        "en": "Project spawn/goal points, request routes and assert real NPC displacement; the presence of a NavMesh volume alone is insufficient.",
+        "fr": "Projeter points de départ et buts, demander des trajets et vérifier un déplacement réel des PNJ ; la présence d’un volume NavMesh ne suffit pas."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/NAVIGATION_FIX.md",
+          "sha256": "b5c30f642c75f1dc0a807b8117c8f560056ed0426ec62c29b7178d9c3cdf1420"
+        }
+      ]
+    },
+    {
+      "id": "player-inventory",
+      "category": "gameplay",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Reconstruct player state and inventory",
+        "fr": "Reconstituer l’état du joueur et l’inventaire"
+      },
+      "requirement": {
+        "en": "Port source movement parameters, damage, shield recharge, weapon slots, pickups and interaction rules to Unreal C++. Keep testing invincibility explicit.",
+        "fr": "Porter en C++ Unreal paramètres de mouvement, dégâts, recharge des boucliers, armes portées, ramassage et interactions. Rendre explicite l’invincibilité de test."
+      },
+      "validation": {
+        "en": "Exercise pickup, swap, reload, damage/recharge and respawn; verify first-person body visibility and saved inventory.",
+        "fr": "Tester ramassage, changement d’arme, rechargement, dégâts/recharge et réapparition ; vérifier visibilité du corps et inventaire sauvegardé."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/COMBAT_PRESENTATION.md",
+          "sha256": "38183995a13b0a2e53ae3977d90138da894dfd6436229fe2d0867f0206f02055"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/COMBAT_ACTIONS.md",
+          "sha256": "bca64ac570a1928c8c7397d753141b695bcf7df9a230f6ae6be666507013889b"
+        }
+      ]
+    },
+    {
+      "id": "weapons",
+      "category": "gameplay",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Use one weapon rule set for players and NPCs",
+        "fr": "Partager les règles d’armes entre joueur et PNJ"
+      },
+      "requirement": {
+        "en": "Bind the real equipped weapon and trigger to cadence, burst, ammunition, heat, projectiles, damage and material responses. Preserve distinct primary and secondary behavior.",
+        "fr": "Relier arme équipée et détente à la cadence, rafale, munitions, surchauffe, projectiles, dégâts et réponses des matériaux. Conserver les différences entre tirs primaire et secondaire."
+      },
+      "validation": {
+        "en": "Run player/NPC fire, reload, empty magazine, overheating and impact scenarios against source constants and branch conditions.",
+        "fr": "Tester tir joueur/PNJ, rechargement, chargeur vide, surchauffe et impacts avec les constantes et conditions de branchement source."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/WEAPON_CPP_PORT.md",
+          "sha256": "f486d6e3cb8cb2dc220fe0e7e657c7d280353db138114efd2ca290fbc5878d8d"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/COMBAT_ACTIONS.md",
+          "sha256": "bca64ac570a1928c8c7397d753141b695bcf7df9a230f6ae6be666507013889b"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/FULL_GAMEPLAY.md",
+          "sha256": "63a91ad68dbf7b2d6fcffda0bb3a9562741e89eb7b1bfba2f3d8543140d73bcb"
+        }
+      ]
+    },
+    {
+      "id": "ai-port",
+      "category": "ai",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Port AI functions with explicit service boundaries",
+        "fr": "Porter les fonctions d’IA avec des services explicites"
+      },
+      "requirement": {
+        "en": "Translate recovered predicates, decisions and tuning to native Unreal C++; distinguish directly ported functions from Unreal perception, pathfinding and scheduling adapters.",
+        "fr": "Traduire prédicats, décisions et paramètres récupérés en C++ Unreal natif ; distinguer fonctions portées et adaptateurs Unreal de perception, navigation et ordonnancement."
+      },
+      "validation": {
+        "en": "Compare value functions with unmodified source oracles and exercise their live integration; neither alone proves full retail AI equivalence.",
+        "fr": "Comparer les fonctions de valeur aux oracles source non modifiés et tester leur intégration en jeu ; aucun de ces tests seul ne prouve une IA commerciale identique."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/AI_KNOWLEDGE.md",
+          "sha256": "6968bad0f8cdaa61a7ef9e7a72a799a06160c3006ba48bdd9dd2f754dea3611b"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/FULL_GAMEPLAY.md",
+          "sha256": "63a91ad68dbf7b2d6fcffda0bb3a9562741e89eb7b1bfba2f3d8543140d73bcb"
+        }
+      ]
+    },
+    {
+      "id": "squads",
+      "category": "ai",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Preserve encounter activation and squad orders",
+        "fr": "Conserver l’activation des rencontres et les ordres d’escouade"
+      },
+      "requirement": {
+        "en": "Use source teams, encounter activation, knowledge, target priorities, platoon orders, cover/retreat conditions and fire gates. Do not populate all future waves at map startup.",
+        "fr": "Utiliser équipes, activation des rencontres, mémoire, priorités des cibles, ordres de platoon, conditions de couverture/repli et portes de tir. Ne pas activer toutes les vagues au démarrage."
+      },
+      "validation": {
+        "en": "Test blocked routes, target changes, retreat, regrouping and trigger-controlled reinforcements against the source encounter layout.",
+        "fr": "Tester trajets bloqués, changements de cible, repli, regroupement et renforts déclenchés selon les rencontres source."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/SQUAD_PILOT_VFX.md",
+          "sha256": "d124721f543da571eb52320713efd813fc8cb14df61fa1ff92d5deeefb36b38f"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/ARRIVAL_FIXES.md",
+          "sha256": "b73f9e05046df96fb4fd3b57461915ad3f6214b9c0169a7ae05e2be35a776578"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/AI_KNOWLEDGE.md",
+          "sha256": "6968bad0f8cdaa61a7ef9e7a72a799a06160c3006ba48bdd9dd2f754dea3611b"
+        }
+      ]
+    },
+    {
+      "id": "vehicle-seats",
+      "category": "vehicles",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Bind vehicle controls, seats and animated markers",
+        "fr": "Relier commandes, places et repères animés des véhicules"
+      },
+      "requirement": {
+        "en": "Use a gameplay vehicle actor with its exact source tag. Resolve driver, gunner and passenger markers, seat permissions, cameras and mounted weapon channels; dragging a mesh alone creates scenery.",
+        "fr": "Utiliser un acteur véhicule avec son tag source exact. Résoudre repères conducteur/tireur/passager, permissions, caméras et armes embarquées ; glisser le mesh seul crée un décor."
+      },
+      "validation": {
+        "en": "Test entering/exiting each seat, player/NPC driving, passenger fire and turret marker transforms. For a Warthog use vehicles\\warthog\\warthog.",
+        "fr": "Tester entrée/sortie de chaque place, conduite joueur/PNJ, tir passager et transformations de tourelle. Pour un Warthog utiliser vehicles\\warthog\\warthog."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/FULL_GAMEPLAY.md",
+          "sha256": "63a91ad68dbf7b2d6fcffda0bb3a9562741e89eb7b1bfba2f3d8543140d73bcb"
+        },
+        {
+          "path": "modules/unreal-reconstruction/unreal_template/Source/HaloA10/RecoveredVehicle.h",
+          "sha256": "453ba8be8253f1cbbe9317e2eb445c3616b70fc6ff486d901f39c308a16d8e85"
+        }
+      ]
+    },
+    {
+      "id": "vehicle-physics",
+      "category": "vehicles",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Separate piloting logic from physical fidelity",
+        "fr": "Distinguer le pilotage de la fidélité physique"
+      },
+      "requirement": {
+        "en": "Port source speed/steering and piloting decisions explicitly. Preserve source recording timing; document the Unreal collision/physics adapter separately from original rigid-body behavior.",
+        "fr": "Porter explicitement vitesse, direction et décisions de pilotage. Conserver le timing des enregistrements source ; documenter l’adaptateur de collision/physique Unreal séparément du solveur original."
+      },
+      "validation": {
+        "en": "Exercise obstacles, detours, reverse recovery, firing passes, landing and mixed player/NPC crews; do not label a kinematic adapter as full source physics.",
+        "fr": "Tester obstacles, détours, dégagement en marche arrière, passes de tir, atterrissage et équipages mixtes ; ne pas présenter un adaptateur cinématique comme la physique source complète."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/FULL_GAMEPLAY.md",
+          "sha256": "63a91ad68dbf7b2d6fcffda0bb3a9562741e89eb7b1bfba2f3d8543140d73bcb"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/SQUAD_PILOT_VFX.md",
+          "sha256": "d124721f543da571eb52320713efd813fc8cb14df61fa1ff92d5deeefb36b38f"
+        }
+      ]
+    },
+    {
+      "id": "effect-graphs",
+      "category": "effects",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Import effect graphs as bounded data",
+        "fr": "Importer les graphes d’effets comme données bornées"
+      },
+      "requirement": {
+        "en": "Resolve names, particle/control namespaces, atlas rectangles, curves, flags, emissions and state transitions as data. Do not execute game scripts as host programs.",
+        "fr": "Résoudre noms, espaces de noms particules/contrôleurs, atlas, courbes, indicateurs, émissions et transitions comme données. Ne pas exécuter les scripts du jeu comme programmes hôtes."
+      },
+      "validation": {
+        "en": "Audit unresolved graph and texture references, numeric booleans and supported commands; retain unsupported nodes and fallback status in reports.",
+        "fr": "Auditer graphes et textures non résolus, booléens numériques et commandes supportées ; conserver nœuds inconnus et replis dans les rapports."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/FULL_GAMEPLAY.md",
+          "sha256": "63a91ad68dbf7b2d6fcffda0bb3a9562741e89eb7b1bfba2f3d8543140d73bcb"
+        },
+        {
+          "path": "modules/unreal-reconstruction/scripts/audit_anniversary_effects.py",
+          "sha256": "c7163dd1c7b37b93ad51b4292af0d5d57a91261579f99a9fb83948c77d71aa69"
+        }
+      ]
+    },
+    {
+      "id": "effect-markers",
+      "category": "effects",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Attach weapon effects in the correct frame",
+        "fr": "Attacher les effets d’arme dans le bon repère"
+      },
+      "requirement": {
+        "en": "Compose local effect transforms with the current muzzle/bone/turret transform once. Keep secondary triggers and multiple muzzles distinct; suppress duplicate generic effects only when a recovered graph can render.",
+        "fr": "Composer une fois la transformation locale de l’effet avec celle du repère animé de bouche/os/tourelle. Distinguer tirs secondaires et bouches multiples ; supprimer le doublon générique seulement si le graphe récupéré est rendable."
+      },
+      "validation": {
+        "en": "Capture fire while aiming in several directions and moving; check muzzle origin, axis, trail direction, shell ejection and visual-plane collision.",
+        "fr": "Capturer le tir en visant plusieurs directions et en mouvement ; vérifier origine, axe, traînée, éjection et absence de collision des plans visuels."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/FULL_GAMEPLAY.md",
+          "sha256": "63a91ad68dbf7b2d6fcffda0bb3a9562741e89eb7b1bfba2f3d8543140d73bcb"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/COMBAT_PRESENTATION.md",
+          "sha256": "38183995a13b0a2e53ae3977d90138da894dfd6436229fe2d0867f0206f02055"
+        }
+      ]
+    },
+    {
+      "id": "audio",
+      "category": "effects",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Preserve audio events and decoded playback",
+        "fr": "Conserver les événements audio et vérifier la lecture"
+      },
+      "requirement": {
+        "en": "Decode supported source sound banks and bind weapon, NPC voice, impact and campaign events to the correct conditions, variants and attenuation.",
+        "fr": "Décoder les banques sonores supportées et relier armes, voix des PNJ, impacts et campagne aux conditions, variantes et atténuations adaptées."
+      },
+      "validation": {
+        "en": "Record actual mixed output, verify duration and non-silence, and check event ordering rather than only the existence of imported sound files.",
+        "fr": "Enregistrer la sortie audio réelle, contrôler durée et absence de silence, et vérifier l’ordre des événements au-delà de la présence des fichiers importés."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/PRESENTATION_REPORT.md",
+          "sha256": "f9b042d2d8ee71c515a7ed29172cee35f7a975cb6855a2572f3e4441c2f0ed33"
+        },
+        {
+          "path": "modules/unreal-reconstruction/unreal_reconstruction/core.py",
+          "sha256": "4d4cb088b6514a67dd1e3dab6099a898a05cf85600c348b6e60500967f2f53a7"
+        }
+      ]
+    },
+    {
+      "id": "campaign-placement",
+      "category": "campaign",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Import placements independently from activation",
+        "fr": "Séparer les placements de leur activation"
+      },
+      "requirement": {
+        "en": "Preserve palette references, object names, transforms, difficulty conditions and encounter triggers. A source object being listed does not mean it must exist or be active immediately.",
+        "fr": "Conserver références de palettes, noms, transformations, conditions de difficulté et déclencheurs. Un objet référencé dans la source ne doit pas nécessairement être présent ou actif immédiatement."
+      },
+      "validation": {
+        "en": "Audit placed/omitted actors per map and compare arrival, transport and reinforcement scenarios against source scripts.",
+        "fr": "Auditer objets placés/omis par carte et comparer arrivées, transports et renforts aux scripts source."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/CAMPAIGN_MAPS.md",
+          "sha256": "6e71e7bb844eb5b0eef66aff4ca5b03c1070a4aac1057a12562c6bb0ce99f47e"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/NPC_EXPANSION.md",
+          "sha256": "533f593fcf6c013db9c6924bf3c419b073f61919357c89910dbe154c55ccfafd"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/ARRIVAL_FIXES.md",
+          "sha256": "b73f9e05046df96fb4fd3b57461915ad3f6214b9c0169a7ae05e2be35a776578"
+        }
+      ]
+    },
+    {
+      "id": "cinematic",
+      "category": "campaign",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Separate cinematic tracks from live gameplay",
+        "fr": "Séparer les pistes cinématiques du gameplay"
+      },
+      "requirement": {
+        "en": "Recover camera tracks, source timing, actor attachments and visibility ownership. Keep unsupported script commands explicit instead of guessing arbitrary actor movement.",
+        "fr": "Récupérer pistes caméra, timing, attaches et gestion de visibilité. Signaler les commandes de script inconnues au lieu d’inventer des déplacements."
+      },
+      "validation": {
+        "en": "Check camera/actor alignment at sampled times, transitions back to player control and source transport recordings.",
+        "fr": "Contrôler alignement caméra/acteurs à plusieurs instants, retour au contrôle joueur et enregistrements de transports source."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/ARRIVAL_FIXES.md",
+          "sha256": "b73f9e05046df96fb4fd3b57461915ad3f6214b9c0169a7ae05e2be35a776578"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/PRESENTATION_REPORT.md",
+          "sha256": "f9b042d2d8ee71c515a7ed29172cee35f7a975cb6855a2572f3e4441c2f0ed33"
+        }
+      ]
+    },
+    {
+      "id": "evidence",
+      "category": "validation",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Bind validation to the exact tested artifacts",
+        "fr": "Lier la validation aux artefacts réellement testés"
+      },
+      "requirement": {
+        "en": "Keep build results, input/source/asset/config/binary hashes, scenario assertions and captures together. A generated project, successful build or historical report is not current gameplay proof.",
+        "fr": "Conserver ensemble compilation, empreintes des entrées/sources/assets/configuration/binaire, assertions et captures. Un projet généré, une compilation ou un ancien rapport ne prouve pas le gameplay actuel."
+      },
+      "validation": {
+        "en": "Reject stale or mixed-binary receipts unless the scoped unchanged files are compared explicitly; report missing and approximated behavior.",
+        "fr": "Refuser les preuves périmées ou mélangeant des binaires, sauf comparaison explicite des fichiers inchangés ; signaler comportements manquants ou approximatifs."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/docs/FULL_GAMEPLAY.md",
+          "sha256": "63a91ad68dbf7b2d6fcffda0bb3a9562741e89eb7b1bfba2f3d8543140d73bcb"
+        },
+        {
+          "path": "modules/unreal-reconstruction/scripts/verify_full_gameplay_delivery.py",
+          "sha256": "f29973c66f9c96ebc6be045101b67232bd8b74ebe567429c8c93f724793b188a"
+        }
+      ]
+    },
+    {
+      "id": "recovery",
+      "category": "validation",
+      "profiles": [
+        "generic",
+        "halo-cea-x360"
+      ],
+      "title": {
+        "en": "Preserve saves and resumable checkpoints",
+        "fr": "Préserver les sauvegardes et permettre la reprise"
+      },
+      "requirement": {
+        "en": "Save durable progress before long conversions or tests. Preserve player checkpoints and restore them even when validation fails; never rewrite completed maps just to expose rules.",
+        "fr": "Enregistrer une progression durable avant conversions ou tests longs. Préserver les sauvegardes joueur et les restaurer même après un échec ; conserver les cartes existantes lors de l’intégration des règles."
+      },
+      "validation": {
+        "en": "Verify original saves and assets after tests; resume from retained receipts following interruption rather than restarting the whole import.",
+        "fr": "Vérifier sauvegardes et assets après les tests ; reprendre depuis les reçus conservés après interruption plutôt que relancer tout l’import."
+      },
+      "evidence": [
+        {
+          "path": "modules/unreal-reconstruction/unreal_reconstruction/core.py",
+          "sha256": "4d4cb088b6514a67dd1e3dab6099a898a05cf85600c348b6e60500967f2f53a7"
+        },
+        {
+          "path": "modules/unreal-reconstruction/docs/FULL_GAMEPLAY.md",
+          "sha256": "63a91ad68dbf7b2d6fcffda0bb3a9562741e89eb7b1bfba2f3d8543140d73bcb"
+        }
+      ]
+    }
+  ],
+  "evidencePolicy": {
+    "en": "Reference hashes identify the source snapshot used to write these rules. They are not current build or gameplay validation. Unsupported behavior and fallbacks must remain explicit.",
+    "fr": "Les empreintes des références identifient l’instantané utilisé pour écrire ces règles. Elles ne valident pas la compilation ou le gameplay actuels. Les comportements inconnus et replis doivent rester explicites."
+  }
+}

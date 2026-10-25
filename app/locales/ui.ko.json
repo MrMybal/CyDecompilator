@@ -1745,5 +1745,16 @@
  "Create or open a project above.": "위에서 프로젝트를 만들거나 여세요.",
  "Select a source file": "소스 파일 선택",
  "Choose a file in the solution explorer.": "솔루션 탐색기에서 파일을 선택하세요.",
- "No application selected": "선택한 앱 없음"
+ "No application selected": "선택한 앱 없음",
+ "Unreal reconstruction": "Unreal 재구성",
+ "Reconstruction rules from the Unreal prototype.": "Unreal 프로토타입에서 얻은 재구성 규칙입니다.",
+ "Rules and profiles are integrated. Game conversion remains a separate prototype.": "규칙과 프로필이 통합되었습니다. 게임 변환은 별도 프로토타입으로 유지됩니다.",
+ "Reconstruction profile": "재구성 프로필",
+ "General reconstruction": "일반 재구성",
+ "Rule category": "규칙 범주",
+ "All categories": "모든 범주",
+ "Reload reconstruction rules": "재구성 규칙 다시 불러오기",
+ "Copy reconstruction guide": "재구성 가이드 복사",
+ "Reconstruction limits": "재구성 제한",
+ "Campaign profiles": "캠페인 프로필"
 }

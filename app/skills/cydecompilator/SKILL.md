@@ -20,6 +20,7 @@ Read [the MCP contract](references/mcp.md) first. Then read the relevant workflo
   projects, builds, Git history, bounded repair and behavioral comparison.
 - [Patching and debugging](references/patching-debugging.md): changing a method
   in a separate application copy, testing receipts, source debugging and cancellation.
+- [Unreal reconstruction rules](references/unreal.md): portable rules, campaign profiles, source snapshots and validation requirements; conversion remains separate.
 
 Use the user's chosen engine and settings. Otherwise let the server select a
 compatible engine, inspect missing components, and resolve dependencies needed

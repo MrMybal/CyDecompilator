@@ -324,3 +324,7 @@ is required in the **GitHub token** field or the `GITHUB_TOKEN` environment vari
 and **Options → Licenses**.
 
 Only decompile software you have the right to analyze.
+
+### Unreal reconstruction rules
+
+The **Unreal reconstruction** page integrates the Halo Anniversary prototype’s rules and ten campaign profiles through the same Runtime, CLI, MCP and agent tools. This exposes reconstruction knowledge; game conversion remains separate. [Guide](app/Docs/UnrealReconstruction.md).

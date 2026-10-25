@@ -432,3 +432,7 @@ them with the decompiled C recompiled for x64 (120/120). Real ARM64 binaries shi
 Studio (vcruntime140.dll, msvcp140_2.dll, llvm-strings.exe: 1,329 functions) decompile and compile.
 Modules: callees whose prototype keeps changing between passes are called unprototyped, so a
 module always compiles.
+
+## Unreal reconstruction knowledge
+
+The **Unreal reconstruction** page and `unreal_rules` / `unreal_guide` operations expose the prototype’s 26 reconstruction rules and ten campaign profiles. The integrated agent can consult the same catalog. This read-only knowledge integration works without game files; import/build/execution remain separate. See [methods and scope](Docs/UnrealReconstruction.md).

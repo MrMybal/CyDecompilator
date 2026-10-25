@@ -1745,5 +1745,16 @@
  "Create or open a project above.": "上でプロジェクトを作成または開きます。",
  "Select a source file": "ソースファイルを選択",
  "Choose a file in the solution explorer.": "ソリューション エクスプローラーでファイルを選びます。",
- "No application selected": "アプリが未選択です"
+ "No application selected": "アプリが未選択です",
+ "Unreal reconstruction": "Unreal 再構築",
+ "Reconstruction rules from the Unreal prototype.": "Unreal プロトタイプから得た再構築ルール。",
+ "Rules and profiles are integrated. Game conversion remains a separate prototype.": "ルールとプロファイルは統合済みです。ゲーム変換は引き続き別のプロトタイプで行います。",
+ "Reconstruction profile": "再構築プロファイル",
+ "General reconstruction": "一般的な再構築",
+ "Rule category": "ルールのカテゴリ",
+ "All categories": "すべてのカテゴリ",
+ "Reload reconstruction rules": "再構築ルールを再読み込み",
+ "Copy reconstruction guide": "再構築ガイドをコピー",
+ "Reconstruction limits": "再構築の制限",
+ "Campaign profiles": "キャンペーンのプロファイル"
 }

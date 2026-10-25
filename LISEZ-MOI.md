@@ -327,3 +327,7 @@ d'environnement `GITHUB_TOKEN`).
 *Engines* et dans *Options* → *Licenses*).
 
 Ne décompiler que des logiciels que l'on a le droit d'analyser.
+
+### Règles de reconstruction Unreal
+
+La page **Reconstruction Unreal** expose les 26 règles du prototype Halo Anniversary et les dix profils de campagne. Les mêmes données sont accessibles depuis le CLI, MCP et l’agent intégré. La conversion reste dans le module séparé. [Guide et limites](app/Docs/UnrealReconstruction.fr.md).

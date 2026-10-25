@@ -68,6 +68,104 @@
   },
   "operations": [
     {
+      "id": "unreal_rules",
+      "name": "Unreal reconstruction rules",
+      "description": "Read bundled reconstruction rules, validation requirements and campaign profiles from the Halo CEA Unreal prototype. Read-only knowledge integration; does not import assets, build or convert a game.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "string",
+            "description": "Reconstruction knowledge profile.",
+            "enum": [
+              "generic",
+              "halo-cea-x360"
+            ],
+            "default": "halo-cea-x360"
+          },
+          "category": {
+            "type": "string",
+            "description": "Optional category id returned by unreal_rules.",
+            "default": ""
+          },
+          "language": {
+            "type": "string",
+            "description": "Guide language.",
+            "enum": [
+              "en",
+              "fr"
+            ],
+            "default": "en"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "unreal_guide",
+      "name": "Unreal reconstruction guide",
+      "description": "Render the same bundled rules as a portable Markdown guide, with source snapshot hashes and explicit limits. No game execution.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "string",
+            "description": "Reconstruction knowledge profile.",
+            "enum": [
+              "generic",
+              "halo-cea-x360"
+            ],
+            "default": "halo-cea-x360"
+          },
+          "category": {
+            "type": "string",
+            "description": "Optional category id returned by unreal_rules.",
+            "default": ""
+          },
+          "language": {
+            "type": "string",
+            "description": "Guide language.",
+            "enum": [
+              "en",
+              "fr"
+            ],
+            "default": "en"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
       "id": "application_open",
       "name": "Open Electron or web application",
       "description": "Capture a bounded immutable folder, ASAR or JS/TS/HTML artifact snapshot and analyze it with the inert TypeScript AST parser. Excluded artifacts are reported.",

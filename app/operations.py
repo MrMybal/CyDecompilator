@@ -45,6 +45,17 @@ ANALYSIS_OPTIONS = {
     }}
 
 OPERATIONS = [
+    dict(id='unreal_rules', name='Unreal reconstruction rules',
+         description='Read bundled reconstruction rules, validation requirements and campaign profiles from the Halo CEA Unreal prototype. '
+                     'Read-only knowledge integration; does not import assets, build or convert a game.',
+         inputs={'profile':S('Reconstruction knowledge profile.',enum=['generic','halo-cea-x360'],default='halo-cea-x360'),
+                 'category':S('Optional category id returned by unreal_rules.',default=''),
+                 'language':S('Guide language.',enum=['en','fr'],default='en')}),
+    dict(id='unreal_guide', name='Unreal reconstruction guide',
+         description='Render the same bundled rules as a portable Markdown guide, with source snapshot hashes and explicit limits. No game execution.',
+         inputs={'profile':S('Reconstruction knowledge profile.',enum=['generic','halo-cea-x360'],default='halo-cea-x360'),
+                 'category':S('Optional category id returned by unreal_rules.',default=''),
+                 'language':S('Guide language.',enum=['en','fr'],default='en')}),
     dict(id='application_open', name='Open Electron or web application',
          description='Capture a bounded immutable folder, ASAR or JS/TS/HTML artifact snapshot and analyze it with the inert TypeScript AST parser. Excluded artifacts are reported.',
          inputs={'path': S('Absolute application folder or artifact path.')}, required=['path'],

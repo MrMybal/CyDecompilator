@@ -7,6 +7,7 @@ PAGES = (
     ('workspace', 'Workspace', 'code', 'Explore'),
     ('project', 'Project IDE', 'document', 'Explore'),
     ('investigation', 'Investigation', 'search', 'Explore'),
+    ('unreal', 'Unreal reconstruction', 'library', 'Explore'),
     ('assistant', 'AI', 'people', 'Explore'),
     ('engines', 'Engines', 'library', 'Tools'),
     ('ai', 'AI assistant settings', 'people', 'Tools'),

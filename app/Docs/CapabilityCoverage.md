@@ -127,3 +127,10 @@ See [Investigation.md](Investigation.md) for setup and limits.
 | Windows launcher | Tested: built with MSVC |
 | Linux launcher | Implemented, not run (no Linux runtime prepared) |
 | Application update stream | Implemented; check tested without a repository (no release exists) |
+
+## Unreal reconstruction knowledge
+
+| Capability | Operation / control | Status and limits |
+|---|---|---|
+| Portable rules and ten campaign profiles | `unreal_rules`, Unreal reconstruction | Read-only catalog from the Anniversary prototype; source snapshot hashes, scoped filters, generic methodology and explicit limits. No automatic conversion or enforcement. |
+| Copyable guide and agent discovery | `unreal_guide`, Copy reconstruction guide | The same data is exposed to native UI, CLI, MCP and the integrated agent. Rule consultation is not build/gameplay evidence. See `tests/test_unreal.py` and the integration receipt for exercised paths. |

@@ -1745,5 +1745,16 @@
  "Create or open a project above.": "在上方创建或打开项目。",
  "Select a source file": "选择源文件",
  "Choose a file in the solution explorer.": "在解决方案资源管理器中选择文件。",
- "No application selected": "未选择应用"
+ "No application selected": "未选择应用",
+ "Unreal reconstruction": "Unreal 重建",
+ "Reconstruction rules from the Unreal prototype.": "来自 Unreal 原型的重建规则。",
+ "Rules and profiles are integrated. Game conversion remains a separate prototype.": "规则和配置已集成。游戏转换仍在独立原型中。",
+ "Reconstruction profile": "重建配置",
+ "General reconstruction": "通用重建",
+ "Rule category": "规则类别",
+ "All categories": "所有类别",
+ "Reload reconstruction rules": "重新加载重建规则",
+ "Copy reconstruction guide": "复制重建指南",
+ "Reconstruction limits": "重建限制",
+ "Campaign profiles": "战役配置"
 }

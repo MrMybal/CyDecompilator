@@ -273,6 +273,8 @@ class App:
         self.ide = ProjectIDE(self, make_editor, set_language, palette, render_editor)
         from investigation_ui import InvestigationUI
         self.investigation = InvestigationUI(self, make_editor, set_language, palette, render_editor)
+        from unreal_ui import UnrealUI
+        self.unreal = UnrealUI(self)
         self.projects = []
         self.project = None           # project_info output
         self.engine = ''
@@ -528,7 +530,8 @@ class App:
         self.poll_dialogs()
         from cyui_shell import draw, utility_page
         panels = {'workspace': self.workspace, 'project': self.ide.draw, 'investigation': self.investigation.draw,
-                  'assistant': self.assistant_page, 'engines': self.engines_tab, 'ai': self.ai_tab}
+                  'assistant': self.assistant_page, 'engines': self.engines_tab, 'ai': self.ai_tab,
+                  'unreal':self.unreal.draw}
         if imgui.is_key_chord_pressed(imgui.Key.mod_ctrl | imgui.Key.o): self.choose_file()
         draw(self, lambda page: panels[page]() if page in panels else utility_page(page))
 

@@ -1745,5 +1745,16 @@
  "Create or open a project above.": "Создайте или откройте проект выше.",
  "Select a source file": "Выберите исходный файл",
  "Choose a file in the solution explorer.": "Выберите файл в обозревателе решения.",
- "No application selected": "Приложение не выбрано"
+ "No application selected": "Приложение не выбрано",
+ "Unreal reconstruction": "Реконструкция Unreal",
+ "Reconstruction rules from the Unreal prototype.": "Правила реконструкции из прототипа Unreal.",
+ "Rules and profiles are integrated. Game conversion remains a separate prototype.": "Правила и профили интегрированы. Конвертация игры остаётся в отдельном прототипе.",
+ "Reconstruction profile": "Профиль реконструкции",
+ "General reconstruction": "Общая реконструкция",
+ "Rule category": "Категория правил",
+ "All categories": "Все категории",
+ "Reload reconstruction rules": "Перезагрузить правила реконструкции",
+ "Copy reconstruction guide": "Копировать руководство по реконструкции",
+ "Reconstruction limits": "Ограничения реконструкции",
+ "Campaign profiles": "Профили кампании"
 }

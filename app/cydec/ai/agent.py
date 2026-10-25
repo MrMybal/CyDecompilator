@@ -25,6 +25,9 @@ For patching, inspect the selected function, prepare and review the plan yoursel
 separate copy and run the verified receipt. DLLs need an explicit harness and behavior captures.
 For reconstruct, use reconstruction_run to build and verify complete scenarios; missing scenarios
 are missing evidence, not success. Supply representative scenarios from the user's objective.
+For game reconstruction into Unreal, consult unreal_rules or unreal_guide first. They expose
+prototype methods and validation requirements; reading them is not game conversion or proof
+of behavior. The Halo Anniversary profile is title-specific; do not claim support for other games.
 Do not claim universal equivalence. Do not change provider/account settings or update the running
 application. A genuine missing credential, runtime, license or required user fact is a blocker.
 Reply with one JSON object: {"tool":"operationId","arguments":{...}}, or
@@ -87,7 +90,7 @@ class Jobs:
             name = operation['id']
             project_bound = 'projectId' in operation['inputSchema']['properties']
             if (name.startswith('ai_') or name == 'delete_project' or
-                    not (project_bound or name in {'list_engines', 'list_components', 'install_component'})):
+                    not (project_bound or name in {'list_engines', 'list_components', 'install_component', 'unreal_rules', 'unreal_guide'})):
                 continue
             if workflow == 'investigate' and name in EDIT_OPERATIONS:
                 continue
@@ -204,7 +207,8 @@ def verified(report, context=None):
         if name == 'behavior_compare' and report['workflow'] == 'patch' and outputs.get('complete'):
             if captured & {outputs.get('left'), outputs.get('right')}:
                 proof = result['jobId']
-        if name not in EDIT_OPERATIONS and name not in ('install_component', 'list_engines', 'list_components'):
+        if name not in EDIT_OPERATIONS and name not in ('install_component', 'list_engines', 'list_components',
+                                                       'unreal_rules', 'unreal_guide'):
             reads = True
     if report['workflow'] == 'investigate':
         return {'verified': reads, 'kind': 'investigation'}

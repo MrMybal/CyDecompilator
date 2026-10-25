@@ -688,5 +688,16 @@
   "Create or open a project above.": "Créez ou ouvrez un projet ci-dessus.",
   "Select a source file": "Sélectionnez un fichier source",
   "Choose a file in the solution explorer.": "Choisissez un fichier dans l’explorateur de solution.",
-  "No application selected": "Aucune application sélectionnée"
+  "No application selected": "Aucune application sélectionnée",
+  "Unreal reconstruction": "Reconstruction Unreal",
+  "Reconstruction rules from the Unreal prototype.": "Règles de reconstruction issues du prototype Unreal.",
+  "Rules and profiles are integrated. Game conversion remains a separate prototype.": "Les règles et profils sont intégrés. La conversion du jeu reste dans un prototype séparé.",
+  "Reconstruction profile": "Profil de reconstruction",
+  "General reconstruction": "Reconstruction générale",
+  "Rule category": "Catégorie de règles",
+  "All categories": "Toutes les catégories",
+  "Reload reconstruction rules": "Recharger les règles de reconstruction",
+  "Copy reconstruction guide": "Copier le guide de reconstruction",
+  "Reconstruction limits": "Limites de la reconstruction",
+  "Campaign profiles": "Profils de campagne"
 }

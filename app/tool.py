@@ -118,7 +118,10 @@ def create_runtime(data_dir, **options):
         return service.c_module(p['projectId'], p.get('functions') or [], destination,
                                 p.get('includeCallees', True), engine_context(context))
 
+    from cydec import unreal
     registrations = {
+        'unreal_rules':lambda c,p:unreal.rules(p.get('profile','halo-cea-x360'),p.get('category',''),p.get('language','en')),
+        'unreal_guide':lambda c,p:unreal.guide(p.get('profile','halo-cea-x360'),p.get('category',''),p.get('language','en')),
         'application_open': lambda c, p: service.application_open(p['path'], engine_context(c)),
         'investigation_native': lambda c, p: service.investigation_native(p['projectId'], p['function'], engine_context(c), p.get('refresh', False)),
         'investigation_query': lambda c, p: service.investigation_query(p['projectId'], p.get('query', ''), p.get('depth', 2), p.get('limit', 200)),

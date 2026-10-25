@@ -10942,5 +10942,49 @@
  "No application selected": {
   "en": "No application selected",
   "fr": "Aucune application sélectionnée"
+ },
+ "Unreal reconstruction": {
+  "en": "Unreal reconstruction",
+  "fr": "Reconstruction Unreal"
+ },
+ "Reconstruction rules from the Unreal prototype.": {
+  "en": "Reconstruction rules from the Unreal prototype.",
+  "fr": "Règles de reconstruction issues du prototype Unreal."
+ },
+ "Rules and profiles are integrated. Game conversion remains a separate prototype.": {
+  "en": "Rules and profiles are integrated. Game conversion remains a separate prototype.",
+  "fr": "Les règles et profils sont intégrés. La conversion du jeu reste dans un prototype séparé."
+ },
+ "Reconstruction profile": {
+  "en": "Reconstruction profile",
+  "fr": "Profil de reconstruction"
+ },
+ "General reconstruction": {
+  "en": "General reconstruction",
+  "fr": "Reconstruction générale"
+ },
+ "Rule category": {
+  "en": "Rule category",
+  "fr": "Catégorie de règles"
+ },
+ "All categories": {
+  "en": "All categories",
+  "fr": "Toutes les catégories"
+ },
+ "Reload reconstruction rules": {
+  "en": "Reload reconstruction rules",
+  "fr": "Recharger les règles de reconstruction"
+ },
+ "Copy reconstruction guide": {
+  "en": "Copy reconstruction guide",
+  "fr": "Copier le guide de reconstruction"
+ },
+ "Reconstruction limits": {
+  "en": "Reconstruction limits",
+  "fr": "Limites de la reconstruction"
+ },
+ "Campaign profiles": {
+  "en": "Campaign profiles",
+  "fr": "Profils de campagne"
  }
 }
