@@ -1,5 +1,19 @@
 [
   {
+    "kind": "Engine",
+    "name": "AnyPS5 (optional separate executable and compatibility libraries)",
+    "license": "GPL-2.0-only; see upstream for included dependencies",
+    "url": "https://github.com/boykopovar/AnyPS5",
+    "notes": "Official releases remain a separate optional engine with published SHA256 verification. The experimental depth-copy, shader-preparation, persistent snapshot-slice, ABI investigation and native graphics source patches in engine-patches are GPL-2.0-only, with their license, pinned upstream commit and file hashes preserved there; their build script produces separate compatibility libraries. Engine code is not imported into the Python runtime. Installed engines and their dependencies retain their upstream licenses."
+  },
+  {
+    "kind": "Engine",
+    "name": "PS5 UltraPack (optional separate extraction backend)",
+    "license": "MIT source; bundled backend dependencies have their own licenses",
+    "url": "https://github.com/knutwurst/ps5-ultrapack",
+    "notes": "Official source is installed at a resolved Git commit with a private Python environment and optional separately built .NET package helper. The distributed upstream application has additional license terms; preserve the checkout's notices, including its vendored components. No backend source is vendored in this Tool."
+  },
+  {
     "kind": "Component",
     "name": "CyUI",
     "license": "MIT",

@@ -67,7 +67,8 @@ def create_runtime(data_dir, **options):
     ensure_tree()
     options.setdefault('event_limit', EVENT_LIMIT)
     runtime = Runtime(load_manifest(APP / 'CyTool.json'), data_dir, **options)
-    runtime.configure_inputs(ROOT / 'data/inputs', fields={'open_file': ['path']})
+    runtime.configure_inputs(ROOT / 'data/inputs', max_bytes=1024**4,
+                             fields={'open_file': ['path'], 'porting_open': ['file']})
 
     def handler(function):
         def run(context, parameters):
@@ -118,10 +119,36 @@ def create_runtime(data_dir, **options):
         return service.c_module(p['projectId'], p.get('functions') or [], destination,
                                 p.get('includeCallees', True), engine_context(context))
 
-    from cydec import unreal
+    def porting_open(context, p):
+        from cydec import porting
+        from cydec.inputs import original_path
+        file, directory = p.get('file',''), p.get('directory','')
+        if bool(file) == bool(directory):
+            raise CyToolError('InvalidParameters', 'Choose one application file or directory.')
+        original = original_path(context, 'porting_open', 'file') if file else str(Path(directory).resolve())
+        return porting.open_input(service.store, file or directory, engine_context(context),
+                                  p.get('entry',''), original, p.get('maxBytes',porting.DEFAULT_LIMIT))
+
+
+    from cydec import porting,porting_analysis,unreal
     registrations = {
         'unreal_rules':lambda c,p:unreal.rules(p.get('profile','halo-cea-x360'),p.get('category',''),p.get('language','en')),
         'unreal_guide':lambda c,p:unreal.guide(p.get('profile','halo-cea-x360'),p.get('category',''),p.get('language','en')),
+        'porting_open': porting_open,
+        'porting_info': lambda c,p: porting.info(service.project_for(p['projectId']),p.get('importId','')),
+        'porting_tools': lambda c,p: porting.tools(p.get('settings')),
+        'porting_install': lambda c,p: (porting.install_ultrapack(engine_context(c),p.get('buildPkgHelper',True))
+            if p.get('backend','anyps5')=='ultrapack' else porting.install_anyps5(p.get('target','windows'),engine_context(c))),
+        'porting_plan': lambda c,p: porting.plan(service.project_for(p['projectId']),p.get('target','windows'),p.get('importId','')),
+        'porting_convert': lambda c,p: porting.convert(service.project_for(p['projectId']),p.get('target','windows'),
+                                    engine_context(c),p.get('importId',''),p.get('toIntel',False),p.get('standalone',False),
+                                    p.get('diagnostics',False),p.get('traceImports',False),p.get('analyzeOnFailure',True)),
+        'porting_conversion': lambda c,p: porting.conversion(service.project_for(p['projectId']),p.get('conversionId','')),
+        'porting_run': lambda c,p: porting.run(service.project_for(p['projectId']),engine_context(c),
+                                    p.get('conversionId',''),p.get('scenarios'),p.get('timeout',60),p.get('traceLibraries','')),
+        'porting_diagnose': lambda c,p: porting_analysis.diagnose(
+            service.project_for(p['projectId']),engine_context(c),p.get('engine','cdec'),p.get('importId',''),
+            p.get('attemptId',''),p.get('conversionId',''),p.get('module',''),p.get('maxFunctions',128)),
         'application_open': lambda c, p: service.application_open(p['path'], engine_context(c)),
         'investigation_native': lambda c, p: service.investigation_native(p['projectId'], p['function'], engine_context(c), p.get('refresh', False)),
         'investigation_query': lambda c, p: service.investigation_query(p['projectId'], p.get('query', ''), p.get('depth', 2), p.get('limit', 200)),

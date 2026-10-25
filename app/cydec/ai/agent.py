@@ -28,6 +28,16 @@ are missing evidence, not success. Supply representative scenarios from the user
 For game reconstruction into Unreal, consult unreal_rules or unreal_guide first. They expose
 prototype methods and validation requirements; reading them is not game conversion or proof
 of behavior. The Halo Anniversary profile is title-specific; do not claim support for other games.
+For port, use porting_info/plan and porting_diagnose to inspect guest functions, syscall sites,
+NID registry call sites and recorded failures with CyDecompilator's own engines. Describe its
+unknowns honestly: offset fields may be guest virtual addresses or source file offsets depending
+on the converter version; ambiguous interpretations stay unresolved. Host pointers are not guest addresses.
+After conversion/run failures, diagnose the persisted attempt before deciding a repair or retry.
+Do not turn a missing console API or syscall into a fake successful stub. Windows diagnostics
+and import tracing can be explicitly enabled when relevant; traceLibraries requires traceImports.
+Install the official converter when allowed, porting_convert,
+then porting_run with explicit representative assertions. A converted file or a zero exit code
+without scenario assertions is not completion. Do not use standalone mode for missing game modules.
 Do not claim universal equivalence. Do not change provider/account settings or update the running
 application. A genuine missing credential, runtime, license or required user fact is a blocker.
 Reply with one JSON object: {"tool":"operationId","arguments":{...}}, or
@@ -41,8 +51,9 @@ EDIT_OPERATIONS = {'workspace_create', 'workspace_open', 'workspace_save', 'work
                    'workspace_execute', 'workspace_history', 'workspace_refactor_check', 'workspace_csharp',
                    'workspace_evaluate', 'rename', 'set_comment', 'set_notes', 'export_sources', 'c_module',
                    'reconstruction_run', 'debug_start', 'debug_control', 'debug_breakpoints', 'patch_prepare',
-                   'managed_patch_prepare', 'patch_apply', 'patch_run', 'behavior_capture'}
-INVALIDATES = {'workspace_create', 'workspace_open', 'workspace_save', 'workspace_dependencies'}
+                   'managed_patch_prepare', 'patch_apply', 'patch_run', 'behavior_capture',
+                   'porting_convert','porting_run'}
+INVALIDATES = {'workspace_create', 'workspace_open', 'workspace_save', 'workspace_dependencies','porting_convert'}
 WORKSPACE_WRITES = {'workspace_save', 'workspace_execute', 'workspace_dependencies', 'workspace_history',
                     'reconstruction_run', 'managed_patch_prepare', 'debug_start', 'workspace_evaluate'}
 
@@ -90,13 +101,15 @@ class Jobs:
             name = operation['id']
             project_bound = 'projectId' in operation['inputSchema']['properties']
             if (name.startswith('ai_') or name == 'delete_project' or
-                    not (project_bound or name in {'list_engines', 'list_components', 'install_component', 'unreal_rules', 'unreal_guide'})):
+                    not (project_bound or name in {'list_engines', 'list_components', 'install_component','porting_install','porting_tools','unreal_rules','unreal_guide'})):
                 continue
             if workflow == 'investigate' and name in EDIT_OPERATIONS:
                 continue
             if workflow != 'patch' and name in {'patch_prepare', 'managed_patch_prepare', 'patch_apply', 'patch_run'}:
                 continue
-            if name == 'install_component' and not allow_install:
+            if name in ('install_component','porting_install') and not allow_install:
+                continue
+            if name in ('porting_convert','porting_run','porting_install','porting_tools') and workflow!='port':
                 continue
             if not set(operation.get('permissions', [])) <= self.actor.permissions:
                 continue
@@ -182,8 +195,11 @@ def verified(report, context=None):
     revision = ''
     copy_path = ''
     captured = set()
+    port_receipt = None
     for step in report['steps']:
         name = step['tool']
+        if name in ('porting_convert','porting_run') and report['workflow']=='port':
+            port_receipt, proof = None, None
         if name in INVALIDATES or (name == 'workspace_history' and step.get('arguments', {}).get('action') == 'restore'):
             proof = None
         result = step.get('result', {})
@@ -200,6 +216,11 @@ def verified(report, context=None):
         if name == 'patch_run':
             proof = (result['jobId'] if receipt and step['arguments'].get('receiptId') == receipt
                      and outputs.get('status') == 'passed' else None)
+        if name == 'porting_convert':
+            port_receipt,proof=None,None
+        if name == 'porting_run' and report['workflow']=='port':
+            port_receipt=outputs.get('conversionId') if outputs.get('status')=='scenarios-passed' else None
+            proof=result['jobId'] if port_receipt else None
         if name == 'behavior_capture' and copy_path and outputs.get('complete') and outputs.get('exitCode') == 0:
             command = [outputs.get('executable'), *outputs.get('arguments', [])]
             if copy_path in command:
@@ -212,6 +233,15 @@ def verified(report, context=None):
             reads = True
     if report['workflow'] == 'investigate':
         return {'verified': reads, 'kind': 'investigation'}
+    if report['workflow']=='port':
+        if port_receipt and proof and context is not None:
+            from .. import porting
+            try:
+                record=porting.conversion(service.project_for(report['projectId']),port_receipt)
+                if porting.inventory(record['directory'],service_context(context),record.get('maxBytes',porting.DEFAULT_LIMIT))!=record['files']:proof=None
+            except CyToolError:proof=None
+        return {'verified':bool(port_receipt and proof),'kind':'desktop-port-scenarios',
+                'conversionId':port_receipt,'jobId':proof}
     if report['workflow'] == 'patch':
         if receipt and proof and context is not None:
             from ..execution import verified_copy
@@ -312,7 +342,8 @@ def run(context, parameters):
                 result = jobs.call(name, arguments)
                 outputs = result.get('outputs') or {}
                 failed = (result.get('state') in ('Failed', 'Cancelled') or
-                          outputs.get('status') in ('failed', 'blocked', 'compilation-failed', 'tests-failed', 'behavior-differs') or
+                          outputs.get('status') in ('failed', 'blocked', 'compilation-failed', 'tests-failed', 'behavior-differs',
+                                                    'conversion-failed','execution-failed') or
                           outputs.get('complete') is False)
                 step.update(result=result, status='error' if failed else 'ok')
             except CyToolError as error:

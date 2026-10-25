@@ -13,3 +13,6 @@
 *.ico binary
 # Preserve the upstream CyUI port byte-for-byte (its SHA256 is recorded with the source).
 app/vendor/cyui.py -text whitespace=cr-at-eol
+
+# Unified diff context whitespace is significant; keep source-patch bytes stable.
+app/engine-patches/*.patch text eol=lf -whitespace

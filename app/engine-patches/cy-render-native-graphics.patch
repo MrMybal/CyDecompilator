@@ -1,0 +1,1769 @@
+diff --git a/core/libs/prx/libSceAgcDriver/CMakeLists.txt b/core/libs/prx/libSceAgcDriver/CMakeLists.txt
+--- a/core/libs/prx/libSceAgcDriver/CMakeLists.txt
++++ b/core/libs/prx/libSceAgcDriver/CMakeLists.txt
+@@ -30,6 +30,16 @@
+ endfunction()
+ 
+ ensure_agc_glslang()
++
++set(agcDepthCopyGenerated ${CMAKE_CURRENT_BINARY_DIR}/generated/prx/libSceAgcDriver/Graphics/shaders)
++add_custom_command(
++    OUTPUT "${agcDepthCopyGenerated}/DepthCopy_spv.h"
++    COMMAND ${CMAKE_COMMAND} -E make_directory "${agcDepthCopyGenerated}"
++    COMMAND "$<TARGET_FILE:glslang-standalone>" -V --target-env vulkan1.1 -o "${agcDepthCopyGenerated}/DepthCopy.spv" "${CMAKE_CURRENT_SOURCE_DIR}/Graphics/shaders/DepthCopy.frag"
++    COMMAND ${CMAKE_COMMAND} -DINPUT=${agcDepthCopyGenerated}/DepthCopy.spv -DOUTPUT=${agcDepthCopyGenerated}/DepthCopy_spv.h -DSYMBOL=DEPTH_COPY_SPV -P "${CMAKE_CURRENT_SOURCE_DIR}/embed_spirv.cmake"
++    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Graphics/shaders/DepthCopy.frag" glslang-standalone
++    VERBATIM
++)
+ 
+ set(agcTextureDetileShaderSource ${CMAKE_CURRENT_SOURCE_DIR}/Graphics/shaders/TextureDetile.comp)
+ set(agcTextureDetileGeneratedRoot ${CMAKE_CURRENT_BINARY_DIR}/generated)
+@@ -267,6 +277,8 @@
+         ${CMAKE_CURRENT_SOURCE_DIR}/Execution/src/PresentationPass.cpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/Execution/src/PerformanceOverlay.cpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/Graphics/src/Draw.cpp
++        ${agcDepthCopyGenerated}/DepthCopy_spv.h
++        ${CMAKE_CURRENT_SOURCE_DIR}/Graphics/src/DepthCopy.cpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/Graphics/src/DepthSurface.cpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/Graphics/src/MultisampleTarget.cpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/Graphics/src/ColorTargetLayout.cpp
+@@ -1421,6 +1433,8 @@
+     set_tests_properties(agc_draw_snapshot_cap PROPERTIES SKIP_RETURN_CODE 77)
+     add_test(NAME agc_draw_snapshot_epoch COMMAND agc_driver_recorder_tests --draw-snapshot-epoch-only)
+     set_tests_properties(agc_draw_snapshot_epoch PROPERTIES SKIP_RETURN_CODE 77)
++    add_test(NAME agc_draw_snapshot_slices COMMAND agc_driver_recorder_tests --draw-snapshot-slices-only)
++    set_tests_properties(agc_draw_snapshot_slices PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 30)
+     add_test(NAME agc_multisample_guest_access COMMAND agc_driver_recorder_tests --multisample-only)
+     set_tests_properties(agc_multisample_guest_access PROPERTIES SKIP_RETURN_CODE 77)
+     add_test(NAME agc_draw_inputs_in_place COMMAND agc_driver_recorder_tests --draw-inputs-in-place-only)
+@@ -1443,7 +1457,7 @@
+     add_test(NAME agc_metadata_pass COMMAND agc_driver_recorder_tests --metadata-pass-only)
+     set_tests_properties(agc_metadata_pass PROPERTIES SKIP_RETURN_CODE 77)
+     if(WIN32)
+-        set_tests_properties(agc_recorder_read_list agc_host_import_unmap agc_parked_import_unmap agc_host_import_retirement agc_sparse_run_import agc_sparse_run_import_copied agc_unit_shadow agc_descriptor_pool_recycling agc_draw_snapshot_cap agc_draw_snapshot_epoch agc_multisample_guest_access agc_draw_inputs_in_place agc_draw_inputs_copied agc_resident_present agc_slice_dirty agc_queued_write_groups agc_metadata_pass agc_tiled_resolve PROPERTIES ENVIRONMENT_MODIFICATION
++        set_tests_properties(agc_recorder_read_list agc_host_import_unmap agc_parked_import_unmap agc_host_import_retirement agc_sparse_run_import agc_sparse_run_import_copied agc_unit_shadow agc_descriptor_pool_recycling agc_draw_snapshot_cap agc_draw_snapshot_epoch agc_draw_snapshot_slices agc_multisample_guest_access agc_draw_inputs_in_place agc_draw_inputs_copied agc_resident_present agc_slice_dirty agc_queued_write_groups agc_metadata_pass agc_tiled_resolve PROPERTIES ENVIRONMENT_MODIFICATION
+             "PATH=path_list_prepend:$<TARGET_FILE_DIR:libc>")
+         add_test(NAME agc_host_import_second_mapping COMMAND agc_driver_recorder_tests --host-import-second-mapping-only)
+         set_tests_properties(agc_host_import_second_mapping PROPERTIES SKIP_RETURN_CODE 77 ENVIRONMENT_MODIFICATION
+@@ -1899,6 +1913,8 @@
+ target_include_directories(agc_driver_color1555_target_tests PRIVATE $<TARGET_PROPERTY:shader_recompiler_agc_driver,INTERFACE_INCLUDE_DIRECTORIES>)
+ 
+ target_include_directories(agc_driver_color565_target_tests PRIVATE $<TARGET_PROPERTY:shader_recompiler_agc_driver,INTERFACE_INCLUDE_DIRECTORIES>)
++
++target_include_directories(agc_driver_depth_copy_tests PRIVATE $<TARGET_PROPERTY:shader_recompiler_agc_driver,INTERFACE_INCLUDE_DIRECTORIES>)
+ 
+ target_include_directories(agc_driver_depth_range_remap_draw_tests PRIVATE $<TARGET_PROPERTY:shader_recompiler_agc_driver,INTERFACE_INCLUDE_DIRECTORIES>)
+ 
+diff --git a/core/libs/prx/libSceAgcDriver/Execution/include/Driver/Shaders/ShaderRegistry.hpp b/core/libs/prx/libSceAgcDriver/Execution/include/Driver/Shaders/ShaderRegistry.hpp
+--- a/core/libs/prx/libSceAgcDriver/Execution/include/Driver/Shaders/ShaderRegistry.hpp
++++ b/core/libs/prx/libSceAgcDriver/Execution/include/Driver/Shaders/ShaderRegistry.hpp
+@@ -153,6 +153,7 @@
+     bool deferred = false;
+ };
+ struct PreparedShaders : PreparedShaderState {
++    std::shared_ptr<const PreparedShaderState> publishedState;
+     std::mutex mutex;
+     std::condition_variable settled;
+     std::exception_ptr failure;
+diff --git a/core/libs/prx/libSceAgcDriver/Execution/include/PerformanceTrace.hpp b/core/libs/prx/libSceAgcDriver/Execution/include/PerformanceTrace.hpp
+--- a/core/libs/prx/libSceAgcDriver/Execution/include/PerformanceTrace.hpp
++++ b/core/libs/prx/libSceAgcDriver/Execution/include/PerformanceTrace.hpp
+@@ -475,7 +475,8 @@
+         output += "},\"top_phases_ms_per_frame\":{";
+         std::vector<std::pair<std::string, Clock::duration>> top(phases.begin(), phases.end());
+         std::stable_sort(top.begin(), top.end(), [](const auto& a, const auto& b) { return a.second > b.second; });
+-        for (std::size_t index = 0; index < top.size() && index < TopPhases; ++index) {
++        const auto phaseLimit = std::getenv("APS5_PROFILE_ABI") != nullptr ? 32u : TopPhases;
++        for (std::size_t index = 0; index < top.size() && index < phaseLimit; ++index) {
+             if (index != 0) output += ',';
+             AppendString(output, top[index].first);
+             output += ':' + number(milliseconds(top[index].second) * perPresent);
+diff --git a/core/libs/prx/libSceAgcDriver/Execution/include/ShaderPreparation.hpp b/core/libs/prx/libSceAgcDriver/Execution/include/ShaderPreparation.hpp
+--- a/core/libs/prx/libSceAgcDriver/Execution/include/ShaderPreparation.hpp
++++ b/core/libs/prx/libSceAgcDriver/Execution/include/ShaderPreparation.hpp
+@@ -16,6 +16,7 @@
+     ShaderPreparationTransaction& operator=(const ShaderPreparationTransaction&) = delete;
+     PreparedShaderState& Edit(const ShaderSnapshot& snapshot);
+     const PreparedShaderState& Read(const ShaderSnapshot& snapshot) const;
++    std::shared_ptr<const PreparedShaderState> ReadOnly(const ShaderSnapshot& snapshot) const;
+     void Hold();
+     void Commit();
+ 
+diff --git a/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Draw/Draw.cpp b/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Draw/Draw.cpp
+--- a/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Draw/Draw.cpp
++++ b/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Draw/Draw.cpp
+@@ -8,6 +8,7 @@
+ #include "prx/libSceAgcDriver/Execution/include/PerformanceTimer.hpp"
+ #include "prx/libSceAgcDriver/Execution/include/Pm4.hpp"
+ #include "Optimization/ResourceProgram.hpp"
++#include "prx/libSceAgcDriver/Graphics/include/DepthCopy.hpp"
+ #include <algorithm>
+ #include <bit>
+ #include <cstdlib>
+@@ -80,7 +81,7 @@
+     timing.Mark("device_setup");
+     phaseTiming.Phase(DrawRowVectors);
+ 
+-    const bool useDrawEntries = drawEntries() && !ShaderRecompiler::DebugProbeActive() && dumpTarget == 0 && dumpSlot1 == 0;
++    const bool useDrawEntries = (readRegister(queue.context, 0x000) & 4u) == 0 && drawEntries() && !ShaderRecompiler::DebugProbeActive() && dumpTarget == 0 && dumpSlot1 == 0;
+     const bool registerKey = useDrawEntries && registerKeyEnabled();
+     std::uint64_t drawKey = 0;
+     std::array<std::uint64_t, 5> drawKeyComponents{};
+@@ -187,6 +188,10 @@
+     resolveDrawDecode(queue, submission, localDevice->graphicsContext(), decode, registerKey, drawKey, profile);
+     const auto& graphics = decode->state;
+     auto pixel = decode->pixel;
++    if (graphics.depthCopy && std::getenv("APS5_TRACE_DEPTH_COPY") != nullptr) {
++        static std::atomic<std::uint32_t> reports{0};
++        if (reports.fetch_add(1) < 20u) std::fprintf(stderr, "[depth-copy] source=0x%llx target=0x%llx extent=%ux%u samples=%u vertices=%u instances=%u indexed=%u indirect=%u rect=%u scissor=%d,%d,%u,%u\n", static_cast<unsigned long long>(graphics.depthCopy->address), static_cast<unsigned long long>(graphics.color.address), graphics.renderExtent.width, graphics.renderExtent.height, graphics.depthCopy->samples, drawParameters.indexCount, drawParameters.instanceCount, drawParameters.indexed, drawParameters.indirect.has_value(), graphics.rectList, graphics.scissor.offset.x, graphics.scissor.offset.y, graphics.scissor.extent.width, graphics.scissor.extent.height);
++    }
+     const bool writesPrograms = graphics.stages.mesh || drawParameters.indirect || !userPatches.empty();
+     std::vector<DrawProgram> writablePrograms;
+     if (writesPrograms) writablePrograms = decode->programs;
+@@ -386,7 +391,10 @@
+         const auto& program = programs[i];
+         pushCursorBytes = Graphics::StagePushOffset(pushCursorBytes, program.binary.stage, localDevice->GraphicsPipelineLibraries());
+         pushOffsets[i] = pushCursorBytes;
+-        if (drawHit) {
++        if (graphics.depthCopy && program.binary.stage == Stage::Fragment) {
++            compiledStages.push_back(std::make_shared<const ShaderRecompiler::RecompileResult>(Graphics::DepthCopyFragment(*graphics.depthCopy)));
++            programResults[i] = compiledStages.back().get();
++        } else if (drawHit) {
+ 
+             programResults[i] = stageData[i].compiled != nullptr ? stageData[i].compiled.get() : matched[i]->compiled.get();
+             memory.insert(memory.end(), matchedRegions[i].begin(), matchedRegions[i].end());
+@@ -454,7 +462,7 @@
+     const auto buildRectList = [&] {
+         phaseTiming.Phase(DrawRowVectors);
+         require(programs.size() == 2 && programResults[0] != nullptr && programResults[1] != nullptr, "rect-list requires vertex and fragment programs");
+-        auto rectangle = DrawRectangle(*programs[0].snapshot, programs[1].snapshot, programResults[0]->variantId, programResults[1]->variantId, localDevice->Target());
++        auto rectangle = graphics.depthCopy ? ShaderRecompiler::BuildRectListShaders(*programResults[0], *programResults[1], localDevice->Target()) : DrawRectangle(*programs[0].snapshot, programs[1].snapshot, programResults[0]->variantId, programResults[1]->variantId, localDevice->Target());
+         auto& control = graphics.provokingVertexMode == VK_PROVOKING_VERTEX_MODE_LAST_VERTEX_EXT ? rectangle.lastVertexControl : rectangle.control;
+         if (rectListBuilt) {
+             results[rectIndex] = std::move(control);
+diff --git a/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Draw/DrawDecode.cpp b/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Draw/DrawDecode.cpp
+--- a/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Draw/DrawDecode.cpp
++++ b/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Draw/DrawDecode.cpp
+@@ -61,7 +61,7 @@
+         require((high & ~0xffu) == 0, "reserved graphics program address bits are set");
+         return (static_cast<std::uint64_t>(ReadGraphicsRegister(queue.shader, base)) << 8u) | (static_cast<std::uint64_t>(high) << 40u);
+     };
+-    const bool pixelSkipped = Graphics::PixelProgramSkipped(queue);
++    const bool pixelSkipped = Graphics::PixelProgramSkipped(queue) || decoded.state.depthCopy.has_value();
+     const auto prepare = [&](std::uint64_t address, std::uint8_t type, Stage stage, std::uint32_t rsrc2, std::uint32_t userDataBase) {
+         const bool nullPixel = stage == Stage::Fragment && (address == 0 || pixelSkipped);
+         if (nullPixel) address = NullPixelProgramAddress();
+@@ -126,6 +126,13 @@
+     auto product = std::make_shared<DrawDecode>();
+     product->state = Graphics::DecodeState(queue, VertexWorkgroupRequired(queue, *submission.shaders));
+     DecodeGraphicsPrograms(*product, queue, *submission.shaders, false, true);
++    if (product->state.depthCopy) {
++        product->pixel = {};
++        product->pixel.wave32 = true;
++        product->pixel.targetOutputMode[0] = 1u;
++        product->pixel.targetExportMapping.fill(0xe4u);
++        return product;
++    }
+     product->pixel = Graphics::DecodePixelStageInfo(queue.context, Graphics::ExportMappings(product->state), Graphics::PixelProgramSkipped(queue));
+     Graphics::NormalizeUnusedViewportDepth(product->state, product->pixel);
+     Graphics::ApplyDepthRemap(context, product->state);
+diff --git a/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Shaders/ShaderRegistry.cpp b/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Shaders/ShaderRegistry.cpp
+--- a/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Shaders/ShaderRegistry.cpp
++++ b/core/libs/prx/libSceAgcDriver/Execution/src/Driver/Shaders/ShaderRegistry.cpp
+@@ -5,6 +5,7 @@
+ #include "prx/libSceAgcDriver/Execution/include/Driver/Shaders/ShaderRegistry.hpp"
+ #include "prx/libSceAgcDriver/Execution/include/Driver/Diagnostics.hpp"
+ #include "prx/libSceAgcDriver/Execution/include/GuestMemory.hpp"
++#include <shared_mutex>
+ #include "CacheKey.hpp"
+ #include "prx/libSceAgcDriver/Execution/include/ShaderPreparation.hpp"
+ #include "prx/libSceAgcDriver/Execution/include/ShaderPreparationScope.hpp"
+@@ -279,23 +280,29 @@
+ struct ShaderPreparationTransaction::State {
+     struct Change {
+         std::shared_ptr<PreparedShaders> destination;
+-        PreparedShaderState prepared;
+-        bool edited = false;
++        std::shared_ptr<const PreparedShaderState> original;
++        std::unique_ptr<PreparedShaderState> prepared;
+         std::size_t baseEntries = 0;
+         std::size_t baseAbis = 0;
++        bool edited = false;
++
++        const PreparedShaderState& Value() const { return prepared != nullptr ? *prepared : *original; }
+     };
+-    static std::mutex writers;
++    static std::shared_mutex writers;
+     static thread_local State* active;
+-    std::unique_lock<std::mutex> lock{writers, std::defer_lock};
++    std::unique_lock<std::shared_mutex> lock{writers, std::defer_lock};
++    std::shared_lock<std::shared_mutex> readLock{writers, std::defer_lock};
+     std::map<PreparedShaders*, Change> changes;
+     bool failed = false;
+ 
+     void Hold() {
+-        if (!lock.owns_lock()) lock.lock();
++        if (lock.owns_lock()) return;
++        if (readLock.owns_lock()) readLock.unlock();
++        lock.lock();
+     }
+ };
+ 
+-std::mutex ShaderPreparationTransaction::State::writers;
++std::shared_mutex ShaderPreparationTransaction::State::writers;
+ thread_local ShaderPreparationTransaction::State* ShaderPreparationTransaction::State::active = nullptr;
+ 
+ ShaderPreparationTransaction::ShaderPreparationTransaction() {
+@@ -313,27 +320,51 @@
+ 
+ PreparedShaderState& ShaderPreparationTransaction::Edit(const ShaderSnapshot& snapshot) {
+     require(!committed, "shader preparation transaction is already committed");
++    Read(snapshot);
++    auto& change = root->changes.at(snapshot.prepared.get());
++    if (change.prepared == nullptr) {
++        PerformanceTimer timing("Shader.PreparedStateCopy");
++        change.prepared = std::make_unique<PreparedShaderState>(*change.original);
++    }
++    change.edited = true;
++    return *change.prepared;
++}
++
++const PreparedShaderState& ShaderPreparationTransaction::Read(const ShaderSnapshot& snapshot) const {
++    require(!committed, "shader preparation transaction is already committed");
++    static const bool profileAbi = std::getenv("APS5_PROFILE_ABI") != nullptr;
++    std::optional<PerformanceTimer> timing;
++    if (profileAbi) timing.emplace("Shader.PreparedRead");
+     root->Hold();
++    if (timing) timing->Mark("writer_lock");
+     auto& changes = root->changes;
+     const auto found = changes.find(snapshot.prepared.get());
+-    if (found != changes.end()) {
+-        found->second.edited = true;
+-        return found->second.prepared;
+-    }
++    if (found != changes.end()) return found->second.Value();
+     std::unique_lock lock(snapshot.prepared->mutex);
+     AwaitRegisteredPreparation(*snapshot.prepared, lock);
+-    return changes.emplace(snapshot.prepared.get(), State::Change{snapshot.prepared, *snapshot.prepared, true, snapshot.prepared->entries.size(), snapshot.prepared->registeredAbis.size()}).first->second.prepared;
+-}
+-
+-const PreparedShaderState& ShaderPreparationTransaction::Read(const ShaderSnapshot& snapshot) const {
++    if (timing) timing->Mark("shader_lock_and_registration");
++    static const bool sharedReads = std::getenv("APS5_NO_SHARED_PREPARED_STATE") == nullptr;
++    if (!sharedReads) {
++        PerformanceTimer timing("Shader.PreparedStateCopy");
++        auto prepared = std::make_unique<PreparedShaderState>(*snapshot.prepared);
++        return changes.emplace(snapshot.prepared.get(), State::Change{snapshot.prepared, {}, std::move(prepared), snapshot.prepared->entries.size(), snapshot.prepared->registeredAbis.size()}).first->second.Value();
++    }
++    if (snapshot.prepared->publishedState == nullptr) {
++        PerformanceTimer timing("Shader.PreparedStateCopy");
++        snapshot.prepared->publishedState = std::make_shared<const PreparedShaderState>(*snapshot.prepared);
++    }
++    const auto& published = snapshot.prepared->publishedState;
++    return changes.emplace(snapshot.prepared.get(), State::Change{snapshot.prepared, published, {}, published->entries.size(), published->registeredAbis.size()}).first->second.Value();
++}
++
++std::shared_ptr<const PreparedShaderState> ShaderPreparationTransaction::ReadOnly(const ShaderSnapshot& snapshot) const {
+     require(!committed, "shader preparation transaction is already committed");
+-    root->Hold();
+-    auto& changes = root->changes;
+-    const auto found = changes.find(snapshot.prepared.get());
+-    if (found != changes.end()) return found->second.prepared;
+-    std::unique_lock lock(snapshot.prepared->mutex);
+-    AwaitRegisteredPreparation(*snapshot.prepared, lock);
+-    return changes.emplace(snapshot.prepared.get(), State::Change{snapshot.prepared, *snapshot.prepared, false, snapshot.prepared->entries.size(), snapshot.prepared->registeredAbis.size()}).first->second.prepared;
++    if (root->lock.owns_lock() || !root->changes.empty()) return nullptr;
++    if (!root->readLock.owns_lock()) root->readLock.lock();
++    std::lock_guard lock(snapshot.prepared->mutex);
++    if (snapshot.prepared->pending || snapshot.prepared->failure != nullptr) return nullptr;
++    if (snapshot.prepared->publishedState == nullptr) snapshot.prepared->publishedState = std::make_shared<const PreparedShaderState>(*snapshot.prepared);
++    return snapshot.prepared->publishedState;
+ }
+ 
+ void ShaderPreparationTransaction::Hold() {
+@@ -350,22 +381,24 @@
+         for (auto& [key, change] : state->changes) {
+             if (!change.edited) continue;
+             auto& destination = *change.destination;
++            auto& prepared = *change.prepared;
+             for (auto index = std::min(change.baseEntries, destination.entries.size()); index < destination.entries.size(); ++index) {
+                 const auto& entry = destination.entries[index];
+-                if (std::ranges::none_of(change.prepared.entries, [&](const auto& existing) { return existing.codeOffset == entry.codeOffset && existing.handle == entry.handle; })) change.prepared.entries.push_back(entry);
++                if (std::ranges::none_of(prepared.entries, [&](const auto& existing) { return existing.codeOffset == entry.codeOffset && existing.handle == entry.handle; })) prepared.entries.push_back(entry);
+             }
+             for (auto index = std::min(change.baseAbis, destination.registeredAbis.size()); index < destination.registeredAbis.size(); ++index) {
+                 const auto& abi = destination.registeredAbis[index];
+-                if (std::ranges::find(change.prepared.registeredAbis, abi) == change.prepared.registeredAbis.end()) change.prepared.registeredAbis.push_back(abi);
++                if (std::ranges::find(prepared.registeredAbis, abi) == prepared.registeredAbis.end()) prepared.registeredAbis.push_back(abi);
+             }
+-            destination.entries.swap(change.prepared.entries);
+-            destination.registeredAbis.swap(change.prepared.registeredAbis);
+-            destination.graphicsAbis.swap(change.prepared.graphicsAbis);
+-            destination.rectangles.swap(change.prepared.rectangles);
+-            destination.rectangleProgress.swap(change.prepared.rectangleProgress);
+-            destination.fragments.swap(change.prepared.fragments);
+-            std::swap(destination.rectangleRequested, change.prepared.rectangleRequested);
+-            destination.deferred = destination.deferred || change.prepared.deferred;
++            destination.entries.swap(prepared.entries);
++            destination.registeredAbis.swap(prepared.registeredAbis);
++            destination.graphicsAbis.swap(prepared.graphicsAbis);
++            destination.rectangles.swap(prepared.rectangles);
++            destination.rectangleProgress.swap(prepared.rectangleProgress);
++            destination.fragments.swap(prepared.fragments);
++            std::swap(destination.rectangleRequested, prepared.rectangleRequested);
++            destination.deferred = destination.deferred || prepared.deferred;
++            destination.publishedState.reset();
+         }
+     }
+     committed = true;
+@@ -617,6 +650,7 @@
+     ReportPreparedAtUse(snapshot, request);
+     auto handle = PrepareShaderWithDiagnostics(request);
+     snapshot.prepared->entries.push_back({codeOffset, handle});
++    snapshot.prepared->publishedState.reset();
+     return handle;
+ }
+ 
+@@ -777,6 +811,7 @@
+     auto invocation = ShaderRecompiler::PreparedShaderInvocation::TryCreate(invocationRequest, handle, key);
+     if (!invocation.has_value()) throw std::runtime_error("AGC driver: an artifact prepared at use does not match its invocation");
+     snapshot.prepared->entries.push_back({codeOffset, std::move(handle)});
++    snapshot.prepared->publishedState.reset();
+     return std::move(*invocation);
+ }
+ 
+@@ -877,6 +912,78 @@
+         registers->ForEach([&](std::uint32_t offset, std::uint32_t value) { key.push_back((static_cast<std::uint64_t>(offset) << 32u) | value); });
+     }
+ }
++
++struct NativeGraphicsAbiState {
++    std::array<std::vector<std::uint64_t>, 3> banks;
++
++    template<typename TValue, typename TVisit>
++    static void Visit(const ShaderSnapshot& snapshot, const TValue* pointer, std::size_t count, TVisit&& visit) {
++        if (count == 0) return;
++        const auto address = reinterpret_cast<std::uintptr_t>(pointer);
++        require(address >= snapshot.headerAddress && address - snapshot.headerAddress <= snapshot.header.size(), "shader metadata is outside the registered header");
++        const auto offset = static_cast<std::size_t>(address - snapshot.headerAddress);
++        require(count <= (snapshot.header.size() - offset) / sizeof(TValue), "truncated shader metadata");
++        for (std::size_t index = 0; index < count; ++index) {
++            TValue value;
++            std::memcpy(&value, snapshot.header.data() + offset + index * sizeof(TValue), sizeof(TValue));
++            visit(value);
++        }
++    }
++
++    void Clear() {
++        static const auto initialContext = [] {
++            std::vector<std::uint64_t> words;
++            InitialContextRegisters().ForEach([&](std::uint32_t offset, std::uint32_t value) { words.push_back((static_cast<std::uint64_t>(offset) << 32u) | value); });
++            return words;
++        }();
++        banks[0].clear();
++        banks[1].assign(initialContext.begin(), initialContext.end());
++        banks[2].assign({std::uint64_t{0x24a} << 32u, std::uint64_t{0x24b} << 32u});
++    }
++
++    void Assign(std::size_t bankIndex, ShaderRegister reg) {
++        auto& bank = banks[bankIndex];
++        const auto offset = static_cast<std::uint64_t>(reg.offset) << 32u;
++        const auto found = std::lower_bound(bank.begin(), bank.end(), offset);
++        if (found != bank.end() && (*found >> 32u) == reg.offset) *found = offset | reg.value;
++        else bank.insert(found, offset | reg.value);
++    }
++
++    void Apply(const ShaderSnapshot& snapshot) {
++        const auto header = ReadHeader(snapshot);
++        Visit(snapshot, header.sh_registers, header.num_sh_registers, [&](ShaderRegister reg) { Assign(0, reg); });
++        Visit(snapshot, header.cx_registers, header.num_cx_registers, [&](ShaderRegister reg) { Assign(1, reg); });
++        if (header.specials == nullptr) return;
++        Visit(snapshot, header.specials, 1, [&](const ShaderSpecialRegs& special) {
++            Assign(1, special.vgt_shader_stages_en);
++            if (special.vgt_gs_out_prim_type.offset != 0) Assign(1, special.vgt_gs_out_prim_type);
++            Assign(2, special.ge_cntl);
++            Assign(2, special.ge_user_vgpr_en);
++        });
++    }
++
++    void BuildKey(const VulkanDevice& device, std::vector<std::uint64_t>& key) const {
++        key.clear();
++        key.reserve(7u + banks[0].size() + banks[1].size() + banks[2].size());
++        key.insert(key.end(), {device.Serial(), ShaderRecompiler::DebugProbeActive(), ShaderRecompiler::RayTracingStrict(), ShaderRecompiler::RayTracingMiss()});
++        for (const auto& bank : banks) {
++            key.push_back(bank.size());
++            key.insert(key.end(), bank.begin(), bank.end());
++        }
++    }
++
++    void Restore(QueueState& state) const {
++        const std::array<Registers*, 3> registers{&state.shader, &state.context, &state.userConfig};
++        for (std::size_t index = 0; index < banks.size(); ++index) {
++            for (const auto word : banks[index]) registers[index]->insert_or_assign(static_cast<std::uint32_t>(word >> 32u), static_cast<std::uint32_t>(word));
++        }
++    }
++
++    std::uint32_t PrimitiveType() const {
++        const auto found = std::lower_bound(banks[2].begin(), banks[2].end(), std::uint64_t{0x242u} << 32u);
++        return found != banks[2].end() && (*found >> 32u) == 0x242u ? static_cast<std::uint32_t>(*found) : 0u;
++    }
++};
+ 
+ struct RegisteredPreparation {
+     std::size_t codeOffset = 0;
+@@ -1296,6 +1403,7 @@
+             std::lock_guard lock(prepared.mutex);
+             prepared.entries.insert(prepared.entries.end(), std::make_move_iterator(entries.begin()), std::make_move_iterator(entries.end()));
+             if (failure == nullptr && !plan->abiKey.empty()) prepared.registeredAbis.push_back(std::move(plan->abiKey));
++            prepared.publishedState.reset();
+             prepared.failure = failure;
+             prepared.pending = false;
+         }
+@@ -1430,14 +1538,59 @@
+ 
+ }
+ 
++bool NativePreparedGraphicsReady(ShaderPreparationTransaction& transaction, const ShaderSnapshot& stage, const std::shared_ptr<const ShaderSnapshot>& selectedFragment, std::uint32_t primitiveType) {
++    const auto front = transaction.ReadOnly(stage);
++    if (front == nullptr) return false;
++    if (selectedFragment != nullptr && !std::ranges::any_of(front->fragments, [&](const auto& item) { return item.lock() == selectedFragment; })) return false;
++    if (!front->rectangleRequested && (primitiveType == 7 || primitiveType == 17)) return false;
++    for (const auto& fragment : front->fragments) {
++        const auto pixel = fragment.lock();
++        if (pixel == nullptr) return false;
++        if (!front->rectangleRequested) continue;
++        const auto pixelPrepared = transaction.ReadOnly(*pixel);
++        if (pixelPrepared == nullptr) return false;
++        if ((front->entries.empty() && front->deferred) || (pixelPrepared->entries.empty() && pixelPrepared->deferred)) continue;
++        if (front->entries.empty() || pixelPrepared->entries.empty()) return false;
++        const auto progress = std::ranges::find_if(front->rectangleProgress, [&](const auto& item) { return item.fragment.lock() == pixel; });
++        if (progress == front->rectangleProgress.end() || progress->vertexCount != front->entries.size() || progress->fragmentCount != pixelPrepared->entries.size()) return false;
++    }
++    return true;
++}
++
++bool NativeGraphicsAbiReady(ShaderPreparationTransaction& transaction, const ShaderSnapshot& owner, const std::vector<std::uint64_t>& key, const std::shared_ptr<const ShaderRegistry>& registry, std::uint32_t primitiveType) {
++    const auto prepared = transaction.ReadOnly(owner);
++    if (prepared == nullptr) return false;
++    for (const auto& abi : prepared->graphicsAbis) {
++        if (abi.key != key || abi.registry.lock() != registry) continue;
++        for (const auto& entry : abi.stages) {
++            const auto stage = entry.lock();
++            if (stage == nullptr) return false;
++            if (stage->type != 1 && !NativePreparedGraphicsReady(transaction, *stage, {}, primitiveType)) return false;
++        }
++        return true;
++    }
++    return false;
++}
++
+ void Driver::ResolveGraphicsStagesAbi(std::span<const Shader* const> stages, std::span<const ShaderRegister> context, std::span<const ShaderRegister> primitive) {
+     BindTitleThread();
+     PerformanceContext timingContext(FrameTiming::Preparation());
+     PerformanceTimer timing("Shader.ResolveGraphicsStagesAbi");
++    static const bool profileAbi = std::getenv("APS5_PROFILE_ABI") != nullptr;
++    static const bool nativeAbi = std::getenv("APS5_NO_NATIVE_ABI_STATE") == nullptr;
++    static const bool nativeReaders = std::getenv("APS5_NO_NATIVE_ABI_READERS") == nullptr && std::getenv("APS5_NO_SHARED_PREPARED_STATE") == nullptr;
++    static const bool checkNativeAbi = std::getenv("APS5_CHECK_NATIVE_ABI_KEYS") != nullptr;
++    struct NativeStateStorage {};
++    auto& native = HostThreadLocal<NativeGraphicsAbiState, NativeStateStorage>();
++    if (nativeAbi || checkNativeAbi) native.Clear();
+     ShaderPreparationTransaction transaction;
+     CheckFailure();
+     require(!stages.empty(), "graphics ABI has no shader headers");
+-    QueueState state{};
++    QueueState state{.context = {}, .userConfig = {}};
++    if (!nativeAbi || checkNativeAbi) {
++        state.context = InitialContextRegisters();
++        state.userConfig = {{0x24a, 0}, {0x24b, 0}};
++    }
+     std::shared_ptr<const ShaderRegistry> registry;
+     std::shared_ptr<const ShaderSnapshot> owner;
+     std::vector<std::shared_ptr<const ShaderSnapshot>> selectedStages;
+@@ -1453,19 +1606,33 @@
+             selectedStages.push_back(selected);
+             const auto& snapshot = *selected;
+             require(snapshot.registeredState != nullptr, "registered shader state is missing");
+-            const auto registered = DecodeRegisteredState(snapshot, {});
+-            registered.shader.ForEach([&](std::uint32_t offset, std::uint32_t value) { state.shader.insert_or_assign(offset, value); });
+-            registered.context.ForEach([&](std::uint32_t offset, std::uint32_t value) { state.context.insert_or_assign(offset, value); });
+-            registered.userConfig.ForEach([&](std::uint32_t offset, std::uint32_t value) { state.userConfig.insert_or_assign(offset, value); });
++            if (nativeAbi || checkNativeAbi) native.Apply(snapshot);
++            if (!nativeAbi || checkNativeAbi) {
++                const auto registered = DecodeRegisteredState(snapshot, {});
++                registered.shader.ForEach([&](std::uint32_t offset, std::uint32_t value) { state.shader.insert_or_assign(offset, value); });
++                registered.context.ForEach([&](std::uint32_t offset, std::uint32_t value) { state.context.insert_or_assign(offset, value); });
++                registered.userConfig.ForEach([&](std::uint32_t offset, std::uint32_t value) { state.userConfig.insert_or_assign(offset, value); });
++            }
+             if (fields.type != snapshot.type) {
+                 const std::size_t count = fields.num_sh_registers;
+                 GuestMemory::CheckRange(fields.sh_registers, count * sizeof(ShaderRegister), alignof(ShaderRegister));
+-                for (std::size_t index = 0; index < count; ++index) state.shader.insert_or_assign(fields.sh_registers[index].offset, fields.sh_registers[index].value);
++                for (std::size_t index = 0; index < count; ++index) {
++                    const auto reg = fields.sh_registers[index];
++                    if (nativeAbi || checkNativeAbi) native.Assign(0, reg);
++                    if (!nativeAbi || checkNativeAbi) state.shader.insert_or_assign(reg.offset, reg.value);
++                }
+             }
+         }
+     }
+-    for (const auto reg : context) state.context.insert_or_assign(reg.offset, reg.value);
+-    for (const auto reg : primitive) state.userConfig.insert_or_assign(reg.offset, reg.value);
++    for (const auto reg : context) {
++        if (nativeAbi || checkNativeAbi) native.Assign(1, reg);
++        if (!nativeAbi || checkNativeAbi) state.context.insert_or_assign(reg.offset, reg.value);
++    }
++    for (const auto reg : primitive) {
++        if (nativeAbi || checkNativeAbi) native.Assign(2, reg);
++        if (!nativeAbi || checkNativeAbi) state.userConfig.insert_or_assign(reg.offset, reg.value);
++    }
++    if (profileAbi) timing.Mark("registered_states");
+     const auto localDevice = device.Load();
+     require(localDevice != nullptr, "graphics ABI device is missing");
+     for (const auto& selected : selectedStages) {
+@@ -1477,18 +1644,44 @@
+     }
+     struct GraphicsAbiKeyStorage {};
+     auto& key = HostThreadLocal<std::vector<std::uint64_t>, GraphicsAbiKeyStorage>();
+-    BuildRegisteredAbiKey(state, *localDevice, key);
+-    const auto primitiveType = state.userConfig.find(0x242u);
+-    for (const auto& abi : transaction.Read(*owner).graphicsAbis) {
++    if (nativeAbi) native.BuildKey(*localDevice, key);
++    else BuildRegisteredAbiKey(state, *localDevice, key);
++    if (checkNativeAbi) {
++        std::vector<std::uint64_t> expected;
++        if (nativeAbi) BuildRegisteredAbiKey(state, *localDevice, expected);
++        else native.BuildKey(*localDevice, expected);
++        require(key == expected, "native graphics ABI state differs from register reconstruction");
++        static std::atomic<std::uint64_t> checked{0};
++        const auto count = checked.fetch_add(1, std::memory_order_relaxed) + 1;
++        if (count == 1 || count % 4096 == 0) APS5_LOG_OUT("native graphics ABI key verification passed: %llu states", static_cast<unsigned long long>(count));
++    }
++    if (profileAbi) timing.Mark("state_key");
++    const auto primitiveType = nativeAbi ? native.PrimitiveType() : state.userConfig.contains(0x242u) ? state.userConfig.at(0x242u) : 0u;
++    if (nativeReaders && NativeGraphicsAbiReady(transaction, *owner, key, registry, primitiveType)) {
++        if (profileAbi) {
++            timing.Mark("native_read_hit");
++            static thread_local std::uint64_t hits = 0;
++            if (++hits == 1 || hits % 16384 == 0) APS5_LOG_OUT("native graphics ABI read reuse: %llu hits on this thread", static_cast<unsigned long long>(hits));
++        }
++        transaction.Commit();
++        return;
++    }
++    const auto& graphicsAbisRead = transaction.Read(*owner).graphicsAbis;
++    if (profileAbi) timing.Mark("prepared_state");
++    for (const auto& abi : graphicsAbisRead) {
+         if (abi.key != key || abi.registry.lock() != registry) continue;
++        if (profileAbi) timing.Mark("cache_lookup");
+         for (const auto& stage : abi.stages) {
+             const auto snapshot = stage.lock();
+             require(snapshot != nullptr, "prepared graphics ABI lost a registered stage");
+-            if (snapshot->type != 1) ResolvePreparedGraphics(*snapshot, {}, primitiveType == state.userConfig.end() ? 0u : primitiveType->second, localDevice->Target(), true);
+-        }
++            if (snapshot->type != 1) ResolvePreparedGraphics(*snapshot, {}, primitiveType, localDevice->Target(), true);
++        }
++        if (profileAbi) timing.Mark("rectangle_updates");
+         transaction.Commit();
+         return;
+     }
++    if (profileAbi) timing.Mark("cache_miss");
++    if (nativeAbi && !checkNativeAbi) native.Restore(state);
+     DrawDecode decoded{};
+     try {
+         decoded.state.stages = Graphics::DecodeShaderStages(state, VertexWorkgroupRequired(state, *registry));
+@@ -1507,7 +1700,7 @@
+     }
+     for (const auto& stage : prepared) {
+         if (stage.snapshot->type == 1) continue;
+-        ResolvePreparedGraphics(*stage.snapshot, {}, primitiveType == state.userConfig.end() ? 0u : primitiveType->second, localDevice->Target(), true);
++        ResolvePreparedGraphics(*stage.snapshot, {}, primitiveType, localDevice->Target(), true);
+     }
+     if (decoded.state.stages.path == Graphics::ShaderPath::Vertex) {
+         for (const auto& stage : prepared) {
+@@ -1572,6 +1765,14 @@
+         }
+     };
+     const bool committedAbi = CommittedAbi(*snapshot, key);
++    static const bool nativeReaders = std::getenv("APS5_NO_NATIVE_ABI_READERS") == nullptr && std::getenv("APS5_NO_SHARED_PREPARED_STATE") == nullptr;
++    if (committedAbi && nativeReaders) {
++        const auto prepared = transaction.ReadOnly(*snapshot);
++        if (prepared != nullptr && std::ranges::find(prepared->registeredAbis, key) != prepared->registeredAbis.end()) {
++            transaction.Commit();
++            return;
++        }
++    }
+     auto entries = committedAbi ? std::vector<PreparedShaders::Entry>{} : prepare();
+     const auto& registeredAbis = transaction.Read(*snapshot).registeredAbis;
+     if (std::ranges::find(registeredAbis, key) != registeredAbis.end()) {
+@@ -1656,6 +1857,11 @@
+             transaction.Commit();
+             return;
+         }
++    }
++    static const bool nativeReaders = std::getenv("APS5_NO_NATIVE_ABI_READERS") == nullptr && std::getenv("APS5_NO_SHARED_PREPARED_STATE") == nullptr;
++    if (nativeReaders && NativePreparedGraphicsReady(transaction, front, fragment, primitiveType)) {
++        transaction.Commit();
++        return;
+     }
+     std::vector<std::shared_ptr<const ShaderSnapshot>> fragments;
+     {
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/include/DepthCopy.hpp b/core/libs/prx/libSceAgcDriver/Graphics/include/DepthCopy.hpp
+new file mode 100644
+--- /dev/null
++++ b/core/libs/prx/libSceAgcDriver/Graphics/include/DepthCopy.hpp
+@@ -0,0 +1,8 @@
++#ifndef CORE_LIBS_PRX_LIBSCEAGCDRIVER_GRAPHICS_INCLUDE_DEPTHCOPY_HPP
++#define CORE_LIBS_PRX_LIBSCEAGCDRIVER_GRAPHICS_INCLUDE_DEPTHCOPY_HPP
++#include "prx/libSceAgcDriver/Graphics/include/State.hpp"
++#include "Recompiler.hpp"
++namespace AgcDriver::Graphics {
++ShaderRecompiler::RecompileResult DepthCopyFragment(const DepthTarget& source);
++}
++#endif
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/include/Recorder.hpp b/core/libs/prx/libSceAgcDriver/Graphics/include/Recorder.hpp
+--- a/core/libs/prx/libSceAgcDriver/Graphics/include/Recorder.hpp
++++ b/core/libs/prx/libSceAgcDriver/Graphics/include/Recorder.hpp
+@@ -26,6 +26,7 @@
+ namespace AgcDriver::Graphics {
+ 
+ class Buffer;
++class DeviceBuffer;
+ 
+ // Accumulates GPU work across guest commands so the CPU does not wait for each one. Dispatches and the
+ // copies that feed them record into one open batch; Submit sends it to the queue without waiting and
+@@ -106,6 +107,10 @@
+     std::shared_ptr<Buffer> UnwrittenDrawSnapshot(std::uint64_t address, std::size_t bytes, const std::array<std::uint64_t, 3>& stamp, VkDeviceSize* offset = nullptr);
+     void NoteUnwrittenDrawSnapshot(std::uint64_t address, std::size_t bytes, const std::array<std::uint64_t, 3>& stamp, std::shared_ptr<Buffer> buffer, VkDeviceSize offset = 0);
+     std::shared_ptr<Buffer> ReusableDrawSnapshot(std::uint64_t address, std::size_t bytes, SnapshotUse use = SnapshotUse::Storage, std::uint32_t* derived = nullptr, std::uint64_t generation = 0);
++    std::shared_ptr<Buffer> ReusableDrawSnapshotSlice(std::uint64_t address, std::size_t bytes, std::uint64_t generation, VkDeviceSize& offset);
++    std::shared_ptr<DeviceBuffer> ResidentDrawSnapshot(const std::shared_ptr<Buffer>& source);
++    static constexpr std::size_t DrawResidentBudget = std::size_t{256} << 20u;
++    static constexpr std::size_t DrawResidentEntries = 256;
+     void KeepDrawSnapshot(std::uint64_t address, std::size_t bytes, std::uint64_t generation, std::uint64_t registryGeneration, std::shared_ptr<Buffer> buffer, SnapshotUse use = SnapshotUse::Storage, std::uint32_t derived = 0);
+     static constexpr std::size_t DrawUploadChunk = std::size_t{1} << 20u;
+     struct UploadSlice {
+@@ -848,18 +853,22 @@
+         std::list<DrawSnapshotKey>::iterator recent;
+         std::shared_ptr<Buffer> buffer;
+         std::uint32_t derived;
++        std::shared_ptr<DeviceBuffer> resident;
+     };
+     struct DrawSnapshotPool {
+         std::list<DrawSnapshotKey> recency;
+         std::size_t bytes = 0;
+     };
+     std::map<DrawSnapshotKey, DrawSnapshot> drawSnapshots;
++    std::unordered_map<const Buffer*, DrawSnapshotKey> storageSnapshotSources;
++    std::size_t residentSnapshotBytes = 0;
++    std::size_t residentSnapshotCount = 0;
+     struct UnwrittenSnapshot {
+         std::size_t bytes;
+         std::shared_ptr<Buffer> buffer;
+         VkDeviceSize offset = 0;
+     };
+-    std::unordered_map<std::uint64_t, UnwrittenSnapshot> unwrittenSnapshots;
++    std::map<std::uint64_t, UnwrittenSnapshot> unwrittenSnapshots;
+     std::array<std::uint64_t, 3> unwrittenStamp{};
+     std::size_t unwrittenBytes = 0;
+     void retireUnwrittenSnapshots(const std::array<std::uint64_t, 3>& stamp);
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/include/Resources.hpp b/core/libs/prx/libSceAgcDriver/Graphics/include/Resources.hpp
+--- a/core/libs/prx/libSceAgcDriver/Graphics/include/Resources.hpp
++++ b/core/libs/prx/libSceAgcDriver/Graphics/include/Resources.hpp
+@@ -18,6 +18,7 @@
+     // shadows of GuestBufferMemory) has no mapping and its bytes move by GPU copies alone.
+     std::span<std::byte> Bytes();
+     bool Mapped() const { return mapping != nullptr; }
++    bool Supports(VkBufferUsageFlags flags) const { return (usage & flags) == flags; }
+     void Invalidate();
+ 
+ private:
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/include/ShaderResources.hpp b/core/libs/prx/libSceAgcDriver/Graphics/include/ShaderResources.hpp
+--- a/core/libs/prx/libSceAgcDriver/Graphics/include/ShaderResources.hpp
++++ b/core/libs/prx/libSceAgcDriver/Graphics/include/ShaderResources.hpp
+@@ -184,6 +184,8 @@
+             std::shared_ptr<Buffer> buffer;
+             VkDeviceSize offset = 0;
+             std::size_t bytes = 0;
++            std::shared_ptr<DeviceBuffer> resident;
++            VkBuffer Handle() const { return resident != nullptr ? resident->Handle() : buffer->Handle(); }
+             std::span<std::byte> Bytes() const { return buffer->Bytes().subspan(static_cast<std::size_t>(offset), bytes); }
+         };
+         DescriptorCache* cache = nullptr;
+@@ -191,6 +193,10 @@
+         VkDescriptorSetLayout fragmentLayout = VK_NULL_HANDLE;
+         DescriptorCache::SetAllocation fragmentAllocation;
+         DescriptorCache::SetAllocation allocation;
++        VkDescriptorSet unchangedSet = VK_NULL_HANDLE;
++        VkDescriptorSet unchangedFragmentSet = VK_NULL_HANDLE;
++        VkDescriptorSet MainSet() const { return allocation.set != VK_NULL_HANDLE ? allocation.set : unchangedSet; }
++        VkDescriptorSet FragmentSet() const { return fragmentAllocation.set != VK_NULL_HANDLE ? fragmentAllocation.set : unchangedFragmentSet; }
+         std::vector<Snapshot> snapshots;
+         ~DrawBindings();
+     };
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/include/State.hpp b/core/libs/prx/libSceAgcDriver/Graphics/include/State.hpp
+--- a/core/libs/prx/libSceAgcDriver/Graphics/include/State.hpp
++++ b/core/libs/prx/libSceAgcDriver/Graphics/include/State.hpp
+@@ -93,6 +93,7 @@
+ struct State {
+     ShaderStages stages;
+     std::optional<DepthTarget> depth;
++    std::optional<DepthTarget> depthCopy;
+     bool depthTest = false;
+     bool depthWrite = false;
+     VkCompareOp depthCompare = VK_COMPARE_OP_ALWAYS;
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/shaders/DepthCopy.frag b/core/libs/prx/libSceAgcDriver/Graphics/shaders/DepthCopy.frag
+new file mode 100644
+--- /dev/null
++++ b/core/libs/prx/libSceAgcDriver/Graphics/shaders/DepthCopy.frag
+@@ -0,0 +1,7 @@
++#version 450
++#extension GL_EXT_samplerless_texture_functions : require
++layout(set = 1, binding = 66) uniform texture2D depthSource[1];
++layout(location = 0) out vec4 copiedDepth;
++void main() {
++    copiedDepth = vec4(texelFetch(depthSource[0], ivec2(gl_FragCoord.xy), 0).r, 0.0, 0.0, 1.0);
++}
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/src/DepthCopy.cpp b/core/libs/prx/libSceAgcDriver/Graphics/src/DepthCopy.cpp
+new file mode 100644
+--- /dev/null
++++ b/core/libs/prx/libSceAgcDriver/Graphics/src/DepthCopy.cpp
+@@ -0,0 +1,37 @@
++#include "prx/libSceAgcDriver/Graphics/include/DepthCopy.hpp"
++#include "prx/libSceAgcDriver/Graphics/shaders/DepthCopy_spv.h"
++#include <iterator>
++
++namespace AgcDriver::Graphics {
++
++ShaderRecompiler::RecompileResult DepthCopyFragment(const DepthTarget& source) {
++    Require(source.samples == 1u && source.firstSlice == source.lastSlice, "depth copy fragment requires one sample and one slice");
++    Require(source.address != 0u && (source.address & 255u) == 0u, "depth copy source is null or not aligned");
++    const bool d16 = source.format == VK_FORMAT_D16_UNORM || source.format == VK_FORMAT_D16_UNORM_S8_UINT;
++    Require(d16 || source.format == VK_FORMAT_D32_SFLOAT || source.format == VK_FORMAT_D32_SFLOAT_S8_UINT, "depth copy source format is unsupported");
++    const auto width = source.extent.width - 1u;
++    const auto height = source.extent.height - 1u;
++    const auto address = source.address >> 8u;
++    ShaderRecompiler::DescriptorBinding binding{};
++    binding.kind = ShaderRecompiler::DescriptorKind::SampledImage;
++    binding.role = ShaderRecompiler::DescriptorRole::GuestImages;
++    binding.descriptorSet = ShaderRecompiler::RuntimeAbi::FragmentDescriptorSet;
++    binding.binding = ShaderRecompiler::RuntimeAbi::BindingNumber(ShaderRecompiler::RuntimeAbi::Stage::Fragment, static_cast<ShaderRecompiler::RuntimeAbi::Binding>(ShaderRecompiler::RuntimeAbi::FirstImageBinding));
++    binding.count = 1u;
++    binding.readOnly = true;
++    binding.imageSamplers = {0u};
++    binding.imageDepthCompare = {false};
++    binding.imageShape = ShaderRecompiler::DescriptorImageShape::Image2D;
++    binding.guestDescriptor = {
++        static_cast<std::uint32_t>(address),
++        static_cast<std::uint32_t>(address >> 32u) | ((d16 ? 7u : 22u) << 20u) | ((width & 3u) << 30u),
++        (width >> 2u) | (height << 14u),
++        0x90000facu | (source.depthSwizzle << 20u), 0u, 0u, 0u, 0u
++    };
++    ShaderRecompiler::RecompileResult result{};
++    result.spirv = std::vector<std::uint32_t>(std::begin(DEPTH_COPY_SPV), std::end(DEPTH_COPY_SPV));
++    result.bindings.push_back(std::move(binding));
++    return result;
++}
++
++}
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/src/Draw.cpp b/core/libs/prx/libSceAgcDriver/Graphics/src/Draw.cpp
+--- a/core/libs/prx/libSceAgcDriver/Graphics/src/Draw.cpp
++++ b/core/libs/prx/libSceAgcDriver/Graphics/src/Draw.cpp
+@@ -1834,7 +1834,7 @@
+     if (bindings != nullptr) {
+         for (const auto& snapshot : bindings->snapshots) {
+             const auto bytes = snapshot.Bytes();
+-            addSample(snapshot.address, bytes.size(), snapshot.buffer->Handle(), snapshot.offset, bytes.data());
++            addSample(snapshot.address, bytes.size(), snapshot.Handle(), snapshot.offset, bytes.data());
+         }
+     }
+     for (const auto& [begin, end] : resources.InPlaceReads()) {
+@@ -1853,7 +1853,7 @@
+     CaptureTrace::Log("input-capture draw=%llu batch=%llu target=%llx ranges=%zu bytes=%zu", draw, batch, static_cast<unsigned long long>(target), samples.size(), total);
+     if (samples.empty()) return;
+     auto readback = std::make_shared<Buffer>(context, total, VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+-    RecordMemoryBarrier(context, commands, VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_ACCESS_HOST_WRITE_BIT, VK_ACCESS_TRANSFER_READ_BIT);
++    RecordMemoryBarrier(context, commands, VK_PIPELINE_STAGE_HOST_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_TRANSFER_READ_BIT);
+     const auto copy = context.Function<PFN_vkCmdCopyBuffer>("vkCmdCopyBuffer");
+     for (const auto& sample : samples) {
+         const VkBufferCopy region{sample.sourceOffset, sample.offset, sample.expected.size()};
+@@ -1998,8 +1998,8 @@
+     }
+     APS5_LOG_CHARS_OUT_DEBUG("Pipeline Begin OK");
+     if (drawBindings != nullptr) {
+-        const auto set = drawBindings->allocation.set;
+-        const auto fragmentSet = drawBindings->fragmentAllocation.set;
++        const auto set = drawBindings->MainSet();
++        const auto fragmentSet = drawBindings->FragmentSet();
+         if (set != VK_NULL_HANDLE) context.Resolved(&DeviceFunctions::cmdBindDescriptorSets, "vkCmdBindDescriptorSets")(commands, VK_PIPELINE_BIND_POINT_GRAPHICS, record.pipeline->Layout(), 0, 1, &set, 0, nullptr);
+         if (fragmentSet != VK_NULL_HANDLE) context.Resolved(&DeviceFunctions::cmdBindDescriptorSets, "vkCmdBindDescriptorSets")(commands, VK_PIPELINE_BIND_POINT_GRAPHICS, record.pipeline->Layout(), ShaderRecompiler::RuntimeAbi::FragmentDescriptorSet, 1, &fragmentSet, 0, nullptr);
+     } else {
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/src/Pipeline.cpp b/core/libs/prx/libSceAgcDriver/Graphics/src/Pipeline.cpp
+--- a/core/libs/prx/libSceAgcDriver/Graphics/src/Pipeline.cpp
++++ b/core/libs/prx/libSceAgcDriver/Graphics/src/Pipeline.cpp
+@@ -379,7 +379,7 @@
+         const VkPushConstantRange push{pushStages, 0, PipelinePushSlotBytes};
+         const std::array<VkPushConstantRange, 2> slots{{{pushStagesOf(context), 0, PipelinePushSlotBytes}, {VK_SHADER_STAGE_FRAGMENT_BIT, PipelinePushSlotBytes, PipelinePushSlotBytes}}};
+         VkPipelineLayoutCreateInfo layoutInfo{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
+-        layoutInfo.flags = resources.split ? VK_PIPELINE_LAYOUT_CREATE_INDEPENDENT_SETS_BIT_EXT : 0;
++        layoutInfo.flags = resources.split && context.graphicsPipelineLibrary ? VK_PIPELINE_LAYOUT_CREATE_INDEPENDENT_SETS_BIT_EXT : 0;
+         layoutInfo.setLayoutCount = resources.split ? 2u : 1u;
+         layoutInfo.pSetLayouts = setLayouts.data();
+         layoutInfo.pushConstantRangeCount = dynamicRendering ? static_cast<std::uint32_t>(slots.size()) : pushStages != 0 ? 1 : 0;
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/src/Recorder.cpp b/core/libs/prx/libSceAgcDriver/Graphics/src/Recorder.cpp
+--- a/core/libs/prx/libSceAgcDriver/Graphics/src/Recorder.cpp
++++ b/core/libs/prx/libSceAgcDriver/Graphics/src/Recorder.cpp
+@@ -2613,7 +2613,49 @@
+     auto& pool = drawSnapshotPools[SnapshotPool(std::get<1>(entry->first))];
+     pool.bytes -= std::get<2>(entry->first);
+     pool.recency.erase(entry->second.recent);
++    if (std::get<1>(entry->first) == SnapshotUse::Storage) {
++        const auto source = storageSnapshotSources.find(entry->second.buffer.get());
++        if (source != storageSnapshotSources.end() && source->second == entry->first) storageSnapshotSources.erase(source);
++        if (entry->second.resident != nullptr) {
++            residentSnapshotBytes -= std::get<2>(entry->first);
++            --residentSnapshotCount;
++        }
++    }
+     drawSnapshots.erase(entry);
++}
++
++std::shared_ptr<DeviceBuffer> Recorder::ResidentDrawSnapshot(const std::shared_ptr<Buffer>& source) {
++    static const bool enabled = std::getenv("APS5_NO_RESIDENT_DRAW_SNAPSHOTS") == nullptr;
++    if (!enabled || source == nullptr || !source->Mapped() || !source->Supports(VK_BUFFER_USAGE_TRANSFER_SRC_BIT)) return {};
++    const auto indexed = storageSnapshotSources.find(source.get());
++    if (indexed == storageSnapshotSources.end()) return {};
++    const auto found = drawSnapshots.find(indexed->second);
++    if (found == drawSnapshots.end() || found->second.buffer != source) return {};
++    auto& snapshot = found->second;
++    const auto bytes = std::get<2>(found->first);
++    if (bytes < 65536 || bytes % 4 != 0 || bytes > DrawResidentBudget || source->Bytes().size() != bytes) return {};
++    auto& recency = drawSnapshotPools[SnapshotPool(SnapshotUse::Storage)].recency;
++    recency.splice(recency.end(), recency, snapshot.recent);
++    if (snapshot.resident != nullptr) return snapshot.resident;
++    for (const auto& key : recency) {
++        if (residentSnapshotBytes + bytes <= DrawResidentBudget && residentSnapshotCount < DrawResidentEntries) break;
++        auto& entry = drawSnapshots.at(key);
++        if (entry.resident == nullptr) continue;
++        residentSnapshotBytes -= std::get<2>(key);
++        --residentSnapshotCount;
++        entry.resident.reset();
++    }
++    auto resident = std::make_shared<DeviceBuffer>(context, bytes, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
++    Keep(source, bytes);
++    Keep(resident, bytes);
++    const auto commands = Commands();
++    RecordMemoryBarrier(context, commands, VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_ACCESS_HOST_WRITE_BIT, VK_ACCESS_TRANSFER_READ_BIT);
++    CopyBuffer(context, commands, source->Handle(), 0, resident->Handle(), 0, bytes);
++    RecordMemoryBarrier(context, commands, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT);
++    snapshot.resident = std::move(resident);
++    residentSnapshotBytes += bytes;
++    ++residentSnapshotCount;
++    return snapshot.resident;
+ }
+ 
+ Recorder::UploadSlice Recorder::DrawUpload(std::size_t bytes) {
+@@ -2636,9 +2678,16 @@
+ 
+ std::shared_ptr<Buffer> Recorder::UnwrittenDrawSnapshot(std::uint64_t address, std::size_t bytes, const std::array<std::uint64_t, 3>& stamp, VkDeviceSize* offset) {
+     retireUnwrittenSnapshots(stamp);
+-    const auto found = unwrittenSnapshots.find(address);
+-    if (found == unwrittenSnapshots.end() || found->second.bytes != bytes) return {};
+-    if (offset != nullptr) *offset = found->second.offset;
++    auto found = unwrittenSnapshots.upper_bound(address);
++    if (found == unwrittenSnapshots.begin()) return {};
++    --found;
++    const auto delta = address - found->first;
++    const auto& snapshot = found->second;
++    if (delta > snapshot.bytes || bytes > snapshot.bytes - delta) return {};
++    if (offset == nullptr && (delta != 0 || bytes != snapshot.bytes)) return {};
++    const auto position = snapshot.offset + delta;
++    if (position % std::max<VkDeviceSize>(context.limits.minStorageBufferOffsetAlignment, 1) != 0) return {};
++    if (offset != nullptr) *offset = position;
+     return found->second.buffer;
+ }
+ 
+@@ -2651,6 +2700,83 @@
+     if (unwrittenSnapshots.size() >= UnwrittenSnapshotEntries || bytes > DrawSnapshotBudget - unwrittenBytes) return;
+     unwrittenSnapshots.emplace(address, UnwrittenSnapshot{bytes, std::move(buffer), offset});
+     unwrittenBytes += bytes;
++}
++
++std::shared_ptr<Buffer> Recorder::ReusableDrawSnapshotSlice(std::uint64_t address, std::size_t bytes, std::uint64_t generation, VkDeviceSize& offset) {
++    static const bool enabled = std::getenv("APS5_NO_PERSISTENT_DRAW_SLICES") == nullptr;
++    if (!enabled || generation == 0 || bytes == 0 || address > std::numeric_limits<std::uint64_t>::max() - bytes) return {};
++    struct Counters {
++        std::chrono::steady_clock::time_point since = std::chrono::steady_clock::now();
++        std::uint64_t queries = 0, hits = 0, bytes = 0, comparisons = 0, candidates = 0;
++    };
++    static const bool profile = std::getenv("APS5_PROFILE_DRAW") != nullptr;
++    thread_local Counters counters;
++    auto& pool = drawSnapshotPools[SnapshotPool(SnapshotUse::Storage)];
++    const auto registry = GuestAllocations::GuestAllocationsGeneration_nid_postfix();
++    const auto alignment = std::max<VkDeviceSize>(context.limits.minStorageBufferOffsetAlignment, 1);
++    const auto finish = [&](std::shared_ptr<Buffer> buffer) {
++        if (profile) {
++            ++counters.queries;
++            if (buffer != nullptr) { ++counters.hits; counters.bytes += bytes; }
++            if (std::chrono::steady_clock::now() - counters.since >= std::chrono::seconds(10)) {
++                ProfilePrint_nid_no_patch("[draw-slices] %llu queries, %llu hits, %.1f MiB reused, %llu compared spans, %llu covering candidates\n", static_cast<unsigned long long>(counters.queries), static_cast<unsigned long long>(counters.hits), counters.bytes / 1048576.0, static_cast<unsigned long long>(counters.comparisons), static_cast<unsigned long long>(counters.candidates));
++                counters = {};
++            }
++        }
++        return buffer;
++    };
++    const auto reuse = [&](auto found) -> std::shared_ptr<Buffer> {
++        if (found == drawSnapshots.end() || std::get<1>(found->first) != SnapshotUse::Storage) return {};
++        const auto base = std::get<0>(found->first);
++        const auto capacity = std::get<2>(found->first);
++        if (base > address || address - base > capacity || bytes > capacity - (address - base)) return {};
++        const auto delta = address - base;
++        auto& entry = found->second;
++        if (delta % alignment != 0 || entry.registryGeneration != registry) return {};
++        const auto held = entry.buffer->Bytes();
++        if (delta > held.size() || bytes > held.size() - delta) return {};
++        if (profile) ++counters.candidates;
++        if (!GuestMemory::UnchangedSince(address, bytes, entry.generation)) {
++            constexpr std::uint64_t block = 65536;
++            const auto aligned = address / block * block;
++            const auto count = static_cast<std::size_t>((address + bytes - 1) / block - address / block + 1);
++            struct Scratch {
++                std::vector<std::uint64_t> generations;
++                std::vector<std::uint8_t> changed;
++                std::vector<CompareSpan> spans;
++                std::vector<std::uint8_t> equal;
++            };
++            auto& scratch = HostThreadLocal<Scratch, Scratch>();
++            scratch.generations.assign(count, entry.generation);
++            scratch.changed.assign(count, GuestMemory::BlockWritten);
++            scratch.spans.clear();
++            GuestMemory::ChangedBlocks(address, bytes, scratch.generations, scratch.changed);
++            for (std::size_t index = 0; index < count; ++index) {
++                if (scratch.changed[index] == GuestMemory::BlockUnchanged) continue;
++                const auto from = std::max(address, aligned + index * block);
++                const auto to = std::min(address + bytes, aligned + (index + 1) * block);
++                scratch.spans.push_back({held.data() + (from - base), reinterpret_cast<const void*>(from), static_cast<std::size_t>(to - from)});
++            }
++            scratch.equal.assign(scratch.spans.size(), 0);
++            CompareSpans(scratch.spans, scratch.equal);
++            if (profile) counters.comparisons += scratch.spans.size();
++            if (std::ranges::find(scratch.equal, 0) != scratch.equal.end()) return {};
++        }
++        pool.recency.splice(pool.recency.end(), pool.recency, entry.recent);
++        offset = delta;
++        return entry.buffer;
++    };
++    const auto preferred = drawSnapshots.lower_bound({address, SnapshotUse::Storage, bytes});
++    if (preferred != drawSnapshots.end() && std::get<0>(preferred->first) == address) {
++        if (auto buffer = reuse(preferred)) return finish(std::move(buffer));
++    }
++    std::size_t checked = 0;
++    for (auto recent = pool.recency.rbegin(); recent != pool.recency.rend() && checked < 16; ++recent, ++checked) {
++        const auto found = drawSnapshots.find(*recent);
++        if (found == preferred) continue;
++        if (auto buffer = reuse(found)) return finish(std::move(buffer));
++    }
++    return finish({});
+ }
+ 
+ std::shared_ptr<Buffer> Recorder::ReusableDrawSnapshot(std::uint64_t address, std::size_t bytes, SnapshotUse use, std::uint32_t* derived, std::uint64_t generation) {
+@@ -2694,7 +2820,7 @@
+     changed.assign(count, GuestMemory::BlockWritten);
+     differing.clear();
+     spans.clear();
+-    const bool sole = entry.buffer.use_count() == 1;
++    const bool sole = entry.buffer.use_count() == 1 && entry.resident == nullptr;
+     GuestMemory::ChangedBlocks(address, bytes, generations, changed);
+     for (std::size_t k = 0; k < count; ++k) {
+         if (changed[k] == GuestMemory::BlockUnchanged) continue;
+@@ -2731,9 +2857,12 @@
+     while (!pool.recency.empty() && (pool.bytes + bytes > budget || pool.recency.size() >= maxEntries)) eraseDrawSnapshot(drawSnapshots.find(pool.recency.front()));
+     const DrawSnapshotKey key{address, use, bytes};
+     pool.recency.push_back(key);
++    auto inserted = drawSnapshots.end();
+     try {
+-        drawSnapshots.emplace(key, DrawSnapshot{generation, registryGeneration, std::prev(pool.recency.end()), std::move(buffer), derived});
++        inserted = drawSnapshots.emplace(key, DrawSnapshot{generation, registryGeneration, std::prev(pool.recency.end()), std::move(buffer), derived, {}}).first;
++        if (storage) storageSnapshotSources.insert_or_assign(inserted->second.buffer.get(), key);
+     } catch (...) {
++        if (inserted != drawSnapshots.end()) drawSnapshots.erase(inserted);
+         pool.recency.pop_back();
+         throw;
+     }
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/src/ShaderResources.cpp b/core/libs/prx/libSceAgcDriver/Graphics/src/ShaderResources.cpp
+--- a/core/libs/prx/libSceAgcDriver/Graphics/src/ShaderResources.cpp
++++ b/core/libs/prx/libSceAgcDriver/Graphics/src/ShaderResources.cpp
+@@ -5239,6 +5239,7 @@
+ }
+ 
+ std::shared_ptr<ShaderResources::DrawBindings> ShaderResources::PrepareDrawBindings(Recorder& recorder, std::span<const MovedBuffer> moved, bool movedOnly) const {
++    PerformanceTimer timing("Graphics.DrawBindings");
+     if ((_set == VK_NULL_HANDLE && fragment.set == VK_NULL_HANDLE) || usesBda) return {};
+     thread_local std::vector<std::pair<std::uint64_t, std::uint64_t>>* readsSlot = nullptr;
+     auto& reads = ShaderRecompiler::ThreadOwned(readsSlot);
+@@ -5246,6 +5247,7 @@
+     const auto maxSnapshotBytes = maxDrawSnapshotBytes;
+     const auto uploadLimit = DrawUploadLimit();
+     std::size_t totalSnapshotBytes = 0;
++    std::uint64_t copiedBytes = 0;
+     auto result = std::make_shared<DrawBindings>();
+     thread_local std::vector<std::size_t>* selectedSlot = nullptr;
+     auto& selected = ShaderRecompiler::ThreadOwned(selectedSlot);
+@@ -5313,14 +5315,17 @@
+             if (uploaded) {
+                 auto slice = recorder.DrawUpload(bytes);
+                 std::memcpy(slice.bytes, reinterpret_cast<const void*>(begin), bytes);
++                copiedBytes += bytes;
+                 buffer = std::move(slice.buffer);
+                 offset = slice.offset;
+             } else {
+                 const auto generation = GuestMemory::CollectWrites(begin, bytes);
+                 buffer = recorder.ReusableDrawSnapshot(begin, bytes, Recorder::SnapshotUse::Storage, nullptr, generation);
++                if (buffer == nullptr) buffer = recorder.ReusableDrawSnapshotSlice(begin, bytes, generation, offset);
+                 if (buffer == nullptr) {
+                     buffer = std::make_shared<Buffer>(context, bytes, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+                     std::memcpy(buffer->Bytes().data(), reinterpret_cast<const void*>(begin), bytes);
++                    copiedBytes += bytes;
+                     recorder.KeepDrawSnapshot(begin, bytes, generation, registryGeneration, buffer);
+                 }
+             }
+@@ -5328,13 +5333,21 @@
+             else if (!uploaded || stamp[1] != 0) recorder.NoteUnwrittenDrawSnapshot(begin, bytes, stamp, buffer, offset);
+         }
+         selected.push_back(index);
+-        keep({begin, std::move(buffer), offset, bytes});
++        auto resident = recorder.ResidentDrawSnapshot(buffer);
++        keep({begin, std::move(buffer), offset, bytes, std::move(resident)});
+         totalSnapshotBytes += bytes;
+         CaptureTrace::Log("draw-snapshot batch=%llu address=%llx bytes=%zu", static_cast<unsigned long long>(recorder.Submissions() + 1), static_cast<unsigned long long>(begin), bytes);
+     }
+     if (selected.empty()) return {};
++    timing.Mark("snapshots", totalSnapshotBytes);
+     Require(context.descriptorCache != nullptr, "draw snapshots require a descriptor cache");
+     std::array<bool, 2> described{};
++    std::array<bool, 2> changedSets{};
++    for (const auto& binding : bindings) {
++        if (std::any_of(binding.allocations.begin(), binding.allocations.end(), [&](std::size_t index) { return std::find(selected.begin(), selected.end(), index) != selected.end(); })) changedSets[setOf(binding)] = true;
++    }
++    result->unchangedSet = _set;
++    result->unchangedFragmentSet = fragment.set;
+     thread_local std::array<std::vector<VkDescriptorPoolSize>, 2>* countsSlot = nullptr;
+     auto& counts = ShaderRecompiler::ThreadOwned(countsSlot);
+     for (auto& sizes : counts) sizes.clear();
+@@ -5352,12 +5365,12 @@
+     const auto sizesOf = [&](std::size_t set) { return std::span<const VkDescriptorPoolSize>(counts[set]); };
+     const auto variableOf = [&](std::size_t set) { return tableBindings[set] != std::numeric_limits<std::size_t>::max() ? std::optional<std::uint32_t>(std::max(1u, static_cast<std::uint32_t>(bindings[tableBindings[set]].imageAllocations.size()))) : std::nullopt; };
+     result->cache = context.descriptorCache;
+-    if (described[0] || splitSets) {
++    if (changedSets[0]) {
+         result->allocation = result->cache->AllocateRewritten(_layout, sizesOf(0), updateAfterBind, variableOf(0));
+         result->layout = _layout;
+         Require(result->allocation.set != VK_NULL_HANDLE, "draw snapshot descriptor allocation failed");
+     }
+-    if (described[1] || splitSets) {
++    if (changedSets[1]) {
+         result->fragmentAllocation = result->cache->AllocateRewritten(fragment.layout, sizesOf(1), updateAfterBind, variableOf(1));
+         result->fragmentLayout = fragment.layout;
+         Require(result->fragmentAllocation.set != VK_NULL_HANDLE, "draw snapshot descriptor allocation failed");
+@@ -5385,14 +5398,35 @@
+                 const auto snapshotIndex = snapshotIndices[binding.allocations[element]];
+                 if (snapshotIndex == selected.size()) continue;
+                 const auto& snapshot = result->snapshots[snapshotIndex];
+-                buffers[offset + element] = {snapshot.buffer->Handle(), snapshot.offset, snapshot.bytes};
++                buffers[offset + element] = {snapshot.Handle(), snapshot.offset, snapshot.bytes};
+             }
+         }
+     }
+     Require(nextWrite == writes.end(), "draw snapshot writes disagree with their descriptor bindings");
++    std::erase_if(writes, [](const VkWriteDescriptorSet& write) { return write.dstSet == VK_NULL_HANDLE; });
+     context.Resolved(&DeviceFunctions::updateDescriptorSets, "vkUpdateDescriptorSets")(context.device, static_cast<std::uint32_t>(writes.size()), writes.data(), 0, nullptr);
++    timing.Mark("descriptors");
+     recorder.Keep(result);
+     for (const auto& snapshot : result->snapshots) recorder.KeepBytes(snapshot.buffer.get(), snapshot.buffer->Bytes().size());
++    if (BuildProfiled()) {
++        struct Counters {
++            std::chrono::steady_clock::time_point since = std::chrono::steady_clock::now();
++            std::uint64_t draws = 0;
++            std::uint64_t copied = 0;
++            std::uint64_t reused = 0;
++            std::size_t largest = 0;
++        };
++        thread_local Counters counters;
++        ++counters.draws;
++        counters.copied += copiedBytes;
++        counters.reused += totalSnapshotBytes - copiedBytes;
++        counters.largest = std::max(counters.largest, totalSnapshotBytes);
++        const auto now = std::chrono::steady_clock::now();
++        if (now - counters.since >= std::chrono::seconds(10)) {
++            AgcDriver::ProfilePrint_nid_no_patch("[draw-snapshots] %llu draws: %.1f MiB copied, %.1f MiB reused, %.1f MiB largest draw\n", static_cast<unsigned long long>(counters.draws), counters.copied / 1048576.0, counters.reused / 1048576.0, counters.largest / 1048576.0);
++            counters = {};
++        }
++    }
+     return result;
+ }
+ 
+diff --git a/core/libs/prx/libSceAgcDriver/Graphics/src/State.cpp b/core/libs/prx/libSceAgcDriver/Graphics/src/State.cpp
+--- a/core/libs/prx/libSceAgcDriver/Graphics/src/State.cpp
++++ b/core/libs/prx/libSceAgcDriver/Graphics/src/State.cpp
+@@ -299,7 +299,7 @@
+ 
+ void decodeDepth(const Registers& cx, std::uint32_t depthControl, bool testValExport, bool opValExport, State& result) {
+     const bool opValReference = opValExport && StencilOperationValueReplaces(cx);
+-    zero(cx, 0x000, 0x0000101cu, "depth copy, resummarize or decompress draws (DB_RENDER_CONTROL)");
++    zero(cx, 0x000, (read(cx, 0x000) & 4u) != 0 ? 0x00001018u : 0x0000101cu, "depth copy, resummarize or decompress draws (DB_RENDER_CONTROL)");
+     const bool depthClear = (read(cx, 0x000) & 1u) != 0;
+     const bool stencilClear = (read(cx, 0x000) & 2u) != 0;
+     const auto view = read(cx, 0x002);
+@@ -1048,6 +1048,7 @@
+     if (DepthResummarizeDrawsNothing(queue)) return {};
+     const auto control = find(queue.context, 0x000);
+     if (control == queue.context.end() || (control->second & ~0x2fe3u) == 0) return {};
++    if ((control->second & 4u) != 0 && (control->second & ~0x84u) == 0 && ColorWriteMask(queue.context) == 1u) return {};
+     const auto depthControl = find(queue.context, 0x200);
+     const bool colorMasks = find(queue.context, 0x8e) != queue.context.end() && find(queue.context, 0x8f) != queue.context.end();
+     if ((control->second & ~0x2fe3u) == 0x10u && depthControl != queue.context.end() && (depthControl->second & 3u) == 0 && colorMasks && ColorWriteMask(queue.context) == 0) return {};
+@@ -1170,7 +1171,7 @@
+         const auto renderControl = find(cx, 0x000);
+         const bool clear = renderControl != cx.end() && (renderControl->second & 3u) != 0;
+         const auto tests = planeTests(cx, depthControl);
+-        if ((clear || tests != 0) && depthSurfaceBound(cx)) {
++        if ((clear || tests != 0 || (renderControl != cx.end() && (renderControl->second & 4u) != 0)) && depthSurfaceBound(cx)) {
+             decodeDepth(cx, depthControl, (read(cx, 0x203) & 2u) != 0 && !PixelProgramSkipped(queue), (read(cx, 0x203) & 4u) != 0 && !PixelProgramSkipped(queue), result);
+         } else if (depthPassThrough(depthControl) || ((depthControl & 0xbu) != 0 && (tests == 0 || depthPlanesAbsent(cx)))) {
+             static bool reported = false;
+@@ -1488,6 +1489,20 @@
+         Require(!result.ditheredAlphaToCoverage || format == 4u || format == 9u, "dithered alpha-to-coverage needs an FP16_ABGR or 32_ABGR export");
+         Require(mrt0 == result.colors.end() || (mrt0->componentMapping == 0xe4u && mrt0->packing == ShaderRecompiler::ColorExportPacking::None), "alpha-to-coverage into a component-swapped or packed MRT0 target is unsupported");
+     }
++    if (const auto control = find(cx, 0x000); control != cx.end() && (control->second & 4u) != 0) {
++        Require((read(cx, 0x000) & ~0x84u) == 0, "depth copy combined with another maintenance operation or a nonzero sample is unsupported");
++        Require(result.depth.has_value() && result.depth->address != 0u, "depth copy needs a bound depth source");
++        Require(result.depth->samples == 1u && result.samples == 1u, "multisampled depth copy is unsupported");
++        Require(result.depth->firstSlice == 0u && result.depth->lastSlice == 0u && result.renderLayers == 1u, "layered depth copy is unsupported");
++        Require(!result.depthTest && !result.depthWrite && !result.depthBoundsTest && !result.stencilTest, "depth copy with depth or stencil tests is unsupported");
++        Require(result.colors.size() == 1u && result.colors.front().exportIndex == 0u && result.colors.front().format == VK_FORMAT_R32_SFLOAT, "depth copy requires one R32 float color target at slot zero");
++        Require(result.colors.front().componentMapping == 0xe4u && !result.blend.blendEnable && result.blend.colorWriteMask == VK_COLOR_COMPONENT_R_BIT, "depth copy requires an unblended red channel");
++        Require(!result.alphaToCoverage && QuadPixelMask(result) == 15u && UniformSampleMask(result), "depth copy with alpha or nonuniform coverage is unsupported");
++        Require(result.colors.front().extent.width == result.depth->extent.width && result.colors.front().extent.height == result.depth->extent.height, "depth copy source and destination extents differ");
++        Require(result.color.address != result.depth->address, "overlapping depth copy is unsupported");
++        result.depthCopy = result.depth;
++        result.depth.reset();
++    }
+     APS5_LOG_OUT_DEBUG("DecodeState done colorTarget=%u render=%ux%u topology=%u", result.hasColorTarget ? 1u : 0u, result.renderExtent.width, result.renderExtent.height, static_cast<unsigned>(result.topology));
+     return result;
+ }
+@@ -1967,7 +1982,7 @@
+     const auto targetMask = find(queue.context, 0x8e);
+     const auto shaderMask = find(queue.context, 0x8f);
+     if (targetMask == queue.context.end() || shaderMask == queue.context.end()) return "AGC graphics: a draw without a pixel program needs CB_TARGET_MASK and CB_SHADER_MASK";
+-    if (ColorWriteMask(queue.context) != 0) return "AGC graphics: a draw without a pixel program writes color";
++    if (ColorWriteMask(queue.context) != 0 && (find(queue.context, 0x000) == queue.context.end() || (find(queue.context, 0x000)->second & 4u) == 0)) return "AGC graphics: a draw without a pixel program writes color";
+     return {};
+ }
+ 
+diff --git a/core/libs/prx/libSceAgcDriver/tests/Graphics.cpp b/core/libs/prx/libSceAgcDriver/tests/Graphics.cpp
+--- a/core/libs/prx/libSceAgcDriver/tests/Graphics.cpp
++++ b/core/libs/prx/libSceAgcDriver/tests/Graphics.cpp
+@@ -2481,6 +2481,33 @@
+ }
+ 
+ void depthMaintenanceTests() {
++    for (const auto control : {4u, 0x84u}) {
++        auto queue = makeState();
++        queue.context[0x000] = control;
++        queue.context[0x002] = 0;
++        queue.context[0x007] = (3u << 16u) | 63u;
++        queue.context[0x00a] = 0;
++        queue.context[0x00b] = 0x3f800000u;
++        queue.context[0x010] = 3u;
++        queue.context[0x011] = 0;
++        queue.context[0x012] = 0x100u;
++        queue.context[0x014] = 0x100u;
++        queue.context[0x200] = 0;
++        queue.context[0x8e] = queue.context[0x8f] = 1u;
++        queue.context[0x31c] = (4u << 2u) | (7u << 8u);
++        queue.context[0x1c5] = 1u;
++        queue.shader.erase(0x8);
++        queue.shader.erase(0x9);
++        Require(AgcDriver::Graphics::DepthMaintenanceRejection(queue).empty(), "a single-sample depth copy was rejected before decoding");
++        const auto state = AgcDriver::Graphics::DecodeState(queue);
++        Require(state.depthCopy && !state.depth && state.depthCopy->address == 0x10000u, "depth copy source was lost or attached as writable depth");
++        auto sampled = queue;
++        sampled.context[0x010] |= 4u;
++        expectFailure([&] { AgcDriver::Graphics::DecodeState(sampled); }, "sample count");
++        auto tested = queue;
++        tested.context[0x200] = 2u;
++        expectFailure([&] { AgcDriver::Graphics::DecodeState(tested); }, "depth or stencil tests");
++    }
+     for (const auto mode : {0x4u, 0x8u, 0x84u, 0x108u, 0xf88u, 0x1000u, 0x4000u}) {
+         for (const auto clear : {0u, 1u, 2u, 3u}) {
+             auto queue = makeState();
+diff --git a/core/libs/prx/libSceAgcDriver/tests/Recorder.cpp b/core/libs/prx/libSceAgcDriver/tests/Recorder.cpp
+--- a/core/libs/prx/libSceAgcDriver/tests/Recorder.cpp
++++ b/core/libs/prx/libSceAgcDriver/tests/Recorder.cpp
+@@ -4019,6 +4019,149 @@
+     Require(cache.ReusableDrawSnapshot(address, 16) == nullptr && cache.ReusableDrawSnapshot(address, 16) == nullptr, "a snapshot outlived a CPU store");
+ }
+ 
++void persistentSnapshotSliceTests(const Device& device) {
++    using namespace AgcDriver::GuestMemory;
++    if (std::getenv("APS5_NO_PERSISTENT_DRAW_SLICES") != nullptr) return;
++    constexpr std::size_t bytes = 4 * 65536;
++    void* block = WriteWatched() ? AllocateWatched(bytes, 65536) : nullptr;
++    if (block == nullptr) {
++        std::cout << "write watching unavailable: persistent snapshot slices not tested\n";
++        return;
++    }
++    struct Release {
++        void* block;
++        ~Release() { ReleaseWatched(block, bytes); }
++    } release{block};
++    const auto address = reinterpret_cast<std::uint64_t>(block);
++    const auto alignment = std::max<VkDeviceSize>(device.GetContext().limits.minStorageBufferOffsetAlignment, 1);
++    Require(alignment < 65536, "slice fixture alignment exceeds a tracked block");
++    for (std::size_t index = 0; index < 4; ++index) std::memset(static_cast<std::byte*>(block) + index * 65536, static_cast<int>(0x31 + index), 65536);
++    auto captured = std::make_shared<Buffer>(device.GetContext(), bytes, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
++    std::memcpy(captured->Bytes().data(), block, bytes);
++    const std::vector<std::byte> original(captured->Bytes().begin(), captured->Bytes().end());
++    Recorder cache(device.GetContext());
++    const auto registry = GuestAllocations::GuestAllocationsGeneration_nid_postfix();
++    const auto initial = CollectWrites(address, bytes);
++    Require(initial != 0, "persistent slice fixture has no generation");
++    cache.KeepDrawSnapshot(address, bytes, initial, registry, captured);
++    VkDeviceSize offset = 0;
++    BumpCollectEpoch();
++    Require(cache.ReusableDrawSnapshotSlice(address + 65536, 65536, CollectWrites(address + 65536, 65536), offset) == captured && offset == 65536, "an unchanged slice was copied after an epoch change");
++    Require(cache.ReusableDrawSnapshotSlice(address, 65536, CollectWrites(address, 65536), offset) == captured && offset == 0, "a shorter snapshot at the same base was not shared");
++    std::memset(block, 0x52, 4096);
++    BumpCollectEpoch();
++    Require(cache.ReusableDrawSnapshotSlice(address + 8192, 8192, CollectWrites(address, 65536), offset) == captured && offset == 8192, "a write outside a slice on the same tracked block changed its answer");
++    Require(cache.ReusableDrawSnapshotSlice(address + 65536, 65536, CollectWrites(address, bytes), offset) == captured, "a write outside a requested slice invalidated its immutable bytes");
++    Require(cache.ReusableDrawSnapshotSlice(address, 65536, CollectWrites(address, 65536), offset) == nullptr, "checking a slice advanced the generation of an unchecked region");
++    std::memset(block, 0x31, 4096);
++    BumpCollectEpoch();
++    Require(cache.ReusableDrawSnapshotSlice(address, 65536, CollectWrites(address, 65536), offset) == captured, "equal bytes on a dirty page could not reuse their snapshot");
++    std::memset(static_cast<std::byte*>(block) + 65536, 0x73, 4096);
++    BumpCollectEpoch();
++    Require(cache.ReusableDrawSnapshotSlice(address + 65536, 65536, CollectWrites(address + 65536, 65536), offset) == nullptr, "a slice outlived a CPU write in its own range");
++    Require(std::equal(original.begin(), original.end(), captured->Bytes().begin()), "slice validation modified a buffer retained by earlier draws");
++    Require(cache.ReusableDrawSnapshotSlice(address + bytes - alignment, alignment * 2, initial, offset) == nullptr, "a slice crossed the captured range");
++    Require(cache.ReusableDrawSnapshotSlice(address + bytes, alignment, initial, offset) == nullptr, "a slice started after the captured range");
++    if (alignment > 1) Require(cache.ReusableDrawSnapshotSlice(address + 1, alignment, initial, offset) == nullptr, "a slice violated descriptor offset alignment");
++    Require(cache.ReusableDrawSnapshotSlice(address, 65536, 0, offset) == nullptr, "an untracked request reused a persistent slice");
++    Recorder stale(device.GetContext());
++    stale.KeepDrawSnapshot(address, bytes, initial, registry + 1, captured);
++    Require(stale.ReusableDrawSnapshotSlice(address, 65536, initial, offset) == nullptr, "a slice ignored its allocation registry generation");
++    Recorder evicted(device.GetContext());
++    evicted.KeepDrawSnapshot(address, bytes, initial, registry, captured);
++    for (std::size_t index = 0; index < Recorder::DrawSnapshotEntries; ++index) evicted.KeepDrawSnapshot(address + bytes + index * 16, 1, initial, registry, captured);
++    Require(evicted.ReusableDrawSnapshotSlice(address, 65536, initial, offset) == nullptr, "an evicted snapshot still served a slice");
++    auto source = cache.ReusableDrawSnapshotSlice(address + 2 * 65536, 65536, CollectWrites(address + 2 * 65536, 65536), offset);
++    Require(source == captured && offset == 2 * 65536, "GPU readback has no immutable source slice");
++    Buffer readback(device.GetContext(), 65536, VK_BUFFER_USAGE_TRANSFER_DST_BIT);
++    CommandBatch commands(device.GetContext());
++    RecordMemoryBarrier(device.GetContext(), commands.Handle(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_ACCESS_HOST_WRITE_BIT, VK_ACCESS_TRANSFER_READ_BIT);
++    CopyBuffer(device.GetContext(), commands.Handle(), source->Handle(), offset, readback.Handle(), 0, 65536);
++    RecordMemoryBarrier(device.GetContext(), commands.Handle(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_HOST_READ_BIT);
++    commands.SubmitAndWait();
++    readback.Invalidate();
++    Require(std::all_of(readback.Bytes().begin(), readback.Bytes().end(), [](std::byte value) { return value == std::byte{0x33}; }), "GPU readback did not read the selected immutable buffer slice");
++    std::cout << "persistent snapshot GPU readback values passed\n";
++    std::cout << "persistent snapshot slice coherency tests passed\n";
++}
++
++void residentSnapshotTests(const Device& device) {
++    using namespace AgcDriver::GuestMemory;
++    if (std::getenv("APS5_NO_RESIDENT_DRAW_SNAPSHOTS") != nullptr) return;
++    constexpr std::size_t bytes = 4 * 65536;
++    Recorder recorder(device.GetContext());
++    const auto makeSource = [&](std::byte value) {
++        auto source = std::make_shared<Buffer>(device.GetContext(), bytes, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
++        std::fill(source->Bytes().begin(), source->Bytes().end(), value);
++        return source;
++    };
++    auto source = makeSource(std::byte{0x31});
++    for (std::size_t index = 0; index < 4; ++index) std::memset(source->Bytes().data() + index * 65536, static_cast<int>(0x31 + index), 65536);
++    constexpr std::uint64_t address = 0x600000000;
++    const auto registry = GuestAllocations::GuestAllocationsGeneration_nid_postfix();
++    recorder.KeepDrawSnapshot(address, bytes, 1, registry, source);
++    const auto resident = recorder.ResidentDrawSnapshot(source);
++    Require(resident != nullptr && recorder.ResidentDrawSnapshot(source) == resident, "resident snapshot upload was not reused");
++    const auto read = [&](const std::shared_ptr<DeviceBuffer>& buffer, VkDeviceSize offset, std::byte expected) {
++        Buffer readback(device.GetContext(), 65536, VK_BUFFER_USAGE_TRANSFER_DST_BIT);
++        const auto commands = recorder.Commands();
++        RecordMemoryBarrier(device.GetContext(), commands, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_TRANSFER_READ_BIT);
++        CopyBuffer(device.GetContext(), commands, buffer->Handle(), offset, readback.Handle(), 0, 65536);
++        RecordMemoryBarrier(device.GetContext(), commands, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_HOST_READ_BIT);
++        recorder.Sync();
++        readback.Invalidate();
++        Require(std::all_of(readback.Bytes().begin(), readback.Bytes().end(), [&](std::byte value) { return value == expected; }), "resident GPU snapshot values differ");
++    };
++    read(resident, 2 * 65536, std::byte{0x33});
++    const auto unsupported = std::make_shared<Buffer>(device.GetContext(), bytes, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
++    recorder.KeepDrawSnapshot(address + bytes, bytes, 1, registry, unsupported);
++    Require(recorder.ResidentDrawSnapshot(unsupported) == nullptr, "resident upload used a buffer without transfer-source support");
++    const auto odd = std::make_shared<Buffer>(device.GetContext(), 65537, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
++    recorder.KeepDrawSnapshot(address + bytes + 65536, 65537, 1, registry, odd);
++    Require(recorder.ResidentDrawSnapshot(odd) == nullptr, "unaligned resident copy was recorded");
++    const auto untracked = makeSource(std::byte{0});
++    Require(recorder.ResidentDrawSnapshot(untracked) == nullptr, "resident upload accepted an unregistered transient buffer");
++    for (std::size_t index = 0; index < Recorder::DrawResidentEntries; ++index) {
++        auto entry = makeSource(std::byte{0x55});
++        recorder.KeepDrawSnapshot(address + (index + 2) * bytes, bytes, 1, registry, entry);
++        Require(recorder.ResidentDrawSnapshot(entry) != nullptr, "resident snapshot entry was not created");
++    }
++    const auto reloaded = recorder.ResidentDrawSnapshot(source);
++    Require(reloaded != nullptr && reloaded != resident, "resident entry limit did not evict the least recent upload");
++    read(resident, 2 * 65536, std::byte{0x33});
++    read(reloaded, 65536, std::byte{0x32});
++    const auto replacement = makeSource(std::byte{0x77});
++    recorder.KeepDrawSnapshot(address, bytes, 1, registry, replacement);
++    Require(recorder.ResidentDrawSnapshot(source) == nullptr, "replaced snapshot retained its resident source index");
++    const auto replaced = recorder.ResidentDrawSnapshot(replacement);
++    Require(replaced != nullptr && replaced != reloaded, "replacement snapshot reused the old GPU data");
++    read(replaced, 0, std::byte{0x77});
++    if (WriteWatched()) {
++        void* watched = AllocateWatched(bytes, 65536);
++        Require(watched != nullptr, "resident snapshot write-watch allocation failed");
++        struct Release {
++            void* block;
++            ~Release() { ReleaseWatched(block, bytes); }
++        } release{watched};
++        std::memset(watched, 0x44, bytes);
++        const auto guest = reinterpret_cast<std::uint64_t>(watched);
++        BumpCollectEpoch();
++        const auto generation = CollectWrites(guest, bytes);
++        auto captured = makeSource(std::byte{0x44});
++        Recorder changed(device.GetContext());
++        changed.KeepDrawSnapshot(guest, bytes, generation, registry, captured);
++        const auto held = changed.ResidentDrawSnapshot(captured);
++        captured.reset();
++        changed.Sync();
++        changed.FlushDeferredReleases();
++        std::memset(watched, 0x88, bytes);
++        BumpCollectEpoch();
++        Require(changed.ReusableDrawSnapshot(guest, bytes, Recorder::SnapshotUse::Storage, nullptr, CollectWrites(guest, bytes)) == nullptr, "resident source was modified in place after a CPU write");
++        read(held, 0, std::byte{0x44});
++    }
++    std::cout << "native resident snapshot GPU values and eviction passed\n";
++}
++
+ void unwrittenSnapshotTests(const Device& device) {
+     Recorder cache(device.GetContext());
+     const auto buffer = std::make_shared<Buffer>(device.GetContext(), 16, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
+@@ -4039,6 +4182,19 @@
+     cache.NoteUnwrittenDrawSnapshot(address, 16, later, buffer, 256);
+     VkDeviceSize offset = 0;
+     Require(cache.UnwrittenDrawSnapshot(address, 16, later, &offset) == buffer && offset == 256, "an unwritten snapshot lost its offset in its buffer");
++    const auto alignment = std::max<VkDeviceSize>(device.GetContext().limits.minStorageBufferOffsetAlignment, 1);
++    const auto large = std::make_shared<Buffer>(device.GetContext(), alignment * 8, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
++    for (std::size_t index = 0; index < large->Bytes().size(); ++index) large->Bytes()[index] = static_cast<std::byte>(index);
++    cache.NoteUnwrittenDrawSnapshot(address, alignment * 4, later, large, alignment);
++    Require(cache.UnwrittenDrawSnapshot(address + alignment, alignment * 2, later, &offset) == large && offset == alignment * 2, "a contained snapshot did not reuse the existing aligned buffer range");
++    Require(cache.UnwrittenDrawSnapshot(address, alignment * 2, later, &offset) == large && offset == alignment, "a shorter snapshot at the same address was copied again");
++    Require(cache.UnwrittenDrawSnapshot(address + alignment * 3, alignment, later, &offset) == large && offset == alignment * 4, "a snapshot ending at the cached range boundary was not reused");
++    Require(cache.UnwrittenDrawSnapshot(address + alignment * 3, alignment + 1, later, &offset) == nullptr, "a snapshot extended beyond its cached range");
++    Require(cache.UnwrittenDrawSnapshot(address - 1, alignment, later, &offset) == nullptr, "a snapshot started before its cached range");
++    Require(cache.UnwrittenDrawSnapshot(address + alignment, alignment, later) == nullptr, "a contained snapshot was returned without an offset output");
++    if (alignment > 1) Require(cache.UnwrittenDrawSnapshot(address + 1, alignment, later, &offset) == nullptr, "a contained snapshot broke descriptor alignment");
++    const std::array<std::uint64_t, 3> changed{2, 3, 1};
++    Require(cache.UnwrittenDrawSnapshot(address + alignment, alignment, changed, &offset) == nullptr, "a contained snapshot outlived its write stamp");
+ }
+ 
+ void drawSnapshotUploadTests(const Device& device, Recorder& recorder) {
+@@ -9654,6 +9810,11 @@
+             drawSnapshotEpochTests(device);
+             return 0;
+         }
++        if (argc == 2 && std::string_view(argv[1]) == "--draw-snapshot-slices-only") {
++            persistentSnapshotSliceTests(device);
++            residentSnapshotTests(device);
++            return 0;
++        }
+ 
+         if (argc == 2 && (std::string_view(argv[1]) == "--vertex-target-range-copied" || std::string_view(argv[1]) == "--vertex-target-range-imported")) {
+             return vertexTargetRangeTests(device, recorder, std::string_view(argv[1]) == "--vertex-target-range-imported") ? 0 : 77;
+@@ -9747,6 +9908,8 @@
+         drawSnapshotEpochTests(device);
+         gpu.lock();
+         recorder.Activate();
++        persistentSnapshotSliceTests(device);
++        residentSnapshotTests(device);
+         std::cout << "Recorder read tracking and label tests passed\n";
+         return 0;
+     } catch (const std::exception& error) {
+diff --git a/core/libs/prx/libSceAgcDriver/tests/execution/DepthCopy.cpp b/core/libs/prx/libSceAgcDriver/tests/execution/DepthCopy.cpp
+new file mode 100644
+--- /dev/null
++++ b/core/libs/prx/libSceAgcDriver/tests/execution/DepthCopy.cpp
+@@ -0,0 +1,118 @@
++#include "prx/libSceAgcDriver/Execution/include/VulkanDevice.hpp"
++#include "prx/libSceAgcDriver/Graphics/include/DepthCopy.hpp"
++#include "prx/libSceAgcDriver/Graphics/include/Draw.hpp"
++#include "DepthFastClearHarness.hpp"
++#include "VulkanTestDevice.hpp"
++#include <array>
++#include <cmath>
++#include <cstdio>
++#include <iostream>
++#include <stdexcept>
++
++namespace {
++
++using AgcDriver::Graphics::Require;
++using ShaderRecompiler::ShaderStage;
++constexpr std::uint32_t Width = 64u;
++constexpr std::uint32_t Height = 32u;
++alignas(4096) std::array<std::byte, 65536> Depth{};
++alignas(4096) std::array<float, Width * Height> ProducerColor{};
++alignas(4096) std::array<float, Width * Height> Copied{};
++using Vertex = std::array<float, 4>;
++constexpr std::array<Vertex, 3> Producer{{{-1, -1, 0.25f, 1}, {3, -1, 1.25f, 1}, {-1, 3, 0.25f, 1}}};
++constexpr std::array<Vertex, 3> Full{{{-1, -1, 0.5f, 1}, {3, -1, 0.5f, 1}, {-1, 3, 0.5f, 1}}};
++constexpr std::array<Vertex, 6> Half{{{-1, -1, 0.5f, 1}, {0, -1, 0.5f, 1}, {-1, 1, 0.5f, 1}, {0, -1, 0.5f, 1}, {0, 1, 0.5f, 1}, {-1, 1, 0.5f, 1}}};
++constexpr std::array<Vertex, 3> Triangle{{{-1, 1, 0.5f, 1}, {1, 1, 0.5f, 1}, {-1, -1, 0.5f, 1}}};
++
++ShaderRecompiler::RecompileResult CompileVertex(AgcDriver::VulkanDevice& device, std::span<const Vertex> vertices) {
++    const auto descriptor = DepthFastClearHarness::BufferDescriptor(vertices.data(), 16u, static_cast<std::uint32_t>(vertices.size()));
++    const std::array<ShaderRecompiler::MemoryRegion, 1> memory{{{reinterpret_cast<std::uintptr_t>(DepthFastClearHarness::VertexCode.data()), std::as_bytes(std::span(DepthFastClearHarness::VertexCode))}}};
++    ShaderRecompiler::RecompileRequest request{
++        {ShaderStage::Vertex, reinterpret_cast<std::uintptr_t>(DepthFastClearHarness::VertexCode.data()), DepthFastClearHarness::VertexCode, 0, {}},
++        {32, 0, descriptor, std::nullopt, std::nullopt, ShaderRecompiler::ShaderVertexStageInfo{}, memory},
++        device.Target(), {0, 0, 0, 64}
++    };
++    request.useCache = false;
++    return ShaderRecompiler::Recompile(request);
++}
++
++AgcDriver::Graphics::State State(float* color) {
++    AgcDriver::Graphics::State state{};
++    state.stages = {AgcDriver::Graphics::ShaderPath::Vertex, 0u, 32u, 32u, std::nullopt, std::nullopt};
++    state.color = {reinterpret_cast<std::uintptr_t>(color), {Width, Height}, VK_FORMAT_R32_SFLOAT, Width * Height * 4u, 0xe4u};
++    state.colors = {state.color};
++    state.hasColorTarget = true;
++    state.renderExtent = {Width, Height};
++    state.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
++    state.viewport = {0, static_cast<float>(Height), static_cast<float>(Width), -static_cast<float>(Height), 0, 1};
++    state.scissor = {{0, 0}, {Width, Height}};
++    state.cullMode = VK_CULL_MODE_NONE;
++    state.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
++    state.blend.colorWriteMask = VK_COLOR_COMPONENT_R_BIT;
++    state.blends = {state.blend};
++    return state;
++}
++
++void Draw(AgcDriver::VulkanDevice& device, const AgcDriver::Graphics::State& state, std::span<const Vertex> vertices, const ShaderRecompiler::RecompileResult& pixel, bool rectangle = false) {
++    auto vertex = CompileVertex(device, vertices);
++    std::vector<AgcDriver::Graphics::CompiledShader> stages{
++        {ShaderStage::Vertex, &vertex, 0},
++        {ShaderStage::Fragment, &pixel, pixel.pushConstants.empty() ? 0u : PixelPushOffset(static_cast<std::uint32_t>(vertex.pushConstants.size()), device.Target())}
++    };
++    std::optional<ShaderRecompiler::RectListShaders> rect;
++    if (rectangle) {
++        rect = ShaderRecompiler::BuildRectListShaders(vertex, pixel, device.Target());
++        stages.insert(stages.begin() + 1, {{ShaderStage::TessellationControl, &rect->control, 0}, {ShaderStage::TessellationEvaluation, &rect->evaluation, 0}});
++    }
++    const AgcDriver::Pm4::DrawParameters draw{0, static_cast<std::uint32_t>(vertices.size()), 0, 1, 0, false};
++    device.Draw(state, draw, stages);
++    device.WaitIdle();
++}
++
++}
++
++int main() {
++    try {
++        const auto device = OpenVulkanTestDevice();
++        if (!device) return VulkanTestSkipped;
++        const auto producerShader = DepthFastClearHarness::Compile(*device);
++        auto producer = State(ProducerColor.data());
++        producer.depth = AgcDriver::Graphics::DepthTarget{reinterpret_cast<std::uintptr_t>(Depth.data()), 0, {Width, Height}, VK_FORMAT_D32_SFLOAT, 1, 0};
++        producer.depthTest = true;
++        producer.depthWrite = true;
++        producer.depthCompare = VK_COMPARE_OP_ALWAYS;
++        Draw(*device, producer, Producer, producerShader.pixel);
++        const auto fragment = AgcDriver::Graphics::DepthCopyFragment(*producer.depth);
++        for (std::uint32_t test = 0; test < 7u; ++test) {
++            constexpr float Sentinel = -7.25f;
++            Copied.fill(Sentinel);
++            auto state = State(Copied.data());
++            if (test == 2u || test == 6u) state.scissor = {{8, 5}, {32, 18}};
++            if (test == 4u) state.cullMode = VK_CULL_MODE_FRONT_AND_BACK;
++            const std::span<const Vertex> vertices = test == 1u || test == 2u ? std::span<const Vertex>(Half) : test == 3u ? std::span<const Vertex>(Triangle) : std::span<const Vertex>(Full);
++            if (test >= 5u) {
++                state.rectList = true;
++                state.topology = VK_PRIMITIVE_TOPOLOGY_PATCH_LIST;
++            }
++            Draw(*device, state, test >= 5u ? std::span<const Vertex>(Half).first(3) : vertices, fragment, test >= 5u);
++            for (std::uint32_t y = 0; y < Height; ++y) {
++                for (std::uint32_t x = 0; x < Width; ++x) {
++                    bool covered = test == 0u || ((test <= 2u || test >= 5u) && x < Width / 2u) || (test == 3u && (x + 0.5f) / Width + (y + 0.5f) / Height < 1.0f);
++                    if (test == 2u || test == 6u) covered = covered && x >= 8u && x < 40u && y >= 5u && y < 23u;
++                    const float expected = covered ? 0.25f + 0.5f * (x + 0.5f) / Width : Sentinel;
++                    const auto actual = Copied[y * Width + x];
++                    if (std::abs(actual - expected) > 0.00001f) {
++                        char text[256];
++                        std::snprintf(text, sizeof(text), "depth copy case %u pixel (%u,%u): got %.9g, expected %.9g", test, x, y, actual, expected);
++                        throw std::runtime_error(text);
++                    }
++                }
++            }
++        }
++        std::puts("Depth copy GPU values, geometry, scissor and culling passed: 14336 pixels checked");
++        return 0;
++    } catch (const std::exception& error) {
++        std::cerr << error.what() << '\n';
++        return 1;
++    }
++}
+diff --git a/core/libs/prx/libSceAgcDriver/tests/execution/PreparedGraphics.cpp b/core/libs/prx/libSceAgcDriver/tests/execution/PreparedGraphics.cpp
+--- a/core/libs/prx/libSceAgcDriver/tests/execution/PreparedGraphics.cpp
++++ b/core/libs/prx/libSceAgcDriver/tests/execution/PreparedGraphics.cpp
+@@ -159,7 +159,11 @@
+         const auto repeated = prebuild(again, {0u, 1u});
+         Require(repeated.first == 0u && repeated.second == 0u, "registration modules: another materialization of the same stages did not find the prebuilt libraries");
+     }
+-    for (const auto& stage : stages) stage.snapshot->prepared->entries.push_back(stage.entry);
++    {
++        ShaderPreparationTransaction transaction;
++        for (const auto& stage : stages) transaction.Edit(*stage.snapshot).entries.push_back(stage.entry);
++        transaction.Commit();
++    }
+     const auto& pixelArtifact = GetPreparedArtifact(*stages.back().entry.handle);
+     Require(!pixelArtifact.fragmentParameters.empty() && pixelArtifact.fragmentParameters.front().sourceLocation == 3u, "prepared fragment lost interpolant mapping");
+     if (!mesh && !tessellation) {
+@@ -176,10 +180,15 @@
+         }, "tessellation shaders are unavailable");
+         Require(front.snapshot->prepared->entries.size() == frontCount && fragment.snapshot->prepared->entries.size() == pixelCount && front.snapshot->prepared->rectangles.empty() && front.snapshot->prepared->fragments.empty() && !front.snapshot->prepared->rectangleRequested, "failed rectangle compilation published part of the stage group");
+         for (const bool primitiveFirst : {false, true}) {
+-            front.snapshot->prepared->rectangles.clear();
+-            front.snapshot->prepared->rectangleProgress.clear();
+-            front.snapshot->prepared->fragments.clear();
+-            front.snapshot->prepared->rectangleRequested = false;
++            {
++                ShaderPreparationTransaction transaction;
++                auto& reset = transaction.Edit(*front.snapshot);
++                reset.rectangles.clear();
++                reset.rectangleProgress.clear();
++                reset.fragments.clear();
++                reset.rectangleRequested = false;
++                transaction.Commit();
++            }
+             if (primitiveFirst) ResolvePreparedGraphics(*front.snapshot, {}, 7, target);
+             ResolvePreparedGraphics(*front.snapshot, fragment.snapshot, 0, target);
+             if (!primitiveFirst) ResolvePreparedGraphics(*front.snapshot, {}, 17, target);
+@@ -194,12 +203,20 @@
+         changed.state.stages.vertexWaveSize = 64;
+         changed.pixel.interpolatorSettings[0] = 0x404u;
+         const auto newStages = PrepareGraphicsStages(changed, target);
+-        front.snapshot->prepared->entries.push_back(newStages.front().entry);
++        {
++            ShaderPreparationTransaction transaction;
++            transaction.Edit(*front.snapshot).entries.push_back(newStages.front().entry);
++            transaction.Commit();
++        }
+         ResolvePreparedGraphics(*front.snapshot, {}, 7, target);
+         const auto newVertexId = GetPreparedArtifact(*newStages.front().entry.handle).variantId;
+         Require(newVertexId != GetPreparedArtifact(*stages.front().entry.handle).variantId, "rectangle test did not change the vertex variant");
+         static_cast<void>(PreparedRectangle(*front.snapshot, newVertexId, pixelArtifact.variantId));
+-        fragment.snapshot->prepared->entries.push_back(newStages.back().entry);
++        {
++            ShaderPreparationTransaction transaction;
++            transaction.Edit(*fragment.snapshot).entries.push_back(newStages.back().entry);
++            transaction.Commit();
++        }
+         ResolvePreparedGraphics(*front.snapshot, fragment.snapshot, 0, target);
+         const auto newPixelId = GetPreparedArtifact(*newStages.back().entry.handle).variantId;
+         Require(newPixelId != pixelArtifact.variantId, "rectangle test did not change the fragment variant");
+@@ -351,7 +368,11 @@
+     for (const auto& stage : stages) {
+         Require(stage.entry.handle != nullptr && stage.snapshot != nullptr, "prebuild policy lost a required source handle");
+         Require(disabled ? stage.registration == nullptr : stage.registration != nullptr, "prebuild policy retained or skipped registration-default materialization");
+-        stage.snapshot->prepared->entries.push_back(stage.entry);
++        {
++            ShaderPreparationTransaction transaction;
++            transaction.Edit(*stage.snapshot).entries.push_back(stage.entry);
++            transaction.Commit();
++        }
+     }
+     std::vector<LinkedProgram> linked;
+     std::vector<MemoryRegion> memory;
+diff --git a/core/libs/prx/libSceAgcDriver/tests/execution/PreparedPublication.cpp b/core/libs/prx/libSceAgcDriver/tests/execution/PreparedPublication.cpp
+--- a/core/libs/prx/libSceAgcDriver/tests/execution/PreparedPublication.cpp
++++ b/core/libs/prx/libSceAgcDriver/tests/execution/PreparedPublication.cpp
+@@ -10,6 +10,7 @@
+ #include <chrono>
+ #include <future>
+ #include <cstring>
++#include <cstdlib>
+ #include <iostream>
+ #include <latch>
+ #include <map>
+@@ -60,7 +61,11 @@
+     Reject([&] { ResolvePreparedGraphics(front, pixel, 7, {}); });
+     Require(!front.prepared->rectangleRequested && front.prepared->fragments.empty(), "failed rectangle preparation published a link");
+     const auto rectangle = std::make_shared<const RectListShaders>();
+-    front.prepared->rectangles.push_back({1, 2, rectangle});
++    {
++        ShaderPreparationTransaction transaction;
++        transaction.Edit(front).rectangles.push_back({1, 2, rectangle});
++        transaction.Commit();
++    }
+     {
+         ShaderPreparationTransaction transaction;
+         auto& prepared = transaction.Edit(front);
+@@ -112,6 +117,112 @@
+     reader.request_stop();
+     reader.join();
+     Require(!partial && front.prepared->entries.size() == 200 && pixel->prepared->entries.size() == 200, "concurrent group publication was partial or lost an update");
++}
++
++void SharedReadSnapshots() {
++    ShaderSnapshot shader{};
++    shader.prepared->registeredAbis = {{11, 22}, {33, 44}};
++    std::shared_ptr<const PreparedShaderState> published;
++    {
++        ShaderPreparationTransaction transaction;
++        const auto& read = transaction.Read(shader);
++        published = shader.prepared->publishedState;
++        Require(published != nullptr && &read == published.get(), "a read did not retain the published preparation state");
++        transaction.Commit();
++    }
++    {
++        ShaderPreparationTransaction transaction;
++        Require(&transaction.Read(shader) == published.get(), "an unchanged preparation state was copied for another transaction");
++        transaction.Edit(shader).registeredAbis.push_back({55, 66});
++        {
++            ShaderPreparationTransaction nested;
++            Require(nested.Read(shader).registeredAbis.size() == 3, "a nested read missed the transaction's staged update");
++            nested.Commit();
++        }
++        Require(published->registeredAbis.size() == 2 && shader.prepared->registeredAbis.size() == 2, "a staged write changed a published preparation state");
++    }
++    {
++        ShaderPreparationTransaction transaction;
++        Require(&transaction.Read(shader) == published.get() && transaction.Read(shader).registeredAbis.size() == 2, "aborting a writer changed the shared preparation state");
++        transaction.Edit(shader).registeredAbis.push_back({77, 88});
++        transaction.Commit();
++    }
++    {
++        ShaderPreparationTransaction transaction;
++        const auto& read = transaction.Read(shader);
++        Require(&read != published.get() && read.registeredAbis.size() == 3 && read.registeredAbis.back() == std::vector<std::uint64_t>({77, 88}), "a committed update reused a stale published preparation state");
++        Require(published->registeredAbis.size() == 2, "a writer changed a retained reader snapshot");
++        transaction.Commit();
++    }
++}
++
++void ConcurrentReadSnapshots() {
++    ShaderSnapshot front{};
++    ShaderSnapshot pixel{};
++    front.prepared->entries.push_back({1, {}});
++    pixel.prepared->entries.push_back({2, {}});
++    std::shared_ptr<const PreparedShaderState> retained;
++    std::future<bool> concurrentReader;
++    {
++        ShaderPreparationTransaction transaction;
++        retained = transaction.ReadOnly(front);
++        Require(retained != nullptr && retained->entries.size() == 1, "read-only preparation is unavailable");
++        concurrentReader = std::async(std::launch::async, [&] {
++            ShaderPreparationTransaction other;
++            const auto read = other.ReadOnly(front);
++            const bool same = read == retained;
++            other.Commit();
++            return same;
++        });
++        Require(concurrentReader.wait_for(std::chrono::seconds(2)) == std::future_status::ready && concurrentReader.get(), "independent read-only transactions serialized or copied their state");
++        transaction.Edit(front).registeredAbis.push_back({123});
++        Require(transaction.ReadOnly(front) == nullptr, "read-only preparation ignored staged edits");
++        {
++            ShaderPreparationTransaction nested;
++            Require(nested.ReadOnly(front) == nullptr && nested.Read(front).registeredAbis.size() == 1, "nested preparation bypassed its writer");
++            nested.Commit();
++        }
++        transaction.Commit();
++    }
++    Require(retained->registeredAbis.empty() && front.prepared->registeredAbis.size() == 1, "read-to-write upgrade modified a retained reader");
++    std::future<void> writer;
++    {
++        ShaderPreparationTransaction transaction;
++        Require(transaction.ReadOnly(front) != nullptr, "read-only preparation was not republished");
++        std::promise<void> started;
++        auto ready = started.get_future();
++        writer = std::async(std::launch::async, [&] {
++            started.set_value();
++            ShaderPreparationTransaction update;
++            update.Edit(front).entries.push_back({3, {}});
++            update.Edit(pixel).entries.push_back({4, {}});
++            update.Commit();
++        });
++        ready.get();
++        Require(writer.wait_for(std::chrono::milliseconds(30)) == std::future_status::timeout, "writer published through a live read-only transaction");
++        Require(transaction.ReadOnly(pixel)->entries.size() == 1, "read-only group observed partial publication");
++        transaction.Commit();
++    }
++    writer.get();
++    {
++        ShaderPreparationTransaction transaction;
++        Require(transaction.ReadOnly(front)->entries.size() == 2 && transaction.ReadOnly(pixel)->entries.size() == 2, "read-only group retained stale state after publication");
++        transaction.Commit();
++    }
++    front.prepared->pending = true;
++    {
++        ShaderPreparationTransaction transaction;
++        Require(transaction.ReadOnly(front) == nullptr, "pending preparation was treated as ready");
++        transaction.Commit();
++    }
++    front.prepared->pending = false;
++    front.prepared->failure = std::make_exception_ptr(std::runtime_error("injected registration failure"));
++    {
++        ShaderPreparationTransaction transaction;
++        Require(transaction.ReadOnly(front) == nullptr, "failed preparation was treated as ready");
++        transaction.Commit();
++    }
++    std::cout << "concurrent native preparation readers passed\n";
+ }
+ 
+ void HeaderSelection() {
+@@ -411,6 +522,8 @@
+ int main() {
+     try {
+         Transactions();
++        if (std::getenv("APS5_NO_SHARED_PREPARED_STATE") == nullptr) SharedReadSnapshots();
++        ConcurrentReadSnapshots();
+         HeaderSelection();
+         RegistryVersions();
+         FusedHullHeaderSelection();
+diff --git a/core/libs/prx/libSceAgcDriver/tests/execution/PreparedShaders.cpp b/core/libs/prx/libSceAgcDriver/tests/execution/PreparedShaders.cpp
+--- a/core/libs/prx/libSceAgcDriver/tests/execution/PreparedShaders.cpp
++++ b/core/libs/prx/libSceAgcDriver/tests/execution/PreparedShaders.cpp
+@@ -1239,6 +1239,11 @@
+     static Header relocated;
+     fill(relocated);
+     AgcDriverResolveShaderAbi_nid_postfix(&relocated.shader, {}, primitive);
++    const std::array<const Shader*, 1> nativeStages{&relocated.shader};
++    const std::array<ShaderRegister, 3> nativeContext{{{0x2d5, 0u}, {0x1b3, 0u}, {0x2d5, 0x2000u}}};
++    const std::array<ShaderRegister, 3> nativePrimitive{{{0x242, 7u}, {0x24b, 0u}, {0x242, 4u}}};
++    AgcDriverResolveGraphicsStagesAbi_nid_postfix(nativeStages, nativeContext, nativePrimitive);
++    AgcDriverResolveGraphicsStagesAbi_nid_postfix(nativeStages, nativeContext, nativePrimitive);
+     Require(sceAgcDriverSubmitDcb(&packet) == 0, "the relocated header's draw was not submitted");
+     AgcDriverWaitIdle_nid_postfix();
+     // A copy that moves only its user data pointer beside the registered arrays keeps resolving.
+diff --git a/core/shader/recompiler/CMakeLists.txt b/core/shader/recompiler/CMakeLists.txt
+--- a/core/shader/recompiler/CMakeLists.txt
++++ b/core/shader/recompiler/CMakeLists.txt
+@@ -264,6 +264,7 @@
+             ReleaseUndrawnResourcePlan
+             ResourceMaterializer::SpecializationNanoseconds
+             RuntimeAbi::RequireVersion
++            RuntimeAbi::BindingNumber
+             RuntimeAbi::HeapCapacity
+             SampledTextureNumericClass
+             SetDebugProbeActive
+diff --git a/docs/dev/debt/libSceAgcDriver.md b/docs/dev/debt/libSceAgcDriver.md
+--- a/docs/dev/debt/libSceAgcDriver.md
++++ b/docs/dev/debt/libSceAgcDriver.md
+@@ -202,3 +202,5 @@
+ 
+ - [Thick SW_4KB_S_X volumes](../../../core/libs/prx/libSceAgcDriver/Graphics/src/TextureTiling.cpp) use AMD addrlib's GFX10 non-RB+ 16-pipe `GFX10_SW_4K_S3_X_PATINFO` equations for 1, 2, 4, 8 and 16-byte elements, including packed mip tails. The layout follows [AMD PAL c5e80007](https://github.com/GPUOpen-Drivers/pal/blob/c5e800072a32f68b6ccc4422936d96167c6e0728/src/core/imported/addrlib/src/gfx10/gfx10addrlib.cpp); it has not been measured on console hardware. Other thick swizzle modes outside the supported families still throw. Mipmapped 3D color targets remain refused by the color-register decoder.
+ - [Viewport depth range remap](../../../core/libs/prx/libSceAgcDriver/Graphics/src/State.cpp) (libSceAgcDriver) - on a device without `VK_EXT_depth_range_unrestricted` a viewport depth range outside [0, 1] (Minecraft PPSA17221 draws its world with `PA_CL_VPORT_ZSCALE` 1, `ZOFFSET` 0 in negative-one-to-one clip space) is folded into the vertex shader: `RemapPositionDepth` scales clip z so z/w is the console's depth, the pipeline's depth clamp applies the console's `PA_SC_VPORT_ZMIN/ZMAX` clipped to [0, 1] (exact for a normalized depth target or none; Minecraft clamps its float depth target to [-1, 1], so a depth below 0 is stored as 0 there, which only a later test or read at exactly 0 can tell, and the first such draw is reported once), and two extra `gl_ClipDistance` elements restore the near and far planes depth clamping removes. The mode is a pipeline specialization constant (`PipelineSpecialization::DepthRemapBase`); scale and offset are read from the draw's push block (two words at byte 104, `DepthRemapPushOffsetBytes`, so a remapped draw's stage push data ends before it), so draws that differ only in them share one vertex module and one pipeline. The remap serves the vertex path only; mesh and tessellation draws with such a range still throw. Whether the console clamps before or after its depth bias and how it treats a clamp range narrower than the transform's are not measured.
++
++- [Single-sample DB depth copy](../../../core/libs/prx/libSceAgcDriver/Graphics/src/DepthCopy.cpp) uses a driver-owned fragment-stage texel fetch while retaining title geometry, scissor, culling and sample mask. Slice-zero D16/D32 sources and same-extent, unblended R32_FLOAT red-only destinations are accepted; depth/stencil tests, other maintenance combinations, nonzero COPY_SAMPLE, multisampling, layers, differing extents and feedback are refused. COPY_CENTROID selects the only sample. The GPU fixture checks produced D32 values and untouched pixels for full, half, triangle, scissor, culling and rectangle coverage (14,336 pixels) on an RTX 3090 with Khronos validation, with and without graphics pipeline libraries. Console equivalence, D16 hardware values and other GPUs are unmeasured. Reaching this path is not proof of playable or equivalent behavior.

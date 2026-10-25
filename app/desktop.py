@@ -229,7 +229,7 @@ class Jobs:
                     text = text or state
                     if state == 'Cancelled':
                         text = tr('Cancelled')
-                    self.message = '%s: %s' % (tr(record['operation']), text)
+                    self.message = '%s: %s' % (tr(record['operation']), tr(text))
                     if record['failed']:
                         record['failed'](text)
 
@@ -273,6 +273,8 @@ class App:
         self.ide = ProjectIDE(self, make_editor, set_language, palette, render_editor)
         from investigation_ui import InvestigationUI
         self.investigation = InvestigationUI(self, make_editor, set_language, palette, render_editor)
+        from porting_ui import PortingUI
+        self.porting = PortingUI(self)
         from unreal_ui import UnrealUI
         self.unreal = UnrealUI(self)
         self.projects = []
@@ -531,7 +533,7 @@ class App:
         from cyui_shell import draw, utility_page
         panels = {'workspace': self.workspace, 'project': self.ide.draw, 'investigation': self.investigation.draw,
                   'assistant': self.assistant_page, 'engines': self.engines_tab, 'ai': self.ai_tab,
-                  'unreal':self.unreal.draw}
+                  'porting':self.porting.draw,'unreal':self.unreal.draw}
         if imgui.is_key_chord_pressed(imgui.Key.mod_ctrl | imgui.Key.o): self.choose_file()
         draw(self, lambda page: panels[page]() if page in panels else utility_page(page))
 
@@ -1256,11 +1258,11 @@ class App:
                     if self.ai_mode == 0:
                         imgui.set_next_item_width(-1)
                         _, self.agent_workflow = imgui.combo('##autonomous-workflow', self.agent_workflow,
-                            [tr('Investigate'), tr('Reconstruct and validate'), tr('Patch and test')])
+                            [tr('Investigate'), tr('Reconstruct and validate'), tr('Patch and test'), tr('Port and test')])
                 with cyui.scoped_disabled(busy or not self.ask_text.strip()):
                     if self.ai_mode == 0:
                         if cyui.primary_button(label('Run autonomous task'), (-1, 0)):
-                            self.start_agent(project_id, self.ask_text.strip(), ['investigate', 'reconstruct', 'patch'][self.agent_workflow])
+                            self.start_agent(project_id, self.ask_text.strip(), ['investigate', 'reconstruct', 'patch', 'port'][self.agent_workflow])
                             self.ask_text = ''
                     else:
                         if imgui.button(label('Send')):

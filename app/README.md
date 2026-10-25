@@ -47,6 +47,20 @@ CDP scenarios retain control states, screenshots, HTTP metadata and owned-proces
 observations. Browser recording requires Node.js 22+; Windows uses a privately compiled
 .NET Framework helper. Indirect native calls and cross-function value resolution remain unresolved.
 
+## PS5 desktop porting
+
+`cydec/porting.py` owns input snapshots, ELF/SELF validation, separate backend
+installation, immutable conversion receipts and asserted host execution. The
+`porting_*` contracts are shared by MCP, CLI and `porting_ui.py`; `ai_agent`
+also supports `workflow=port`. AnyPS5 and UltraPack remain separate optional
+executables, with private installations under `runtime/engines`. See
+[PS5Porting.md](Docs/PS5Porting.md) for formats, setup, tests and compatibility limits.
+`porting_analysis.py` binds matching conversion attempts, registries and run evidence
+to actual native/C/Ghidra functions and bounded code samples. Failures use built-in
+C analysis by default. The native/C ELF loader falls back to program headers when
+there are no loadable sections. Ambiguous offsets and host/module mappings remain
+unresolved; generated C with unsupported instructions is explicitly marked.
+
 ## Reconstruction workflow
 
 `reconstruction_run` unifies workspace generation, bounded builds, optional AI source

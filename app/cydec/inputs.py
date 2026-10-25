@@ -4,7 +4,7 @@ from pathlib import Path
 from cytools_core import CyToolError
 
 
-def original_path(context):
+def original_path(context, operation='open_file', field='path'):
     """The Core stages inputs before invoking the operation handler.
 
     Preserve that name and sibling-reference location when creating a persistent
@@ -14,9 +14,9 @@ def original_path(context):
     # A separate user-supplied sourcePath parameter would allow forged provenance.
     with context.runtime._cv:
         job = context.runtime._jobs[context.job_id]
-        if job['operationId'] != 'open_file':
-            raise CyToolError('InvalidState', 'Input provenance requires an open_file job.')
-        source = Path(job['parameters']['path']).expanduser()
+        if job['operationId'] != operation:
+            raise CyToolError('InvalidState', 'Input provenance requires the matching import job.')
+        source = Path(job['parameters'][field]).expanduser()
         root = context.runtime.input_root
     if not source.is_absolute():
         source = (root / source).resolve()

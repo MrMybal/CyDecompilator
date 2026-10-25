@@ -61,6 +61,8 @@ child jobs, results and server-checked validation. Status meanings:
 - `completed`: recorded proof satisfies this workflow. Reconstruction requires
   matching complete scenarios and unchanged source revisions. A patch requires
   a verified-copy run or completed harness captures/comparison, plus copy integrity.
+  A port requires an asserted successful `porting_run` and unchanged receipt files;
+  see [porting](porting.md) for the backend and compatibility limits.
   The agent's prose alone is never completion evidence.
 - `budget-exhausted`: preserve and resume the checkpoint with the same objective
   and workflow and an appropriate remaining budget. Resume when the user's existing

@@ -10986,5 +10986,289 @@
  "Campaign profiles": {
   "en": "Campaign profiles",
   "fr": "Profils de campagne"
+ },
+ "PS5 porting": {
+  "en": "PS5 porting",
+  "fr": "Portage PS5"
+ },
+ "Port and test": {
+  "en": "Port and test",
+  "fr": "Porter et tester"
+ },
+ "Application input": {
+  "en": "Application input",
+  "fr": "Application à préparer"
+ },
+ "Application file or folder": {
+  "en": "Application file or folder",
+  "fr": "Fichier ou dossier de l’application"
+ },
+ "Entry executable (optional)": {
+  "en": "Entry executable (optional)",
+  "fr": "Exécutable principal (facultatif)"
+ },
+ "Relative path when several applications are present": {
+  "en": "Relative path when several applications are present",
+  "fr": "Chemin relatif si plusieurs applications sont présentes"
+ },
+ "Choose application input": {
+  "en": "Choose application input",
+  "fr": "Choisir le fichier de l’application"
+ },
+ "Prepare input": {
+  "en": "Prepare input",
+  "fr": "Préparer l’application"
+ },
+ "Target operating system": {
+  "en": "Target operating system",
+  "fr": "Système d’exploitation cible"
+ },
+ "Adapt supported AMD instructions for Intel": {
+  "en": "Adapt supported AMD instructions for Intel",
+  "fr": "Adapter les instructions AMD prises en charge pour Intel"
+ },
+ "Standalone homebrew without bundled modules": {
+  "en": "Standalone homebrew without bundled modules",
+  "fr": "Homebrew autonome sans modules fournis"
+ },
+ "Check porting prerequisites": {
+  "en": "Check porting prerequisites",
+  "fr": "Vérifier les prérequis du portage"
+ },
+ "Convert for desktop": {
+  "en": "Convert for desktop",
+  "fr": "Convertir pour ordinateur"
+ },
+ "Test scenarios": {
+  "en": "Test scenarios",
+  "fr": "Scénarios de test"
+ },
+ "Run converted application": {
+  "en": "Run converted application",
+  "fr": "Exécuter l’application convertie"
+ },
+ "Porting tools": {
+  "en": "Porting tools",
+  "fr": "Outils de portage"
+ },
+ "Install official AnyPS5 tools": {
+  "en": "Install official AnyPS5 tools",
+  "fr": "Installer les outils AnyPS5 officiels"
+ },
+ "Install official UltraPack backend": {
+  "en": "Install official UltraPack backend",
+  "fr": "Installer le moteur UltraPack officiel"
+ },
+ "Read tool settings": {
+  "en": "Read tool settings",
+  "fr": "Lire les réglages des outils"
+ },
+ "Save tool settings": {
+  "en": "Save tool settings",
+  "fr": "Enregistrer les réglages des outils"
+ },
+ "AnyPS5 converter": {
+  "en": "AnyPS5 converter",
+  "fr": "Convertisseur AnyPS5"
+ },
+ "Windows compatibility libraries": {
+  "en": "Windows compatibility libraries",
+  "fr": "Bibliothèques de compatibilité Windows"
+ },
+ "Linux compatibility libraries": {
+  "en": "Linux compatibility libraries",
+  "fr": "Bibliothèques de compatibilité Linux"
+ },
+ "UltraPack backend cli.py": {
+  "en": "UltraPack backend cli.py",
+  "fr": "Moteur UltraPack cli.py"
+ },
+ "UltraPack Python (optional)": {
+  "en": "UltraPack Python (optional)",
+  "fr": "Python UltraPack (facultatif)"
+ },
+ "UltraPack package helper (optional)": {
+  "en": "UltraPack package helper (optional)",
+  "fr": "Auxiliaire de paquets UltraPack (facultatif)"
+ },
+ "Choose tool": {
+  "en": "Choose tool",
+  "fr": "Choisir un outil"
+ },
+ "Compatibility libraries": {
+  "en": "Compatibility libraries",
+  "fr": "Bibliothèques de compatibilité"
+ },
+ "Open in Workspace": {
+  "en": "Open in Workspace",
+  "fr": "Ouvrir dans l’espace de travail"
+ },
+ "Open Project IDE": {
+  "en": "Open Project IDE",
+  "fr": "Ouvrir l’éditeur de projet"
+ },
+ "Scenario": {
+  "en": "Scenario",
+  "fr": "Scénario"
+ },
+ "files": {
+  "en": "files",
+  "fr": "fichiers"
+ },
+ "Input prepared": {
+  "en": "Input prepared",
+  "fr": "Application préparée"
+ },
+ "Blocked": {
+  "en": "Blocked",
+  "fr": "Bloqué"
+ },
+ "Converted; behavior unverified": {
+  "en": "Converted; behavior unverified",
+  "fr": "Converti ; comportement non vérifié"
+ },
+ "Conversion failed": {
+  "en": "Conversion failed",
+  "fr": "Échec de la conversion"
+ },
+ "Executed; behavior unverified": {
+  "en": "Executed; behavior unverified",
+  "fr": "Exécuté ; comportement non vérifié"
+ },
+ "Test scenarios passed": {
+  "en": "Test scenarios passed",
+  "fr": "Scénarios de test réussis"
+ },
+ "Execution failed": {
+  "en": "Execution failed",
+  "fr": "Échec de l’exécution"
+ },
+ "Prepare input to start the porting workflow.": {
+  "en": "Prepare input to start the porting workflow.",
+  "fr": "Préparez l’application pour commencer le portage."
+ },
+ "Conversion alone does not prove that a game works.": {
+  "en": "Conversion alone does not prove that a game works.",
+  "fr": "La conversion seule ne prouve pas qu’un jeu fonctionne."
+ },
+ "Prepare an application, convert it for desktop, then test recorded scenarios.": {
+  "en": "Prepare an application, convert it for desktop, then test recorded scenarios.",
+  "fr": "Préparer une application, la convertir pour ordinateur, puis tester des scénarios définis."
+ },
+ "ELF, plaintext SELF and ZIP are prepared internally. PKG, PFS, RAR and 7z require the UltraPack backend.": {
+  "en": "ELF, plaintext SELF and ZIP are prepared internally. PKG, PFS, RAR and 7z require the UltraPack backend.",
+  "fr": "ELF, SELF en clair et ZIP sont préparés en interne. PKG, PFS, RAR et 7z nécessitent le moteur UltraPack."
+ },
+ "Each scenario may specify arguments, stdin, expectedExitCode and exact expectedStdout.": {
+  "en": "Each scenario may specify arguments, stdin, expectedExitCode and exact expectedStdout.",
+  "fr": "Chaque scénario peut définir arguments, stdin, expectedExitCode et la sortie exacte expectedStdout."
+ },
+ "AnyPS5 conversion is an optional external backend. UltraPack is used only to extract application containers.": {
+  "en": "AnyPS5 conversion is an optional external backend. UltraPack is used only to extract application containers.",
+  "fr": "La conversion AnyPS5 utilise un moteur externe facultatif. UltraPack sert uniquement à extraire les conteneurs d’applications."
+ },
+ "Maximum application size (GiB)": {
+  "en": "Maximum application size (GiB)",
+  "fr": "Taille maximale de l’application (Gio)"
+ },
+ "Build package helper (.NET SDK 9+)": {
+  "en": "Build package helper (.NET SDK 9+)",
+  "fr": "Compiler l’auxiliaire de paquets (.NET SDK 9+)"
+ },
+ "Analysis complete": {
+  "en": "Analysis complete",
+  "fr": "Analyse terminée"
+ },
+ "Guest syscall instruction": {
+  "en": "Guest syscall instruction",
+  "fr": "Instruction syscall de l’application"
+ },
+ "AnyPS5 syscall rejection": {
+  "en": "AnyPS5 syscall rejection",
+  "fr": "Syscall refusé par AnyPS5"
+ },
+ "Console import reference": {
+  "en": "Console import reference",
+  "fr": "Référence d’import console"
+ },
+ "Observed import trace": {
+  "en": "Observed import trace",
+  "fr": "Trace d’import observée"
+ },
+ "Dependency error": {
+  "en": "Dependency error",
+  "fr": "Erreur de dépendance"
+ },
+ "Host instruction error": {
+  "en": "Host instruction error",
+  "fr": "Erreur d’instruction sur l’ordinateur"
+ },
+ "AnyPS5 startup diagnostics": {
+  "en": "AnyPS5 startup diagnostics",
+  "fr": "Diagnostics de démarrage AnyPS5"
+ },
+ "Instrument console imports": {
+  "en": "Instrument console imports",
+  "fr": "Instrumenter les imports console"
+ },
+ "Trace libraries: all or comma-separated names; requires instrumented conversion.": {
+  "en": "Trace libraries: all or comma-separated names; requires instrumented conversion.",
+  "fr": "Bibliothèques à tracer : all ou noms séparés par des virgules ; conversion instrumentée requise."
+ },
+ "CyDecompilator analysis": {
+  "en": "CyDecompilator analysis",
+  "fr": "Analyse CyDecompilator"
+ },
+ "Analysis module (optional)": {
+  "en": "Analysis module (optional)",
+  "fr": "Module à analyser (facultatif)"
+ },
+ "Analysis engine": {
+  "en": "Analysis engine",
+  "fr": "Moteur d’analyse"
+ },
+ "Analyze port and failures": {
+  "en": "Analyze port and failures",
+  "fr": "Analyser le portage et ses échecs"
+ },
+ "Link AnyPS5 evidence to guest instructions and decompiled functions.": {
+  "en": "Link AnyPS5 evidence to guest instructions and decompiled functions.",
+  "fr": "Relier les preuves AnyPS5 aux instructions et aux fonctions décompilées de l’application."
+ },
+ "Functions inspected": {
+  "en": "Functions inspected",
+  "fr": "Fonctions examinées"
+ },
+ "Open analyzed executable": {
+  "en": "Open analyzed executable",
+  "fr": "Ouvrir l’exécutable analysé"
+ },
+ "Findings": {
+  "en": "Findings",
+  "fr": "Constats"
+ },
+ "Unresolved address": {
+  "en": "Unresolved address",
+  "fr": "Adresse non résolue"
+ },
+ "Unmapped host address": {
+  "en": "Unmapped host address",
+  "fr": "Adresse de l’ordinateur non reliée à l’application"
+ },
+ "Affected functions": {
+  "en": "Affected functions",
+  "fr": "Fonctions concernées"
+ },
+ "Unknowns and limits": {
+  "en": "Unknowns and limits",
+  "fr": "Inconnues et limites"
+ },
+ "Analyze conversion failures automatically": {
+  "en": "Analyze conversion failures automatically",
+  "fr": "Analyser automatiquement les échecs de conversion"
+ },
+ "Decompiled C is incomplete; unsupported instructions remain.": {
+  "en": "Decompiled C is incomplete; unsupported instructions remain.",
+  "fr": "Le C décompilé est incomplet ; certaines instructions ne sont pas prises en charge."
  }
 }

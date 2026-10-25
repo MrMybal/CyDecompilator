@@ -210,6 +210,27 @@ def load_elf(path):
                                    'size': len(data), 'executable': executable})
             if section.name.startswith('.plt'):
                 plt_sections.append(section)
+        if not image.segments:
+            # Stripped console ELF images can have only program headers. Those
+            # headers are the loader's source of truth when sections are absent.
+            file_size=handle.seek(0,2)
+            total=0
+            ranges=[]
+            for index,segment in enumerate(elf.iter_segments()):
+                if segment['p_type']!='PT_LOAD':continue
+                offset,size=segment['p_offset'],segment['p_filesz']
+                address,memory=segment['p_vaddr'],segment['p_memsz']
+                total+=size
+                if (offset+size>file_size or size>memory or address+memory>1<<64 or total>512*1024**2):
+                    raise CyToolError('Unsupported','Invalid or oversized sectionless ELF load ranges.')
+                if any(max(address,start)<min(address+size,end) for start,end in ranges):
+                    raise CyToolError('Unsupported','Overlapping sectionless ELF load ranges need a specialized loader.')
+                ranges.append((address,address+size))
+                flags=segment['p_flags']
+                name='PT_LOAD_'+str(index)
+                image.segments.append(Segment(address,segment.data(),bool(flags&1),name,bool(flags&2),memory))
+                image.sections.append({'name':name,'address':hex(address),'size':size,
+                                       'executable':bool(flags&1),'source':'program-header'})
         image.finish()
         image.entry = elf['e_entry'] or None
         if image.entry:

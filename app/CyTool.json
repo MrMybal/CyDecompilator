@@ -166,6 +166,542 @@
       "supportsProgress": true
     },
     {
+      "id": "porting_open",
+      "name": "Prepare PS5 application input",
+      "description": "Persistently import one local file or folder. Built-in ZIP and plaintext SELF preparation; PKG/PFS/RAR/7z use a configured separate UltraPack backend. Originals are preserved. No decryption.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Input ELF, plaintext SELF, ZIP or application container. Supply file OR directory.",
+            "default": ""
+          },
+          "directory": {
+            "type": "string",
+            "description": "Absolute application folder, imported with modules and resources. Supply file OR directory.",
+            "default": ""
+          },
+          "entry": {
+            "type": "string",
+            "description": "Entry executable relative to the imported root. Empty selects a unique eboot or ELF.",
+            "default": ""
+          },
+          "maxBytes": {
+            "type": "integer",
+            "description": "Maximum expanded application and extraction scratch bytes (256 GiB by default). Runtime file staging accepts up to 1 TiB.",
+            "default": 274877906944,
+            "minimum": 1024,
+            "maximum": 1099511627776
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "importId": {
+            "type": "string",
+            "description": "Immutable prepared input identifier."
+          },
+          "status": {
+            "type": "string",
+            "description": "prepared"
+          }
+        },
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "porting-import"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "porting_info",
+      "name": "Inspect prepared porting input",
+      "description": "Read the saved input manifest, ELF evidence and preparation limits.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "importId": {
+            "type": "string",
+            "description": "Prepared input id; empty selects the latest.",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "porting_tools",
+      "name": "Porting tool settings",
+      "description": "Read or configure separate converter, target-library and UltraPack CLI paths. Does not execute tools.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "relinker": {
+                "type": "string",
+                "description": "Existing absolute file path; empty clears it."
+              },
+              "windowsLibraries": {
+                "type": "string",
+                "description": "Existing absolute directory path; empty clears it."
+              },
+              "linuxLibraries": {
+                "type": "string",
+                "description": "Existing absolute directory path; empty clears it."
+              },
+              "ultrapackCli": {
+                "type": "string",
+                "description": "Existing absolute file path; empty clears it."
+              },
+              "ultrapackPython": {
+                "type": "string",
+                "description": "Existing absolute file path; empty clears it."
+              },
+              "ultrapackPkgTool": {
+                "type": "string",
+                "description": "Existing absolute file path; empty clears it."
+              }
+            }
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "porting-tools"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "porting_install",
+      "name": "Install official porting tools",
+      "description": "Install separate official AnyPS5 converter and target libraries with published SHA-256 digests, or UltraPack source at a resolved Git commit with a private Python environment and optional .NET package helper.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "backend": {
+            "type": "string",
+            "description": "Separate backend to install.",
+            "enum": [
+              "anyps5",
+              "ultrapack"
+            ],
+            "default": "anyps5"
+          },
+          "target": {
+            "type": "string",
+            "description": "AnyPS5 library target OS.",
+            "enum": [
+              "windows",
+              "linux"
+            ],
+            "default": "windows"
+          },
+          "buildPkgHelper": {
+            "type": "boolean",
+            "description": "UltraPack: build its package helper; requires .NET SDK 9+.",
+            "default": true
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "install",
+        "porting-tools"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "porting_plan",
+      "name": "Check desktop port prerequisites",
+      "description": "Check prepared input and selected tools. This is not a claim of game compatibility.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "importId": {
+            "type": "string",
+            "description": "Prepared input id; empty selects latest.",
+            "default": ""
+          },
+          "target": {
+            "type": "string",
+            "description": "Output OS.",
+            "enum": [
+              "windows",
+              "linux"
+            ],
+            "default": "windows"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "porting_convert",
+      "name": "Convert PS5 executable for desktop",
+      "description": "Convert a verified application snapshot using the separately configured AnyPS5 converter. Write a separate receipt-verified output with libraries and resources; behavior remains unverified.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "importId": {
+            "type": "string",
+            "description": "Prepared input id; empty selects latest.",
+            "default": ""
+          },
+          "target": {
+            "type": "string",
+            "description": "Output OS.",
+            "enum": [
+              "windows",
+              "linux"
+            ],
+            "default": "windows"
+          },
+          "toIntel": {
+            "type": "boolean",
+            "description": "Rewrite AMD-specific instructions supported by the selected converter.",
+            "default": false
+          },
+          "diagnostics": {
+            "type": "boolean",
+            "description": "Include AnyPS5 startup dependency diagnostics (Windows only).",
+            "default": false
+          },
+          "traceImports": {
+            "type": "boolean",
+            "description": "Instrument imports for explicit bounded runtime tracing (Windows only).",
+            "default": false
+          },
+          "analyzeOnFailure": {
+            "type": "boolean",
+            "description": "Use the built-in C engine to diagnose converter failures and return a bounded evidence dossier.",
+            "default": true
+          },
+          "standalone": {
+            "type": "boolean",
+            "description": "Explicit standalone homebrew only: no bundled executable modules. Never use for an incomplete game dump.",
+            "default": false
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn",
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "porting-tools"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "porting_conversion",
+      "name": "Read converted desktop application",
+      "description": "Read the saved conversion receipt and output manifest.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "conversionId": {
+            "type": "string",
+            "description": "Conversion receipt id; empty selects latest.",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "porting_run",
+      "name": "Test converted desktop application",
+      "description": "Verify receipt hashes, copy the output into a job-owned directory, then run bounded scenarios on the matching host. No assertions means executed-unverified, not behavioral validation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "conversionId": {
+            "type": "string",
+            "description": "Conversion receipt id; empty selects latest.",
+            "default": ""
+          },
+          "timeout": {
+            "type": "integer",
+            "description": "Maximum seconds per scenario.",
+            "default": 60,
+            "minimum": 1,
+            "maximum": 900
+          },
+          "traceLibraries": {
+            "type": "string",
+            "description": "Trace instrumented calls: all or comma-separated library names. Requires conversion with traceImports=true.",
+            "default": "",
+            "maxLength": 1024
+          },
+          "scenarios": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "arguments": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "One argument."
+                  },
+                  "maxItems": 100
+                },
+                "stdin": {
+                  "type": "string",
+                  "description": "Finite stdin batch."
+                },
+                "expectedExitCode": {
+                  "type": "integer",
+                  "description": "Expected process exit code."
+                },
+                "expectedStdout": {
+                  "type": "string",
+                  "description": "Exact expected stdout."
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "porting-tools"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "porting_diagnose",
+      "name": "Analyze AnyPS5 port with CyDecompilator",
+      "description": "Analyze verified guest ELF bytes with cdec, native or Ghidra. Link saved AnyPS5 registry file offsets and conversion errors to decoded instructions/functions; include assembly/C samples and runtime trace candidates without guessing host-to-guest address mappings. Does not patch or execute the application.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "importId": {
+            "type": "string",
+            "description": "Prepared input id; empty selects latest.",
+            "default": ""
+          },
+          "attemptId": {
+            "type": "string",
+            "description": "Saved conversion attempt; empty selects latest matching input.",
+            "default": ""
+          },
+          "conversionId": {
+            "type": "string",
+            "description": "Specific successful conversion; overrides latest attempt.",
+            "default": ""
+          },
+          "module": {
+            "type": "string",
+            "description": "Executable relative to input root; empty selects the application entry.",
+            "default": ""
+          },
+          "engine": {
+            "type": "string",
+            "description": "Analysis engine.",
+            "enum": [
+              "cdec",
+              "native",
+              "ghidra"
+            ],
+            "default": "cdec"
+          },
+          "maxFunctions": {
+            "type": "integer",
+            "description": "Maximum discovered functions inspected for instructions.",
+            "default": 128,
+            "minimum": 1,
+            "maximum": 512
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "porting-tools"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
       "id": "application_open",
       "name": "Open Electron or web application",
       "description": "Capture a bounded immutable folder, ASAR or JS/TS/HTML artifact snapshot and analyze it with the inert TypeScript AST parser. Excluded artifacts are reported.",
@@ -4469,7 +5005,7 @@
     {
       "id": "ai_agent",
       "name": "AI: autonomous project task",
-      "description": "Autonomously investigate, reconstruct or patch the selected project using live operation schemas and authenticated child jobs. Recovers from tool/build errors, installs missing official components when enabled, saves checkpoints and requires recorded validation before completion. Existing AI provider credentials are required.",
+      "description": "Autonomously investigate, reconstruct, patch or port the selected project using live operation schemas and authenticated child jobs. Recovers from tool/build errors, installs missing official components when enabled, saves checkpoints and requires recorded validation before completion. Existing AI provider credentials are required.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -4487,7 +5023,8 @@
             "enum": [
               "investigate",
               "reconstruct",
-              "patch"
+              "patch",
+              "port"
             ],
             "default": "reconstruct"
           },

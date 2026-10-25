@@ -1,6 +1,6 @@
 ---
 name: cydecompilator
-description: Use CyDecompilator through MCP to investigate binaries or JavaScript/Electron applications, reconstruct and build editable projects, replace native or .NET methods in application copies, debug .NET sources, and compare observed process, network and graphical behavior. Drive requested work autonomously to a tested result. Use when the user requests these operations in CyDecompilator.
+description: Use CyDecompilator through MCP to investigate binaries or JavaScript/Electron applications, reconstruct and build editable projects, replace native or .NET methods, debug .NET sources, compare observed behavior, or prepare and test PS5 desktop ports with separate AnyPS5 and UltraPack backends. Drive requested work to a tested result. Use when the user requests these operations in CyDecompilator.
 ---
 
 # CyDecompilator
@@ -20,6 +20,8 @@ Read [the MCP contract](references/mcp.md) first. Then read the relevant workflo
   projects, builds, Git history, bounded repair and behavioral comparison.
 - [Patching and debugging](references/patching-debugging.md): changing a method
   in a separate application copy, testing receipts, source debugging and cancellation.
+- [PS5 desktop porting](references/porting.md): local input containers, separate
+  official backends, conversion receipts, host execution and compatibility limits.
 - [Unreal reconstruction rules](references/unreal.md): portable rules, campaign profiles, source snapshots and validation requirements; conversion remains separate.
 
 Use the user's chosen engine and settings. Otherwise let the server select a

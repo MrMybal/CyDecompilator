@@ -47,6 +47,26 @@ les détails de la fonction depuis un onglet près du code.
 
 Le format est reconnu à partir du contenu du fichier, pas de son extension.
 
+## Portage PS5 vers ordinateur
+
+La page **Portage PS5** accepte un dossier d’application, ELF/SELF en clair, ZIP ou
+un conteneur comme PKG/PFS. Elle prépare une copie de référence, convertit avec le
+moteur externe facultatif **AnyPS5**, puis teste le résultat avec des scénarios
+explicites. **UltraPack** fournit l’extraction des conteneurs. L’installation des
+moteurs officiels est disponible dans la page ; leurs dépendances restent séparées.
+Le parcours IA **Porter et tester** partage ces opérations MCP et exige des preuves
+d’exécution avant de déclarer le travail terminé.
+
+Nos moteurs natif/C analysent aussi les ELF sans sections et relient les diagnostics
+et registres d’appels AnyPS5 aux instructions et fonctions d’origine. Un échec de
+conversion peut déclencher automatiquement un dossier C/assembleur avec ses preuves
+et ses inconnues, sans modifier l’application d’origine.
+
+La conversion Windows, l’exécution et la préparation PFS/PKG ont été vérifiées sur
+nos applications de test. La compatibilité des jeux, API et graphismes dépend encore
+du moteur : une conversion réussie ne prouve pas qu’un jeu fonctionne.
+Voir [les prérequis et limites](app/Docs/PS5Porting.md).
+
 ## Le décompilateur C intégré
 
 - x86 (cdecl, stdcall, thiscall, helpers MSVC), x64 (Win64, System V) et ARM64 (AAPCS64,

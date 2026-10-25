@@ -1,0 +1,376 @@
+{
+  "source": "https://github.com/boykopovar/AnyPS5",
+  "license": "GPL-2.0-only",
+  "licenseFile": "AnyPS5-LICENSE.txt",
+  "baseCommit": "b6583dd8687f359c2caea295cde23e4732b73433",
+  "patchSha256": "96b332d8cbca453d30eaba2cbebc1fdb61c161f49d288c80e5640a613c620b39",
+  "files": [
+    {
+      "path": "core/libs/prx/libSceAgcDriver/CMakeLists.txt",
+      "beforeSha256": "f309d7095b4323d57d9ba65610ce232c93f1c56b6d09b9159162a2fec885c162",
+      "afterSha256": "463ca7b229b7cc77ae04ad0eff7c3297c1eaf6b99e38e000f5f97bc1080c1b11"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Execution/include/Driver/Shaders/ShaderRegistry.hpp",
+      "beforeSha256": "26e2200c5bdcd4ab21c7309056ce81f9b12286ce1217da58c4bf731005a71943",
+      "afterSha256": "93cd8ed8c1cd6b9a6a4496d8e960849bae965f909be6c344e8a79b0cd2ec4a83"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Execution/include/PerformanceTrace.hpp",
+      "beforeSha256": "15ad3e96eb5a4f1829af5c5e6d85668b76ecc4bde92deacd8d6d562020a74b55",
+      "afterSha256": "e7e336deabbf04e04b4883da8ff7c8819c75c6f4cb6d1d27c7fcf05a0b5afd50"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Execution/include/ShaderPreparation.hpp",
+      "beforeSha256": "f6994826c5153c8753fcc6a7ded906bc79541d455cee80afb10ff42c18efc717",
+      "afterSha256": "0cf4503be11f0f240312bd564b8f55731c06ea851e394dcdb78b389b47abda8a"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Execution/include/WorkerSampler.hpp",
+      "beforeSha256": "3d8e66072a5d11e7137ab409801eeddd5f59b5925ffff3f49a6992577c636d0e",
+      "afterSha256": "be4f94ba9fbfe9dfa9f1b82acb8653afa057a425251059c0631af7a646c19783"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Execution/src/Driver/Draw/Draw.cpp",
+      "beforeSha256": "58f0d3b02a00936250f019b1dc3e45145916e5a46f2a3772b3cf34a4cdb42390",
+      "afterSha256": "5db39133f7d63e51a533febb3ed2b6ff37c30d867141e40485601bb6cb302133"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Execution/src/Driver/Draw/DrawDecode.cpp",
+      "beforeSha256": "d1e7b72a9a96b78f9cd5b716675220161261d8d9e489f574a52c28b4b76b3e46",
+      "afterSha256": "d2c4187156395364ede5714c93854166de8f7ff0fcd78459f8b8fd693d78628a"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Execution/src/Driver/Draw/DrawPipeline.cpp",
+      "beforeSha256": "44ca2ce501e97c7c99f81715fe0bac7c776582c557059f6abf345cbbcba88410",
+      "afterSha256": "ea96177c850a0f83c64da889e7400b35b32bd4a4a97697efea3b238f8c63a548"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Execution/src/Driver/Memory/WrittenBuffers.cpp",
+      "beforeSha256": "a94d9ab94e3f3e5d8025bbf3ea98d5bbdb7fae78913b3d91480130b0e546c9ca",
+      "afterSha256": "0f1d6c45a4cc6d1df9c60850d3f367c96afe3ae5a1b37dfa6a52b399fcf6bce3"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Execution/src/Driver/Shaders/ShaderRegistry.cpp",
+      "beforeSha256": "58a01b61bb0e99c3c2159a2b89c44f155851dfc8c74ee782cc9350246a708f16",
+      "afterSha256": "42a320c0fc1d6681bae7c0119f9d69641866511b231b67f3235a31afd44e50fb"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Execution/src/HostAllocator.cpp",
+      "beforeSha256": "f11be2f85110a0482c3a16224c145cfa96f84fad22b7676134ad3a2749e4a4f0",
+      "afterSha256": "7a8739e79135c553b55579fa00339d76a4f8f987e158389477c324bb17710a40"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Execution/src/WorkerSampler.cpp",
+      "beforeSha256": "7e72c9521464750d7cd2b2974001901127192caada236c1cb25951a1e0eff76f",
+      "afterSha256": "29ad448c032c436480160bdc214280703504b9ced8d1545acc159e371e79503c"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/include/DepthCopy.hpp",
+      "beforeSha256": null,
+      "afterSha256": "8d5c3a43c8f998a25d545e8cf01e8c16bbac6b12150a39320255d30872f26274"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/include/Recorder.hpp",
+      "beforeSha256": "c32dfeb06d040c10ccb6b3b757eb45e7d6e5bf8e5509ac6525049b0be3a7e436",
+      "afterSha256": "fbd325fe19112dceb2ae54c282b6d05eb23fc4038ed4c925abca19884e2ecf17"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/include/Resources.hpp",
+      "beforeSha256": "eccb9b637aa80ed036e436b16897cb916e56eb4054a784443d1da10000552772",
+      "afterSha256": "a1b379a4717819fe2895ec57a249761de8dc980dcb609d7486e843d50171686a"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/include/ShaderResources.hpp",
+      "beforeSha256": "a3f07b55ebb3c29f85972fa2e34ed2cbf6090611cd315627beb223142258761b",
+      "afterSha256": "33d73e41f42bb6882faa60ae4ff5d03ca28848df675ebc1ac39fc35dfe34afc6"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/include/State.hpp",
+      "beforeSha256": "82e4383a0f50b95bed6f7aee31cd4ecc0ee32a0fb65993e1ee278a9a8bc9850a",
+      "afterSha256": "1972e5926e9322e2255cbe78c5bc8c065c2f3a2f10b3151fc9dd8661cfadb580"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/shaders/DepthCopy.frag",
+      "beforeSha256": null,
+      "afterSha256": "a5ca1ed7e9db9a12c44e71fea9503d7b16ab7fac8b51a9b26ca60eb1070273ee"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/src/BufferPool.cpp",
+      "beforeSha256": "f93d859c821edadfafe91fba3833468f8fa5a288e6f5a046cb9ce78a4185e5af",
+      "afterSha256": "80866c88550966e7aa0982f042f213fa0dcb2804c0c8b03333160a950162a1d1"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/src/DepthCopy.cpp",
+      "beforeSha256": null,
+      "afterSha256": "36347ad1c23ebc1e6bc386212f9a6f4c54329ba6881ef923f5dd4fd993784473"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/src/Draw.cpp",
+      "beforeSha256": "05c6c9c2a95f727ec84d35b5e618db751ea751d3b815be5026c87db8829887a3",
+      "afterSha256": "54bfb9040b119e9e8759dba6100e10d88ed33e1fa208940cdc682d98c8e74b7d"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/src/Pipeline.cpp",
+      "beforeSha256": "f3aaef7cb9c1cef7faf5bc1622a5813f4bc956a8ac289c8fc4abf67e371b488c",
+      "afterSha256": "fd4627724dde2d2428015c17667a9338c1c0595e0a3858ee37223469e66afcf9"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/src/Recorder.cpp",
+      "beforeSha256": "694afd1f91b21a0cbd7d7bdc2fd2966f0c8acf5b2075b8e6f910f0a9ff8a4300",
+      "afterSha256": "8989238be749599b7a438a0820a2b6a897fbdb6424aee0265f73116d625139d9"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/src/Resources.cpp",
+      "beforeSha256": "bb2fb52f7c2c5e5a7512be317f4e77bcbad4302dbb01b0c9ac06f1d5248723c9",
+      "afterSha256": "7d9f42a170393ca1ea056ac40459928905d4642d083a5d88dd3dc0dcbcc877e0"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/src/ShaderResources.cpp",
+      "beforeSha256": "17ddfcc5c3d4023efdefcc5800d19fd0e627205eb86f504428c201c81568ddf1",
+      "afterSha256": "8186080efb008ec5ede464425d69ea6243e7e6ff053e826fe62c8e15e875d5bc"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/Graphics/src/State.cpp",
+      "beforeSha256": "cdba4395fb91f3ac75162e295b6a01bdbead12fd29638e159f73ba45bbe2d614",
+      "afterSha256": "db46a0127a154926c7e73fedc155926d38280efac12a2fcb6a98548720dd4b97"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/BdaResources.cpp",
+      "beforeSha256": "23f628fd5c2d9fae662a1fb760c072392f2ad15fc3dabd153bad086b01c9af56",
+      "afterSha256": "958a6908d9edb85790f6fa6ae76201da82238afda7a29867abf22d68aa21afeb"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/Graphics.cpp",
+      "beforeSha256": "b2d6b8bd4a95beec567325d67d92a03fd7f1658c1a46d8192760e1567bd9098c",
+      "afterSha256": "a655ed3682c4cc99831054ffeee7d0632517f66634ba69371c415ba69eaffcb1"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/HostAllocator.cpp",
+      "beforeSha256": "e85c396132ddb80dcc885073a142615fd17c4770c65bf63993af9b7a08f6b636",
+      "afterSha256": "65ecfe26d556ae07081a836afa56fc79a67a2f5e32e46812f5d618478f0a8a2c"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/Recorder.cpp",
+      "beforeSha256": "4f62fa438daca6a9938b5aabddec61a644be7904c59e27cf716dee3bd304c5aa",
+      "afterSha256": "b02ef9f76c817e7d18d91af18330a92aafad66e45fa86064a1189512b111c3dc"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/ShaderDiskCache.cpp",
+      "beforeSha256": "c8eb8bf265b464a57746a1683b540a4e09a5f00040725f0ea0fc5ac6ac3c806c",
+      "afterSha256": "81ea33db4775a21a70630211f1fb7b802459b2d5e76b8008a1d8e88f3da89d0c"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/ShaderMemory.cpp",
+      "beforeSha256": "209de6fec361892e47174cef29abc56388678a8b1eb35fe0c64a36fcae580f32",
+      "afterSha256": "9fe28ba46994a7e4f3767e473d2f4026dff3bfea3922acb42ccbf4e60cd2a8d5"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/DepthCopy.cpp",
+      "beforeSha256": null,
+      "afterSha256": "06f099f83173c45c9cbb8acfdd65853214860f049be896364833330eee0b5246"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/DispatchMove.cpp",
+      "beforeSha256": "3ea06c35ddf1a0eca6783b38cd910aba10433421699e6c1f7beb4a4ba02c87a7",
+      "afterSha256": "407b97a8d16c12a2c181d27543f76d4df869af9f3568fa5c160a166cf96dfc17"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/DispatchMoveDepth.cpp",
+      "beforeSha256": "b0ab443671c7c02e67a78f9e39550bff84125dbc4ea56e7127c68ba76e1c8fd2",
+      "afterSha256": "9d33271bca723d5a9d95f02865e408803fa68f7f088ec84e97c61bcde909de22"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/DrawWriteRanges.cpp",
+      "beforeSha256": "b4038be63bc7c19a894b7032cbb47a25da88f0c883990ff381ab2d11ca243fcb",
+      "afterSha256": "99ec80c4a3a553764d0a328756fba2fed4474fd71854565a32eba9427555c181"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/EmulatedColorCompare.cpp",
+      "beforeSha256": "a52ecbb00dbc62e74cefde15e553e015a5413b29f05dbfd5d74c595726d97525",
+      "afterSha256": "d811b6cb58b8c821e345d4ef4a425e731fca9538f12ea4e41f6003f9535171f7"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/ImageSampleReduction.cpp",
+      "beforeSha256": "0b4b4c10be8d4b9b7d8dfb28e0233f5e16ce0d6123337f8a4f9b3421c9027714",
+      "afterSha256": "471d8a49ac558608d62e1a9b4c98bb98f535837b5311872e4a9b736ae87f31b5"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/NativeMultisampleDepth.cpp",
+      "beforeSha256": "4c1805429f1d07bc3eb98b38b1e1b6a42e81119c582f275e331188182a121a7b",
+      "afterSha256": "55c35a71313c13cede944930d71e218febb6a9196fa34043f45379e949938bab"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/PipelinedIndirectDraw.cpp",
+      "beforeSha256": "10cca60253e4ff8a8de4e64d9c8957a7ca4ecb7842e8d2932f26eec118118971",
+      "afterSha256": "2953ad6c0726adbd1e06f093399c940d3bbc47231bec540600599971f93fe290"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/PreparedGraphics.cpp",
+      "beforeSha256": "4fdb8778755e4ba61e1734b75c4bc2afe32e6ade048031e4475dd17bde2a1c81",
+      "afterSha256": "fd7a5dfd6e6e52e760a3afea277da0d9cd98bed5ce15a105c54d09821a46c179"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/PreparedPublication.cpp",
+      "beforeSha256": "8747f1e184130787ede97d15aaf861b631680568317b2e072414d51f07f70e77",
+      "afterSha256": "7f31c562210efbe887f6525c2ca9fe89306fa7780669daed390860cc8d16f432"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/PreparedShaders.cpp",
+      "beforeSha256": "faec5c0c2780ab604f41d3e9ea75468dec142e79ccf2a766434ea1fb4734b27f",
+      "afterSha256": "ccf990ce32a20a0be11160a9cbaeb9d21f575a9a0bd602c1afe306ae5af4ea64"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/SampledCacheBudget.cpp",
+      "beforeSha256": "1df4b6d8115a9e9d823a6752f472e4d21f5ec11d752539e85e764f27a7810b42",
+      "afterSha256": "a62ffcab8b08b6b7d807ad41e81d5ac8b000ceccd1986db07d2c2ff81a9eac60"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tests/execution/StencilNullFeedback.cpp",
+      "beforeSha256": "25918adea2229814a862ed042331bcc535e59556b47f92f68d92c8db1b9731fe",
+      "afterSha256": "5394263e067c3e616174390eee2b22934abcca632989b279e3553e274fb06009"
+    },
+    {
+      "path": "core/libs/prx/libSceAgcDriver/tools/ShaderReplay.cpp",
+      "beforeSha256": "e1016b02681e4105a0141940a8408c0ede07a0152300318d302f1bd96cf1b892",
+      "afterSha256": "0eceaf5806d757f0b59ed315d8a2166db0d5593174437728eedf808055e24c2a"
+    },
+    {
+      "path": "core/libs/prx/libSceVideoOut/src/VideoOutDriver.cpp",
+      "beforeSha256": "9ce37956029bfd9be089387714942847a64e2e0f0b8ee3b4d179468090e7ee1e",
+      "afterSha256": "a5cd975c8d4e138f5d18a4d18b7de03094c0f88582f19076258aaa4c21b65281"
+    },
+    {
+      "path": "core/libs/prx/libc/src/Process.cpp",
+      "beforeSha256": "92f00ad5c5d8629a2c2a309fde20a2f423bc8323ed197c47d89f1f934214e300",
+      "afterSha256": "4531acc6e1ce9f77f45413bfdfe2f7d22f1fe260e265709e910849c15cd9211d"
+    },
+    {
+      "path": "core/shader/recompiler/CMakeLists.txt",
+      "beforeSha256": "30a6425e0947338234935cf2f5cd77b2bde95f959fd15404cad3cccd9fb38943",
+      "afterSha256": "4c1b25d0dd27dd68725122c3d271e9889b8af9e1ba2bbf089402c54f046fa3a9"
+    },
+    {
+      "path": "core/shader/recompiler/Optimization/include/Optimization/SrtWalker/SrtTape.hpp",
+      "beforeSha256": "924ef11bbb7f0c48975b6112872a3293c7cdb277e70434f712e8f3756b9fff16",
+      "afterSha256": "856954fe8ad781a44bb2652afcadd1ece96a61790093a8c253e35630e690b44c"
+    },
+    {
+      "path": "core/shader/recompiler/Optimization/src/DescriptorBindingBuilder.cpp",
+      "beforeSha256": "cdb34485950d39acb3bd27ec9feeec2aa45136535d6644f8fe0bafa3ee3a9d18",
+      "afterSha256": "416e42d388fec403539a343d896a77e52c6083a8cfede426958c9db04e4a1fc4"
+    },
+    {
+      "path": "core/shader/recompiler/Optimization/src/SrtWalker/SrtTape.cpp",
+      "beforeSha256": "22919d08251d5478bbe0d992847b57efaafdfda74b5c8d7663127be9c805a0f0",
+      "afterSha256": "e3973ae84e2a20c0e731a12ff2db6ae4a69ca2c59bff531f4dced79b9c7336ff"
+    },
+    {
+      "path": "core/shader/recompiler/Recompiler.cpp",
+      "beforeSha256": "c2f235b456c411dd69b4d15136e1e9b790147fe43c4885c3755bf7d619d71d8a",
+      "afterSha256": "8c01b9411070cd22d7ef3913901827b5378600b0bd473a6dce66334421080bb5"
+    },
+    {
+      "path": "core/shader/recompiler/Recompiler.hpp",
+      "beforeSha256": "ef7c3821ca7f1f1fc372bd62bbd63a77ba5889d5a8e6a0b58621fd15a0daebb5",
+      "afterSha256": "c8e52efc734f445824e3852af76945dd8619444c24c24bb815b77f37893a0bf9"
+    },
+    {
+      "path": "core/shader/recompiler/ShaderDiskCache.cpp",
+      "beforeSha256": "2a50349e6233f2298886f14533f6e53cac577412ae34c7deaf8260587830afc9",
+      "afterSha256": "91c4987be87ffcf61e741508f067c8ebe3098bb76234ddbd92aac770939ff0e1"
+    },
+    {
+      "path": "docs/dev/debt/libSceAgcDriver.md",
+      "beforeSha256": "ced298489647c27ab874921e76f9f5219c5632f50e7eded4d0d541ed03c93742",
+      "afterSha256": "896e8a0249bed498ed02cfecb8f14b2d7ed5687c35aab5c88ac264d38986945c"
+    }
+  ],
+  "testPattern": "^(agc_driver_graphics|agc_driver_readonly_resummarize|agc_driver_depth_copy|agc_driver_depth_storage|agc_driver_depth_range_remap_draw|agc_draw_snapshot_cap|agc_draw_snapshot_epoch|agc_driver_prepared_publication|agc_driver_prepared_graphics|agc_driver_prepared_shaders|agc_draw_snapshot_slices|agc_driver_prepared_shaders_abi_deferred_.*|agc_shader_disk_cache|agc_driver_draw_cache_reuse|agc_driver_draw_cache_reuse_inline|agc_driver_draw_cache_reuse_verify|agc_driver_pipelined_indirect_draw|agc_driver_queued_index_read_order|agc_driver_shutdown_threads_draw_committer|agc_driver_shutdown_threads_exit_after_start|agc_driver_host_allocator|agc_shader_memory)$",
+  "limits": [
+    "Experimental single-sample depth copy; multisample and layered copies are refused.",
+    "GPU values and coverage tested on NVIDIA RTX 3090 with Vulkan validation.",
+    "Not a proof of PS5 hardware equivalence or playable game compatibility."
+  ],
+  "profileId": "cydecompilator-native-device-parameters",
+  "description": "Frequently updated draw parameter buffers up to 64 KiB use mapped coherent device-local memory when available, with a 64 MiB live capacity budget and host-memory fallback. Previous bounded snapshot rotation, exact large-host views and asynchronous retirement remain enabled.",
+  "additionalBuildTargets": [
+    "agc_driver_prepared_publication_tests",
+    "agc_driver_prepared_graphics_tests",
+    "agc_driver_prepared_shaders_tests",
+    "agc_shader_disk_cache_tests",
+    "agc_driver_draw_cache_reuse_tests",
+    "agc_driver_pipelined_indirect_draw_tests",
+    "agc_driver_queued_index_read_order_tests",
+    "agc_driver_shutdown_threads_tests",
+    "agc_driver_host_allocator_tests",
+    "agc_shader_memory_tests"
+  ],
+  "requiredTestMessages": [
+    "persistent snapshot slice coherency tests passed",
+    "persistent snapshot GPU readback values passed",
+    "concurrent native preparation readers passed",
+    "native resident snapshot GPU values and eviction passed",
+    "published native preparation views passed",
+    "shader disk cache tests passed",
+    "native invocation sources and invalidation passed",
+    "native batched resident snapshot GPU readback passed",
+    "native draw descriptor set reuse passed",
+    "pipelined indirect draw tests passed",
+    "shutdown threads tests passed",
+    "native draw descriptor cache lifetime passed",
+    "native moved buffer recycling checks passed",
+    "native resident incremental refresh checks passed",
+    "native host allocator larger classes passed",
+    "native draw retirement lock and lifetime passed",
+    "native SRT frame reuse and nested capture passed",
+    "native large host buffer classes and exact views passed",
+    "native large host buffer GPU readback passed",
+    "native snapshot rotation and held GPU readback passed",
+    "native snapshot rotation retention bound passed",
+    "native mapped device parameters and bounded fallback passed"
+  ],
+  "keyVerificationEnvironment": {
+    "APS5_CHECK_NATIVE_ABI_KEYS": "1",
+    "APS5_VERIFY_SRT_TAPE": "1"
+  },
+  "keyVerificationMessages": [
+    "native graphics ABI key verification passed",
+    "native graphics input cache verification passed",
+    "native invocation source reuse verified",
+    "native prepared binding lookup verified",
+    "native prepared module lookup verified",
+    "native draw scratch reuse verified"
+  ],
+  "expectedTestCount": 29,
+  "additionalValidationEnvironments": {
+    "native-reuse-disabled": {
+      "APS5_NO_NATIVE_DRAW_SCRATCH": "1",
+      "APS5_NO_NATIVE_PREPARED_LOOKUPS": "1",
+      "APS5_NO_PERSISTENT_DRAW_SETS": "1",
+      "APS5_NO_MOVED_BUFFER_RECYCLING": "1",
+      "APS5_NO_RESIDENT_DRAW_UPDATES": "1",
+      "APS5_NO_SRT_FRAME_REUSE": "1",
+      "APS5_NO_DRAW_SNAPSHOT_ROTATION": "1",
+      "APS5_NO_LARGE_HOST_CLASSES": "1",
+      "APS5_NO_DEVICE_PARAMETERS": "1"
+    }
+  },
+  "modeRequiredTestMessages": {
+    "standard": [
+      "native resident incremental GPU readback passed",
+      "native mapped device parameter GPU readback passed"
+    ],
+    "without-pipeline-libraries": [
+      "native resident incremental GPU readback passed",
+      "native mapped device parameter GPU readback passed"
+    ],
+    "key-verification": [
+      "native resident incremental GPU readback passed",
+      "native mapped device parameter GPU readback passed"
+    ],
+    "native-reuse-disabled": [
+      "native host parameter fallback GPU readback passed"
+    ]
+  }
+}

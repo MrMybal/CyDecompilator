@@ -50,6 +50,23 @@ from its dedicated sidebar page, and function details move into a tab beside the
 
 Formats are detected from file contents rather than extensions.
 
+## PS5 desktop porting
+
+The **PS5 porting** sidebar page accepts an application folder, ELF/plaintext SELF,
+ZIP or a container such as PKG/PFS. It prepares a preserved input snapshot, converts
+through the optional separate **AnyPS5** backend, and tests the desktop output with
+explicit scenarios. **UltraPack** supplies container extraction; official backend
+installation is available in the page. The AI workflow **Port and test** uses the
+same MCP operations and verifies execution evidence before completion.
+
+CyDecompilator's native/C engines also analyze sectionless guest ELF images and link
+AnyPS5 failures/import registries to source instructions and functions. Failed conversions
+can automatically produce a C/assembly dossier with evidence and unresolved cases.
+
+Real Windows conversion/execution and PFS/PKG preparation have been exercised on
+owned test applications. Game/API/GPU compatibility still depends on the backend;
+conversion does not establish that a game works. See [setup and limits](app/Docs/PS5Porting.md).
+
 ## Built-in C decompiler
 
 - x86 (cdecl, stdcall, thiscall, MSVC helpers), x64 (Win64, System V) and ARM64 (AAPCS64,
