@@ -5,7 +5,7 @@
 <p align="center">
 AI-assisted multi-engine decompiler — Windows, Linux · x86, x64, ARM64 · .NET, Java, Android, Python, shaders
 <br>
-<img src="https://img.shields.io/badge/version-1.4.0-1f4e8c" alt="version 1.4.0">
+<img src="https://img.shields.io/badge/version-1.5.0-1f4e8c" alt="version 1.5.0">
 <img src="https://img.shields.io/badge/license-GPL--3.0-1f4e8c" alt="GPL-3.0">
 </p>
 
@@ -29,8 +29,11 @@ The interface defaults to English. In the **Options** sidebar page, select *Lang
 Français, Deutsch, Español, Italiano, Português, Русский, 简体中文, 日本語 or 한국어.
 Changes take effect immediately, without restarting. The AI assistant responds in the selected language.
 
-The interface uses **CyUI**: permanent sidebar navigation, toolbars with tooltips, resizable
-explorer and code panes, and a task status bar. **Options** provides five themes (Mid grey,
+The interface uses **modular CyUI 1.2**: shared code/diff views, filtered logs and diagnostics,
+Markdown AI reports, a Ctrl+Shift+P command palette and zoomable captured screens.
+[Integration and limits](app/Docs/CyUIMigration.md). It retains permanent sidebar navigation,
+toolbars with tooltips, resizable explorer and code panes, and a task status bar.
+**Options** provides five themes (Mid grey,
 Light grey, Amber night, Violet and Navy), compact or comfortable density, and text scaling.
 Existing theme preferences migrate automatically. In smaller windows, AI remains available
 from its dedicated sidebar page, and function details move into a tab beside the code.

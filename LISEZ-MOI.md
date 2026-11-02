@@ -25,7 +25,10 @@ L'interface est en anglais par défaut. Menu latéral **Options** → *Language*
 Deutsch, Español, Italiano, Português, Русский, 简体中文, 日本語, 한국어 (changement immédiat,
 sans redémarrage). L'assistant IA répond dans la langue choisie.
 
-L’interface utilise **CyUI** : navigation permanente à gauche, barres d’outils avec infobulles,
+L’interface utilise **CyUI 1.2 modulaire** : vues de code et de différences communes,
+journaux et diagnostics filtrables, rapports IA en Markdown, palette Ctrl+Maj+P et
+captures avec zoom. [Intégration et limites](app/Docs/CyUIMigration.md).
+Navigation permanente à gauche, barres d’outils avec infobulles,
 explorateur et code redimensionnables, état des tâches en bas. **Options** propose cinq thèmes
 (gris moyen, gris clair, nuit ambrée, violet, bleu nuit), une densité compacte ou confortable
 et la taille du texte. Les anciennes préférences de thème sont reprises automatiquement.

@@ -1,8 +1,19 @@
-# Capability coverage — CyDecompilator 1.4.0
+# Capability coverage — CyDecompilator 1.5.0
 
 Status values: **Tested** (exercised on this machine, with the proof named), **Implemented**
 (code path present, not run end to end here), **Not exposed** (engine feature not offered),
 **Planned**.
+
+## Modular desktop interface
+
+CyUI 1.2 is pinned and shipped selectively: Core, Code/CodeEditor, Diff, Commands,
+Diagnostics, DocumentViews, Inspector and Images, with Canvas as a dependency.
+Actual ImGui frame tests cover all five themes, both densities, DPI 1/1.5,
+keyboard command selection/cancellation, JSON Undo, native source Undo/Redo,
+image navigation, diagnostic confinement and unchanged source/document data.
+Windows native captures exercise the migrated application views. Linux/macOS
+execution is unverified. The richer native source editor and application file tree
+remain intentional adapters; see [CyUIMigration.md](CyUIMigration.md).
 
 ## PS5 desktop porting
 

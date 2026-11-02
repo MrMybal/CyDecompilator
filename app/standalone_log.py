@@ -51,6 +51,7 @@ class Journal:
     def __init__(self,root):
         self.root=Path(root);folder=self.root/'data/logs';folder.mkdir(parents=True,exist_ok=True)
         self.path=folder/'standalone.log';self.selected=self.path;self.text='';self.paused=False;self.last=0.;self.focus=False
+        self.view=None;self.read_stamp=None
         self.copy_thread=None;self.copy_result=None
         self.principals={};self.cursors={};self.files=set();self.bound=set();self.discovery={};self.test='--ui-test-logs' in sys.argv;self.frames=0
         self.handler=RotatingFileHandler(self.path,maxBytes=2*1024*1024,backupCount=3,encoding='utf-8',delay=True)
@@ -110,9 +111,9 @@ class Journal:
             choices=sorted(set((self.root/'data/logs').glob('*.log*'))|self.files,key=str)
             if self.selected not in choices:choices.insert(0,self.selected)
             changed,index=ui.combo(label('Log file'),choices.index(self.selected),[str(p.relative_to(self.root)) if p.is_relative_to(self.root) else str(p) for p in choices])
-            if changed:self.selected=choices[index];self.text=self.read()
+            if changed:self.selected=choices[index];self.read_stamp=None
             _,self.paused=ui.checkbox(label('Pause log refresh'),self.paused);ui.same_line()
-            if ui.button(label('Refresh log')):self.text=self.read()
+            refresh=ui.button(label('Refresh log'))
             ui.same_line()
             if ui.button(label('Copy entire log')) and not (self.copy_thread and self.copy_thread.is_alive()):
                 selected=self.selected
@@ -120,9 +121,15 @@ class Journal:
                 self.copy_thread=threading.Thread(target=copy,daemon=True);self.copy_thread.start()
             if self.copy_result is not None:ui.set_clipboard_text(self.copy_result);self.copy_result=None
             ui.text_wrapped(tr('Select text and press Ctrl+C. Ctrl+A selects all. Refresh pauses while selecting.'))
-            if not self.paused and not self.focus:self.text=self.read()
-            ui.input_text_multiline('##standalone-log',self.text,ui.ImVec2(-1,max(180,ui.get_content_region_avail().y-20)),flags=ui.InputTextFlags_.read_only)
-            self.focus=ui.is_item_active()
+            from ui_views import LogView
+            if self.view is None:self.view=LogView()
+            try:
+                stat=self.selected.stat();stamp=(str(self.selected),stat.st_size,stat.st_mtime_ns)
+            except OSError:stamp=(str(self.selected),None)
+            if refresh or ((not self.paused and not self.focus) and stamp!=self.read_stamp):
+                self.text=self.read();self.read_stamp=stamp;self.view.set_text(self.text)
+            self.view.render('##standalone-log',(0,0))
+            self.focus=self.view.raw and ui.is_any_item_active()
             if self.test:
                 self.frames+=1
                 if self.frames==3:

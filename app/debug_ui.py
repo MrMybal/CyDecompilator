@@ -3,6 +3,7 @@ import time
 from pathlib import Path
 
 import cyui
+from ui_views import LogView
 from ui_common import imgui, label, tr
 
 
@@ -13,7 +14,7 @@ class DebugUI:
     def init(self, session):
         session.update(debug={'status': 'idle', 'sessionId': ''}, debug_rows=[], debug_children={},
                        debug_poll=0, debug_inspected=None, debug_stop_entry=False, debug_executable='',
-                       debug_error='', debug_console=self.ide.make_editor(), debug_marker=None)
+                       debug_error='', debug_console=LogView(), debug_marker=None)
 
     def active(self, pid):
         state = self.ide.sessions[pid]['debug']
@@ -156,7 +157,7 @@ class DebugUI:
         current = next((f for f in state.get('frames', []) if f['id'] == state.get('frameId')
                         and f.get('path') == path), None) if state['status'] == 'paused' and not state.get('sourceChanged') else None
         stamp = (path, repr(session['debug_rows']), state.get('stopId'), state['status'], state.get('frameId'),
-                 session['tabs'][path]['revision'], repr(current))
+                 session['tabs'][path]['revision'], repr(current), cyui.palette().error, cyui.palette().warning)
         if session['debug_marker'] == stamp:
             return
         session['debug_marker'] = stamp
@@ -165,8 +166,9 @@ class DebugUI:
         for line in sorted(lines | ({current['line']} if current else set())):
             here = current and current['line'] == line
             tooltip = tr('Current instruction') if here else tr('Breakpoint')
-            editor.add_marker(max(0, line - 1), 0xFF5050EE if line in lines else 0xFF40CCFF,
-                              0x4040CCFF if here else 0, tooltip, tr('Current instruction') if here else '')
+            editor.add_marker(max(0, line - 1), cyui.palette().error if line in lines else cyui.palette().warning,
+                              cyui.alpha(cyui.palette().warning, .25) if here else 0,
+                              tooltip, tr('Current instruction') if here else '')
 
     def shortcuts(self, pid):
         session = self.ide.sessions[pid]
@@ -262,8 +264,7 @@ class DebugUI:
                 imgui.end_tab_item()
             opened, _ = imgui.begin_tab_item(label('Debug console'))
             if opened:
-                self.ide.palette(session['debug_console'])
-                self.ide.render(session['debug_console'], '###debug-console', imgui.ImVec2(-1, max(70, imgui.get_content_region_avail().y)))
+                session['debug_console'].render('###debug-console', (-1, max(cyui.dp(70), imgui.get_content_region_avail().y)))
                 imgui.end_tab_item()
             imgui.end_tab_bar()
 

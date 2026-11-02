@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 
 import cyui
+from cyui_modules.code import CodeEditor
+from ui_views import LogView, SourceView
 from imgui_bundle import portable_file_dialogs as pfd
 from ui_common import imgui, label, tr
 
@@ -34,6 +36,10 @@ class PortingUI:
         self.max_gib=256
         self.build_pkg_helper=True
         self.scenarios='[{"expectedExitCode": 0}]'
+        self.scenario_editor=CodeEditor(self.scenarios,'json')
+        self.scenario_editor.preview=False
+        self.output_view=LogView()
+        self.code_views={}
         self.report={}
         self.converted={}
         self.tool_settings={}
@@ -139,7 +145,8 @@ class PortingUI:
                 if cyui.button(label('Refresh')):self.refresh()
             if cyui.begin_section(label('Test scenarios'),False):
                 imgui.text_wrapped(tr('Each scenario may specify arguments, stdin, expectedExitCode and exact expectedStdout.'))
-                _,self.scenarios=imgui.input_text_multiline('###porting-scenarios',self.scenarios,cyui.dp2(-1,120))
+                if self.scenario_editor.text!=self.scenarios:self.scenario_editor.set_text(self.scenarios)
+                if self.scenario_editor.draw('###porting-scenarios',(-1,cyui.dp(120))):self.scenarios=self.scenario_editor.text
                 imgui.text_wrapped(tr('Trace libraries: all or comma-separated names; requires instrumented conversion.'))
                 imgui.set_next_item_width(-1)
                 _,self.trace_libraries=imgui.input_text('###porting-trace-libraries',self.trace_libraries)
@@ -215,9 +222,8 @@ class PortingUI:
             if cyui.button(label('Open Project IDE')):self.app.force_tab='project'
         if self.converted.get('directory'):imgui.text_wrapped(self.converted['directory'])
         if report.get('output'):
-            imgui.begin_child('###porting-log',cyui.dp2(-1,180))
-            imgui.text_unformatted(report['output'])
-            imgui.end_child()
+            self.output_view.set_text(report['output'])
+            self.output_view.render('###porting-log',(-1,cyui.dp(180)))
 
     def draw_diagnosis(self):
         report=self.diagnosis
@@ -254,9 +260,11 @@ class PortingUI:
                             if code.get('hasUnmodeledInstructions'):
                                 cyui.callout('warning',tr('Decompiled C is incomplete; unsupported instructions remain.'))
                             imgui.text_unformatted(code['language'])
-                            imgui.begin_child('###porting-code-'+view+'-'+function['id'],cyui.dp2(-1,180))
-                            imgui.text_unformatted(code['code'])
-                            imgui.end_child()
+                            key=(view,function['id'])
+                            source=self.code_views.setdefault(key,SourceView(code['language']))
+                            source.set_language(code['language'])
+                            source.set_text(code['code'])
+                            source.render('###porting-code-'+view+'-'+function['id'],(-1,cyui.dp(220)))
                         elif code.get('error'):cyui.callout('warning',code['error']['message'])
                     imgui.tree_pop()
             imgui.tree_pop()

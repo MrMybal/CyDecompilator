@@ -8,6 +8,7 @@ class Panel:
     def __init__(self,runtime,principal=None):
         self.runtime=runtime;self.index=0;self.drafts={};self.job=None;self.message='';self.frames=0
         self.test='--ui-test-advanced' in sys.argv;self.future=None;self.executor=ThreadPoolExecutor(max_workers=1)
+        self.editors={};self.contracts={};self.results={}
         if runtime is not None:
             from cytools_core.transports.api import LocalClient
 
@@ -50,9 +51,18 @@ class Panel:
             if ui.button(label('Copy operation contract')):ui.set_clipboard_text(json.dumps(operation,indent=2,ensure_ascii=False))
             ui.same_line()
             if ui.button(label('Import current form')):self.restore(current_recipe());operation,state=self.state()
+            from cyui_modules.code import CodeEditor
+            from cyui import dp
+            from ui_views import SourceView
             if ui.collapsing_header(label('Full input and output schemas')):
-                ui.input_text_multiline('##contract',json.dumps(operation,indent=2,ensure_ascii=False),ui.ImVec2(-1,180),flags=ui.InputTextFlags_.read_only)
-            _,state['text']=ui.input_text_multiline(label('Parameters JSON'),state['text'],ui.ImVec2(-1,200))
+                contract=self.contracts.setdefault(operation['id'],SourceView('json'))
+                contract.set_text(json.dumps(operation,indent=2,ensure_ascii=False));contract.render('##contract',(-1,dp(240)))
+            if operation['id'] not in self.editors:
+                self.editors[operation['id']]=CodeEditor(state['text'],'json')
+            editor=self.editors[operation['id']]
+            if editor.text!=state['text']:editor.set_text(state['text'])
+            ui.text_unformatted(tr('Parameters JSON'))
+            if editor.draw('###parameters-'+operation['id'],(-1,dp(280))):state['text']=editor.text
             _,state['backend']=ui.input_text(label('Backend ID'),state['backend'])
             _,state['model']=ui.input_text(label('Model ID'),state['model'])
             priorities=['Interactive','Critical','High','Normal','Background','Low']
@@ -86,8 +96,11 @@ class Panel:
             if self.job:
                 ui.text(self.job['state'])
                 if ui.button(label('Copy job and outputs')):ui.set_clipboard_text(json.dumps(self.job,indent=2,ensure_ascii=False))
-                ui.input_text_multiline('##job',json.dumps(self.job,indent=2,ensure_ascii=False),ui.ImVec2(-1,180),flags=ui.InputTextFlags_.read_only)
-            if self.message:ui.input_text_multiline('##result',self.message,ui.ImVec2(-1,120),flags=ui.InputTextFlags_.read_only)
+                view=self.results.setdefault('job',SourceView('json'))
+                view.set_text(json.dumps(self.job,indent=2,ensure_ascii=False));view.render('##job',(-1,dp(240)))
+            if self.message:
+                view=self.results.setdefault('result',SourceView('json'))
+                view.set_text(self.message);view.render('##result',(-1,dp(180)))
         except Exception as exc:self.message=str(exc)
         finally:ui.end_tab_item()
     def close(self):

@@ -3,9 +3,11 @@ import re
 import time
 from pathlib import Path
 
-from imgui_bundle import imgui_color_text_edit as ed, portable_file_dialogs as pfd
+from imgui_bundle import imgui as native_imgui, imgui_color_text_edit as ed, portable_file_dialogs as pfd
 from ui_common import imgui, label, tr
 import cyui
+from cyui_modules import diagnostics
+from ui_views import DiffView, LogView, diagnostic_rows, language_for_path
 
 
 class ProjectIDE:
@@ -65,7 +67,7 @@ class ProjectIDE:
     def session(self):
         pid = self.app.project['projectId']
         if pid not in self.sessions:
-            self.sessions[pid] = {'info': {}, 'tabs': {}, 'active': '', 'force': '', 'output': self.make_editor(),
+            self.sessions[pid] = {'info': {}, 'tabs': {}, 'active': '', 'force': '', 'output': LogView(),
                                   'result': {}, 'configuration': 0, 'executable': '', 'arguments': '',
                                   'new_file': '', 'patch': None, 'patch_editor': self.make_editor('c', False),
                                   'patch_symbol': '', 'patch_plan': None, 'patch_destination': '', 'patch_receipt': None,
@@ -80,7 +82,7 @@ class ProjectIDE:
                                       csharp_rename=None, csharp_format=None, csharp_references=None, csharp_name='')
             self.sessions[pid]['target_project'] = ''
             self.sessions[pid].update(history=None, history_commit='', history_message='', history_preview=None,
-                                      history_restoring=False, history_preview_editor=self.make_editor())
+                                      history_restoring=False, history_file='', history_diffs={}, refactor_diffs={})
             self.debug.init(self.sessions[pid])
             self.reconstruction.init(self.sessions[pid])
             self.refresh(pid)
@@ -640,10 +642,7 @@ class ProjectIDE:
                 session['history'] = out
                 if action == 'compare':
                     session['history_preview'] = out
-                    text = '\n\n'.join(row['path'] + ' | ' + tr(row['kind']) +
-                            (' | ' + tr('Binary file changed') if row['binary'] else '') + '\n' + row['diff'] +
-                            ('\n' + tr('Diff truncated') if row['truncated'] else '') for row in out['changes'])
-                    session['history_preview_editor'].set_text(text or tr('No changes'))
+                    session['history_diffs'].clear()
                 else:
                     session['history_preview'] = None
                     session['history_commit'] = out.get('commit') or out['head']
@@ -708,10 +707,26 @@ class ProjectIDE:
             imgui.end_disabled()
         imgui.end_disabled()
         if session['history_preview']:
-            editor = session['history_preview_editor']
-            editor.set_read_only_enabled(True)
-            self.palette(editor)
-            self.render(editor, '###git-preview', imgui.ImVec2(-1, max(100, imgui.get_content_region_avail().y - 180)))
+            changes = session['history_preview']['changes']
+            if changes:
+                paths = [row['path'] for row in changes]
+                current = paths.index(session['history_file']) if session['history_file'] in paths else 0
+                _, current = native_imgui.combo(label('Source file'), current, paths)
+                row = changes[current]
+                session['history_file'] = row['path']
+                imgui.text_unformatted(row['path'] + ' | ' + tr(row['kind']))
+                if row['truncated']:
+                    cyui.callout('warning', tr('Diff truncated'))
+                if row['binary']:
+                    cyui.callout('info', tr('Binary file changed'))
+                else:
+                    view = session['history_diffs'].setdefault(row['path'], DiffView())
+                    view.set_unified(row['diff'], language_for_path(row['path']))
+                    selected = view.render('###git-preview', (-1, max(cyui.dp(100), imgui.get_content_region_avail().y-cyui.dp(180))))
+                    if selected and selected.new_line > 0 and row['kind'] != 'deleted':
+                        self.open_file(pid, row['path'], selected.new_line)
+            else:
+                cyui.empty_state(tr('No changes'))
         self.draw_output(pid, session)
 
     def draw_output(self, pid, session):
@@ -723,21 +738,15 @@ class ProjectIDE:
         if imgui.begin_tab_bar('###build-results'):
             opened, _ = imgui.begin_tab_item(label('Build output'))
             if opened:
-                self.palette(session['output'])
-                self.render(session['output'], '###build-output', imgui.ImVec2(-1, max(90, imgui.get_content_region_avail().y)))
+                session['output'].render('###build-output', (-1, max(cyui.dp(90), imgui.get_content_region_avail().y)))
                 imgui.end_tab_item()
             opened, _ = imgui.begin_tab_item(label('Problems'))
             if opened:
-                imgui.begin_child('###build-problems', imgui.ImVec2(-1, max(90, imgui.get_content_region_avail().y)))
-                for index, item in enumerate(result.get('diagnostics', [])):
-                    caption = '%s:%s: %s' % (Path(item['file']).name, item['line'], item['message'])
-                    if imgui.selectable(caption + '###problem-' + str(index), False)[0]:
-                        root = Path(session['info']['directory']).resolve()
-                        path = Path(item['file'])
-                        resolved = (path if path.is_absolute() else root / path).resolve()
-                        if resolved.is_relative_to(root):
-                            self.open_file(pid, resolved.relative_to(root).as_posix(), item['line'], item['column'])
-                imgui.end_child()
+                rows = diagnostic_rows(result.get('diagnostics', []), ('build', pid))
+                selected = diagnostics.diagnostic_list('###build-problems', rows, (-1, max(cyui.dp(90), imgui.get_content_region_avail().y)))
+                chosen = next((row for row in rows if row.id == selected), None)
+                if chosen:
+                    self.open_diagnostic(pid, chosen)
                 imgui.end_tab_item()
             opened, _ = imgui.begin_tab_item(label('Search source project'), None,
                     imgui.TabItemFlags_.set_selected if session.pop('force_search', False) else 0)
@@ -823,8 +832,9 @@ class ProjectIDE:
                 imgui.text(tr('Refactoring changes %d files') % len(result['edits']))
                 for edit in result['edits']:
                     if imgui.collapsing_header(edit['path'] + '##refactoring-' + action):
-                        import difflib
-                        imgui.text_unformatted('\n'.join(difflib.unified_diff(edit['before'].splitlines(), edit['text'].splitlines(), lineterm='')))
+                        view = session['refactor_diffs'].setdefault((action, edit['path']), DiffView())
+                        view.set_texts(edit['before'], edit['text'], 'csharp')
+                        view.render('###refactoring-' + action + '-' + edit['path'], (0, cyui.dp(220)))
                 if imgui.button(label('Apply preview to editor buffers') + '##' + action):
                     self.apply_refactoring(pid, action)
         imgui.end_disabled()
@@ -870,14 +880,25 @@ class ProjectIDE:
         diagnostics = session['csharp_diagnostics']
         if diagnostics:
             imgui.text(tr('C# diagnostics: %d') % len(diagnostics['diagnostics']))
-            for index, row in enumerate(diagnostics['diagnostics']):
-                location = row['location']
-                caption = '%s:%d %s: %s' % (location['path'], location['point']['line'], row['code'], row['message'])
-                if imgui.selectable(caption + '###csharp-issue-' + str(index), False)[0]:
-                    self.open_file(pid, location['path'], location['point']['line'], location['point']['column'])
+            from cyui_modules.diagnostics import diagnostic_list
+            rows = diagnostic_rows(diagnostics['diagnostics'], ('csharp', pid))
+            selected = diagnostic_list('###csharp-issues', rows, (0, cyui.dp(180)))
+            chosen = next((row for row in rows if row.id == selected), None)
+            if chosen:
+                self.open_diagnostic(pid, chosen)
         for note in session['csharp_notes']:
             imgui.text_wrapped(tr(note))
         imgui.end_child()
+
+    def open_diagnostic(self, pid, diagnostic):
+        directory = self.sessions[pid]['info'].get('directory')
+        if not directory or not diagnostic.source:
+            return
+        root = Path(directory).resolve()
+        path = Path(diagnostic.source)
+        resolved = (path if path.is_absolute() else root / path).resolve()
+        if resolved.is_relative_to(root):
+            self.open_file(pid, resolved.relative_to(root).as_posix(), max(1, diagnostic.line), max(1, diagnostic.column))
 
     def draw_search(self, pid, session):
         busy = self.app.jobs.busy('ide-' + pid)

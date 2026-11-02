@@ -22,6 +22,8 @@ from imgui_bundle import portable_file_dialogs as pfd  # noqa: E402
 from ui_common import configure_generation, imgui, label, preferences, run, tr  # noqa: E402
 from tool import create_runtime  # noqa: E402
 import cyui
+from cyui_modules import inspector
+from ui_views import ConversationView, DocumentView, SourceView, stable_id
 
 TERMINAL = ('Completed', 'Failed', 'Cancelled')
 LANGUAGES = {'c': 'c', 'cpp': 'cpp', 'csharp': 'cs', 'java': 'cpp', 'python': 'python', 'hlsl': 'hlsl',
@@ -128,12 +130,17 @@ def make_editor(language=None, read_only=True):
 
 
 def set_language(editor, language):
+    if isinstance(editor, SourceView):
+        editor.set_language(language)
+        return
     name = LANGUAGES.get(language or '', None)
     factory = getattr(ed.TextEditor.Language, name, None) if name else None
     editor.set_language(factory() if factory is not None else PLAIN)
 
 
 def palette(editor):
+    if isinstance(editor, SourceView):
+        return
     if cyui.is_light():
         editor.set_palette(ed.TextEditor.get_light_palette())
     else:
@@ -287,9 +294,12 @@ class App:
         self.details = None           # function_info output
         self.view = 'decompiled'
         self.code_editor = make_editor()
-        self.ai_editor = make_editor('markdown')
-        self.ai_editor.set_show_line_numbers_enabled(False)
-        self.converted_editor = make_editor('c')
+        self.ai_editor = DocumentView()
+        self.ai_conversation = ConversationView()
+        self.ai_is_conversation = False
+        self.converted_editor = SourceView('c')
+        self.function_properties = inspector.InspectorState()
+        self.function_filter = cyui.TextFilter()
         self.code_meta = {}
         self.converted = None
         self.history = []
@@ -934,8 +944,8 @@ class App:
                 imgui.end_table()
         if pe.get('sections') and imgui.collapsing_header(label('Sections and entropy')):
             for section in pe['sections']:
-                color = color('error') if 'X' in section['flags'] and section['entropy'] > 7.2 else color('textDim')
-                imgui.text_colored(color, '%-9s %s  %-3s  virt %8d  raw %8d  entropy %.2f' % (
+                entropy_color = color('error') if 'X' in section['flags'] and section['entropy'] > 7.2 else color('textDim')
+                imgui.text_colored(entropy_color, '%-9s %s  %-3s  virt %8d  raw %8d  entropy %.2f' % (
                     section['name'], section['address'], section['flags'], section['virtualSize'], section['rawSize'],
                     section['entropy']))
         if pe.get('rich') and imgui.collapsing_header(label('Build tools (Rich header)')):
@@ -1093,12 +1103,9 @@ class App:
             imgui.text_wrapped(tr('Use "Convert to source" in the AI panel to rewrite this unit as real code.'))
             return
         status = converted.get('verification', 'skipped')
-        color = color('success') if status == 'passed' else color('error') if status == 'failed' else color('textDim')
+        status_color = color('success') if status == 'passed' else color('error') if status == 'failed' else color('textDim')
         tool = next((c.get('tool') for c in reversed(converted.get('checks', [])) if c.get('tool')), '')
-        imgui.text_colored(color, '%s: %s%s' % (tr('Compile check'), tr(status), (' (%s)' % tool) if tool else ''))
-        imgui.same_line()
-        if imgui.small_button(label('Copy##converted')):
-            imgui.set_clipboard_text(self.converted_editor.get_text())
+        imgui.text_colored(status_color, '%s: %s%s' % (tr('Compile check'), tr(status), (' (%s)' % tool) if tool else ''))
         imgui.text_colored(color('textDim'), tr('Saved to: ') + converted.get('file', ''))
         if converted.get('checks') and status == 'failed':
             imgui.text_wrapped(converted['checks'][-1].get('output', '')[:1500])
@@ -1127,14 +1134,16 @@ class App:
             imgui.text(tr('No unit selected.'))
             return
         imgui.begin_child('###details', imgui.ImVec2(0, 0))
-        imgui.text_colored(color('textDim'), tr('Name') + ':')
-        imgui.same_line()
-        imgui.text(details['displayName'])
+        cyui.filter_box('###function-filter', self.function_filter, hint='Search', width=-1, shortcut=False)
+        properties = [inspector.Property(stable_id('details', 'name'), 'Name', details['displayName'], read_only=True)]
         if details['displayName'] != details['name']:
-            imgui.text_colored(color('textDim'), tr('Original') + ': ' + details['name'])
-        for key in ('address', 'size', 'kind', 'callingConvention'):
+            properties.append(inspector.Property(stable_id('details', 'original'), 'Original', details['name'], read_only=True))
+        for key, caption in (('address', 'Address'), ('size', 'Size'), ('kind', 'Kind'), ('callingConvention', 'Calling convention')):
             if details.get(key) not in (None, ''):
-                imgui.text_colored(color('textDim'), tr(key) + ': ' + str(details[key]))
+                properties.append(inspector.Property(stable_id('details', key), caption, details[key], read_only=True))
+        inspector.inspector('###function-properties', self.function_properties, properties,
+                            revision=stable_id(details['id'], [(p.id, p.value) for p in properties]),
+                            filter_state=self.function_filter)
         imgui.separator()
         imgui.text(tr('Comment'))
         _, self.comment_text = imgui.input_text_multiline('##comment', self.comment_text, imgui.ImVec2(-1, cyui.dp(70)))
@@ -1165,6 +1174,7 @@ class App:
         return preferences.values.get('language', 'en')
 
     def ai_job(self, operation, parameters, title, on_done):
+        self.ai_is_conversation = False
         if not self.project or not self.selected:
             return
         self.ai_title = title
@@ -1268,6 +1278,7 @@ class App:
                         if imgui.button(label('Send')):
                             question = self.ask_text.strip()
                             self.transcript += '\n\n### %s\n%s\n' % (tr('You'), question)
+                            self.ai_conversation.append('You', question)
 
                             def done(out):
                                 self.conversation_id = out.get('conversationId', '')
@@ -1275,17 +1286,22 @@ class App:
                                 self.transcript += '\n### %s%s\n%s\n' % (tr('Assistant'), ('  _(%s: %s)_' % (tr('tools'), tools)) if tools else '',
                                                                          out.get('answer', ''))
                                 self.ai_editor.set_text(self.transcript.strip())
+                                self.ai_conversation.append('Assistant',
+                                    ('_'+tr('tools')+': '+tools+'_\n\n' if tools else '') + out.get('answer', ''))
                             self.ai_title = tr('Conversation')
+                            self.ai_is_conversation = True
                             self.ai_editor.set_text(self.transcript.strip())
                             self.jobs.submit('ai_ask', {'projectId': project_id, 'question': question, 'function': unit,
                                                         'engine': self.engine, 'conversationId': self.conversation_id,
                                                         'language': self.ai_language()}, tag='ai', done=done, timeout=None,
-                                             failed=lambda message: self.ai_editor.set_text(self.transcript + '\n\n**%s** %s' % (tr('Error'), message)))
+                                             failed=lambda message: (self.ai_editor.set_text(self.transcript + '\n\n**%s** %s' % (tr('Error'), message)),
+                                                 self.ai_conversation.append('Error', message)))
                             self.ask_text = ''
                 if self.ai_mode == 1 and cyui.ghost_button(label('New conversation')):
                     self.conversation_id = ''
                     self.transcript = ''
                     self.ai_editor.set_text('')
+                    self.ai_conversation.clear()
                 if self.ai_mode == 0 and self.agent_run and self.agent_run['projectId'] == project_id and self.agent_run.get('runId'):
                     with cyui.scoped_disabled(busy or self.agent_run.get('status') == 'completed'):
                         if cyui.button(label('Resume autonomous task')):
@@ -1305,15 +1321,13 @@ class App:
                     self.ai_editor.set_text(text)
         if self.ai_title:
             imgui.text_colored(color('textDim'), self.ai_title)
-            imgui.same_line()
-            if imgui.small_button(label('Copy##ai')):
-                imgui.set_clipboard_text(self.ai_editor.get_text())
         if not self.ai_editor.get_text().strip() and not job_id:
             cyui.empty_state(tr('Ready to assist'), tr('Give the AI a task to begin.'), cyui.icon.code)
             return
-        palette(self.ai_editor)
-        self.ai_editor.set_word_wrap_enabled(True) if hasattr(self.ai_editor, 'set_word_wrap_enabled') else None
-        self.ai_editor.render('###ai-output', imgui.ImVec2(0, 0))
+        if self.ai_is_conversation:
+            self.ai_conversation.render('###ai-output', self.jobs.deltas.get(job_id, '') if job_id else '')
+        else:
+            self.ai_editor.render('###ai-output', imgui.ImVec2(0, 0))
 
     def assistant_page(self):
         if not self.project:
@@ -1322,6 +1336,7 @@ class App:
         self.ai_panel()
 
     def start_agent(self, project_id, objective, workflow, run_id=''):
+        self.ai_is_conversation = False
         self.ai_title = tr('Autonomous workflow')
         self.ai_editor.set_text(objective)
         parameters = {'projectId': project_id, 'objective': objective, 'workflow': workflow,

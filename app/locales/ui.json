@@ -11270,5 +11270,93 @@
  "Decompiled C is incomplete; unsupported instructions remain.": {
   "en": "Decompiled C is incomplete; unsupported instructions remain.",
   "fr": "Le C décompilé est incomplet ; certaines instructions ne sont pas prises en charge."
+ },
+ "Clear filter (Escape)": {
+  "en": "Clear filter (Escape)",
+  "fr": "Effacer le filtre (Échap)"
+ },
+ "Follow": {
+  "en": "Follow",
+  "fr": "Suivre"
+ },
+ "Filter (Ctrl/Cmd+F)...": {
+  "en": "Filter (Ctrl/Cmd+F)...",
+  "fr": "Filtrer (Ctrl/Cmd+F)..."
+ },
+ "warning": {
+  "en": "warning",
+  "fr": "avertissement"
+ },
+ "Calling convention": {
+  "en": "Calling convention",
+  "fr": "Convention d’appel"
+ },
+ "Raw text": {
+  "en": "Raw text",
+  "fr": "Texte brut"
+ },
+ "Copy visible": {
+  "en": "Copy visible",
+  "fr": "Copier les lignes visibles"
+ },
+ "Address": {
+  "en": "Address",
+  "fr": "Adresse"
+ },
+ "Source file": {
+  "en": "Source file",
+  "fr": "Fichier source"
+ },
+ "Link copied": {
+  "en": "Link copied",
+  "fr": "Lien copié"
+ },
+ "Kind": {
+  "en": "Kind",
+  "fr": "Type"
+ },
+ "Next change": {
+  "en": "Next change",
+  "fr": "Modification suivante"
+ },
+ "Copy message": {
+  "en": "Copy message",
+  "fr": "Copier le message"
+ },
+ "error": {
+  "en": "error",
+  "fr": "erreur"
+ },
+ "Next": {
+  "en": "Next",
+  "fr": "Suivant"
+ },
+ "Diff work limit reached; unmatched regions are shown as replacements.": {
+  "en": "Diff work limit reached; unmatched regions are shown as replacements.",
+  "fr": "Limite de comparaison atteinte ; les zones non appariées sont affichées comme des remplacements."
+ },
+ "info": {
+  "en": "info",
+  "fr": "information"
+ },
+ "Command palette": {
+  "en": "Command palette",
+  "fr": "Palette de commandes"
+ },
+ "Side by side": {
+  "en": "Side by side",
+  "fr": "Côte à côte"
+ },
+ "Find next": {
+  "en": "Find next",
+  "fr": "Rechercher le suivant"
+ },
+ "debug": {
+  "en": "debug",
+  "fr": "débogage"
+ },
+ "No matching properties": {
+  "en": "No matching properties",
+  "fr": "Aucune propriété correspondante"
  }
 }

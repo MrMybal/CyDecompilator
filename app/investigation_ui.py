@@ -1,7 +1,9 @@
 """Investigation frontend. Analysis, reads and captures are Runtime jobs."""
 import json
 import cyui
-from imgui_bundle import portable_file_dialogs as pfd, hello_imgui
+from cyui_modules import images
+from ui_views import DiffView, SourceView, stable_id
+from imgui_bundle import imgui as native_imgui, portable_file_dialogs as pfd, hello_imgui
 from ui_common import imgui, label, tr
 
 STEP_CAPTIONS={'click':'Click control','fill':'Fill text','waitFor':'Wait for control','assertText':'Check text',
@@ -75,14 +77,14 @@ class InvestigationUI:
         pid = self.app.project['projectId']
         if pid not in self.sessions:
             self.sessions[pid] = {'query': '', 'depth': 2, 'report': {}, 'selected': None,
-                'source': self.make_editor(), 'source_path': '', 'error': '', 'har': '', 'dossier': {},
+                'source': SourceView(), 'source_path': '', 'error': '', 'har': '', 'dossier': {},
                 'executables': ['', ''], 'arguments': ['[]', '[]'], 'stdin': '', 'assets': '',
                 'seeds': '{}', 'timeout': 60, 'captures': [], 'chosen': ['', ''], 'comparison': {},
                 'driver':0,'network':False,'headless':False,'url':'','target_url':'','steps':'[]',
                 'settle':500,'evidence':{},'frame':0,
                 'step_edit':-1,'step_action':0,'step_selector':'','step_id':'','step_name':'','step_type':'',
                 'step_text':'','step_url':'','step_ms':500,'step_timeout':5000,'step_key':0,
-                'comparison_editor': self.make_editor()}
+                'comparison_diffs': {}, 'comparison_file': '', 'image_views': {}}
         return pid, self.sessions[pid]
 
     def submit(self, pid, state, operation, parameters, done):
@@ -116,8 +118,7 @@ class InvestigationUI:
                     self.set_language(state['source'], 'javascript')
                     self.palette(state['source'])
                     # Keep source locations one-based in the contract; editor coordinates are zero-based.
-                    from imgui_bundle import imgui_color_text_edit as ed
-                    state['source'].set_cursor_position(ed.TextEditor.Coordinates(max(0,location.get('line',1)-1), max(0,location.get('column',1)-1)))
+                    state['source'].focus_line(max(0, location.get('line', 1)-1))
             self.submit(pid, state, 'investigation_source', {'path': path}, loaded)
 
     def draw(self):
@@ -276,13 +277,19 @@ class InvestigationUI:
 
     def comparison_ready(self, state, out):
         state['comparison'] = out
-        text = '\n\n'.join(tr(key) + '\n' + row['diff'] for key,row in out['streams'].items())
+        comparisons = {}
+        for key, row in out['streams'].items():
+            comparisons[key] = row['diff']
         for row in out['fileChanges']:
-            text += '\n%s · %s\n%s\n' % (row['kind'],row['path'],json.dumps(row, ensure_ascii=False, indent=2))
-        text+='\n\n'+tr('Network and console differences')+'\n'+out.get('network',{}).get('diff','')
+            comparisons[row['kind']+' · '+row['path']] = json.dumps(row, ensure_ascii=False, indent=2)
+        comparisons['Network and console differences'] = out.get('network',{}).get('diff','')
         for row in out.get('graphics',{}).get('states',[]):
-            text+='\n\n'+(tr('Graphical step %d') % row['step'])+' · '+str(row['label'])+'\n'+row['diff']
-        state['comparison_editor'].set_text(text)
+            comparisons[(tr('Graphical step %d') % row['step'])+' · '+str(row['label'])] = row['diff']
+        state['comparison_diffs'] = {}
+        for key, text in comparisons.items():
+            view = DiffView()
+            view.set_unified(text)
+            state['comparison_diffs'][key] = view
 
     def scenario_controls(self,state):
         if not imgui.collapsing_header(label('Network and graphical scenario')):
@@ -414,7 +421,10 @@ class InvestigationUI:
                             width=max(100,imgui.get_content_region_avail().x)
                             size=hello_imgui.image_size_from_asset(image['path'])
                             if size.x>0:
-                                hello_imgui.image_from_asset(image['path'],imgui.ImVec2(width,width*size.y/size.x))
+                                view=state['image_views'].setdefault((index,image['path']),images.ImageState())
+                                data=images.ImageData(hello_imgui.im_texture_id_from_asset(image['path']),int(size.x),int(size.y))
+                                images.image_viewport('###capture-image-'+str(stable_id(index,image['path'])),view,data,
+                                    (width,min(cyui.dp(400),max(cyui.dp(160),width*size.y/size.x))))
                     imgui.text_wrapped(json.dumps(frame['state'],ensure_ascii=False,indent=2)[:12000])
                 if gui.get('error'):imgui.text_wrapped(tr(gui['error']))
                 imgui.end_child()
@@ -509,7 +519,12 @@ class InvestigationUI:
             requested,self.force_results=self.force_results,''
             opened,_=imgui.begin_tab_item(label('Observed differences'),None,imgui.TabItemFlags_.set_selected if requested=='diff' else 0)
             if opened:
-                if result:self.render(state['comparison_editor'],'###behavior-diff',imgui.ImVec2(0,max(180,imgui.get_content_region_avail().y)))
+                if result and state['comparison_diffs']:
+                    keys=list(state['comparison_diffs'])
+                    index=keys.index(state['comparison_file']) if state['comparison_file'] in keys else 0
+                    _,index=native_imgui.combo(label('Observed differences'),index,[tr(k) for k in keys])
+                    state['comparison_file']=keys[index]
+                    state['comparison_diffs'][keys[index]].render('###behavior-diff',(0,max(cyui.dp(180),imgui.get_content_region_avail().y)))
                 imgui.end_tab_item()
             opened,_=imgui.begin_tab_item(label('Captured screens'),None,imgui.TabItemFlags_.set_selected if requested=='screens' else 0)
             if opened:

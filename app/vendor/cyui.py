@@ -1,13 +1,14 @@
-"""CyUI for Python: the CyUI look (CyDAW 2, Shaderixel, CyEngineHub) for imgui_bundle.
+"""CyUI for Python: themed widgets and optional modules for imgui_bundle.
 
 A port of the C++ library in this folder (include/cyui, src/), for the Python Dear ImGui
-applications (imgui_bundle 1.92 or newer) such as the CyTools. Same palettes, same five
+applications (imgui_bundle 1.92 or newer). Same palettes, same five
 themes, same two densities, same fonts and icons, same widgets and layout, same rules: read
 docs/AI_GUIDE.md. Names follow Python: primary_button for primaryButton, begin_card for
 beginCard. Value controls return (changed, value) the way imgui_bundle does.
 
-What is not ported: knob, fader, meter, the typed value entry, the gallery and the theme
-editor (audio and editor controls the C++ apps use).
+Optional controls, plots, editors, documents and browser panels live in cyui_modules.
+See docs/MODULES.md; importing this core API does not import those optional modules.
+The typed C++ value-entry popover and theme-editor window remain C++ conveniences.
 
 Start-up, once per application:
 
@@ -25,8 +26,12 @@ import time
 from types import SimpleNamespace
 
 from imgui_bundle import imgui
+from cyui_modules.locale import set_locale, locale, available_locales, register_translations, tr, tr_label, locale_scope
+from cyui_modules.filters import TextFilter, FilterMenuItem, filter_box, filter_menu, filter_menu_matches, begin_filtered_section, fold_filter_text
 
 ImVec2 = imgui.ImVec2
+# ImDrawFlags_RoundCornersLeft: imgui_bundle has named it both ways across releases.
+_ROUND_LEFT = getattr(imgui.ImDrawFlags_, 'round_corners_left', None) or imgui.ImDrawFlags_.round_left
 
 # ---- Colours --------------------------------------------------------------------------
 
@@ -78,11 +83,11 @@ _NAVY = _palette(
     rgb(0x65cca9), rgb(0xf2b84b), rgb(0xe8747c), rgb(0x70a8fa))
 
 # (key, name shown to people, palette, light)
-THEMES = (('mid-grey', 'Mid grey (CyDAW)', _MID_GREY, False),
-          ('light-grey', 'Light grey (CyDAW)', _LIGHT_GREY, True),
-          ('amber-night', 'Amber night (CyDAW)', _AMBER_NIGHT, False),
-          ('violet', 'Violet (Shaderixel)', _VIOLET, False),
-          ('navy', 'Navy (CyEngineHub)', _NAVY, False))
+THEMES = (('mid-grey', 'Mid grey', _MID_GREY, False),
+          ('light-grey', 'Light grey', _LIGHT_GREY, True),
+          ('amber-night', 'Amber night', _AMBER_NIGHT, False),
+          ('violet', 'Violet', _VIOLET, False),
+          ('navy', 'Navy', _NAVY, False))
 DEFAULT_THEME = 'mid-grey'
 DENSITIES = ('compact', 'comfortable')
 
@@ -99,7 +104,7 @@ _COMFORTABLE = SimpleNamespace(
 
 _state = SimpleNamespace(palette=SimpleNamespace(**_MID_GREY), theme=DEFAULT_THEME, light=False,
                          density='compact', metrics=_COMPACT, dpi=1.0, square=False,
-                         icons=False, fonts=[], toasts=[], toast_ids=0, modal_open=None)
+                         icons=False, fonts=[], toasts={}, modals=[], closed_modals={})
 
 
 def palette():
@@ -134,19 +139,47 @@ def vec(colour):
                         ((colour >> 16) & 0xFF) / 255.0, ((colour >> 24) & 0xFF) / 255.0)
 
 
-_CATEGORICAL = (0xf0a43a, 0x5ab0f0, 0x52d1a2, 0xc792ea, 0xe8765a, 0x7fd1e8,
-                0xe8c547, 0x9ccc65, 0xf06292, 0x8c9eff, 0x4dd0b5, 0xffb74d)
+def _luminance(colour):
+    return (0.2126 * (colour & 0xFF) + 0.7152 * ((colour >> 8) & 0xFF) + 0.0722 * ((colour >> 16) & 0xFF)) / 255.0
 
 
 def categorical(index):
-    """The n-th colour of a pleasant set, for series (tracks, layers, tags, characters)."""
-    return rgb(_CATEGORICAL[index % len(_CATEGORICAL)])
+    """The n-th of twelve colours for series (tracks, layers, tags, characters).
+
+    Hues spread by the golden ratio from the accent's; saturation and brightness follow the
+    grounds, so the set reads on light and dark themes (as the C++ categorical()).
+    """
+    p = palette()
+    accent = vec(p.accent)
+    h, _, _ = imgui.color_convert_rgb_to_hsv(accent.x, accent.y, accent.z)
+    n = index % 12
+    light = _luminance(p.bg1) > 0.5
+    hue = math.fmod(h + n * 0.618034, 1.0)
+    odd = 1.0 if n & 1 else 0.0
+    r, g, b = imgui.color_convert_hsv_to_rgb(hue, (0.72 if light else 0.52) + 0.08 * odd,
+                                             (0.66 if light else 0.92) - 0.08 * odd)
+    return imgui.color_convert_float4_to_u32(imgui.ImVec4(r, g, b, 1.0))
 
 
 def contrast_text(ground):
-    """Dark or light text, whichever reads on `ground`."""
-    r, g, b = (ground & 0xFF) / 255.0, ((ground >> 8) & 0xFF) / 255.0, ((ground >> 16) & 0xFF) / 255.0
-    return rgb(0x141414) if 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.55 else rgb(0xffffff)
+    """The palette's text, deepest or most raised ground: whichever reads best on `ground`."""
+    p = palette()
+    level = _luminance(ground)
+    best = p.text
+    for candidate in (p.bg0, p.bg5):
+        if abs(_luminance(candidate) - level) > abs(_luminance(best) - level):
+            best = candidate
+    return best
+
+
+def _faded(colour):
+    """A hand-drawn colour faded like ImGui's own (style alpha: disabled items, fades)."""
+    return imgui.get_color_u32(vec(colour))
+
+
+def _mark_edited():
+    """Lets IsItemDeactivatedAfterEdit() see a custom widget's change (for undo)."""
+    imgui.internal.mark_item_edited(imgui.get_item_id())
 
 
 def tone_colour(tone):
@@ -189,6 +222,9 @@ def dp2(x, y):
 def _apply_colours(style):
     p = palette()
     c = imgui.Col_
+    # Dimming behind modals: the darker of text and the deepest ground.
+    shade = p.text if _luminance(p.text) < _luminance(p.bg0) else p.bg0
+    light = _luminance(p.bg1) > 0.5
     colours = {
         c.text: p.text, c.text_disabled: p.textFaint, c.window_bg: p.bg1,
         c.child_bg: alpha(p.bg2, 0.0), c.popup_bg: alpha(p.bg2, 0.98), c.border: p.line,
@@ -210,12 +246,15 @@ def _apply_colours(style):
         c.table_row_bg_alt: alpha(p.text, 0.025), c.text_link: p.info,
         c.text_selected_bg: alpha(p.accent, 0.30), c.drag_drop_target: p.accent,
         c.nav_cursor: p.accent, c.nav_windowing_highlight: alpha(p.accent, 0.7),
-        c.nav_windowing_dim_bg: rgb(0x000000, 0.35),
-        c.modal_window_dim_bg: rgb(0x000000, 0.25 if _state.light else 0.45),
+        c.nav_windowing_dim_bg: alpha(shade, 0.35),
+        c.modal_window_dim_bg: alpha(shade, 0.25 if light else 0.45),
         c.input_text_cursor: p.accent, c.tree_lines: p.line}
-    for name in ('docking_preview', 'docking_empty_bg'):
+    # Colours that only some ImGui / imgui_bundle releases have (docking, 1.92.x).
+    for name, colour in (('docking_preview', alpha(p.accent, 0.45)), ('docking_empty_bg', p.bg0),
+                         ('drag_drop_target_bg', alpha(p.accent, 0.10)), ('unsaved_marker', p.accent),
+                         ('checkbox_selected_bg', p.bg4)):
         if hasattr(c, name):
-            colours[getattr(c, name)] = alpha(p.accent, 0.45) if name == 'docking_preview' else p.bg0
+            colours[getattr(c, name)] = colour
     for index, colour in colours.items():
         style.set_color_(index, vec(colour))
     if _state.square:
@@ -223,43 +262,77 @@ def _apply_colours(style):
         style.set_color_(c.window_bg, imgui.ImVec4(window.x, window.y, window.z, 1.0))
 
 
+def _reset_style(style):
+    """ImGui's own defaults, so that nothing set by an earlier apply() is scaled twice."""
+    fresh = imgui.Style()
+    for name in dir(fresh):
+        if name.startswith('_'):
+            continue
+        value = getattr(fresh, name)
+        if callable(value):
+            continue
+        try:
+            setattr(style, name, value)
+        except (AttributeError, TypeError):
+            pass
+    for index in range(int(imgui.Col_.count)):
+        style.set_color_(index, fresh.color_(index))
+
+
+def _set_if_present(style, **values):
+    """Style fields that only some ImGui / imgui_bundle releases have."""
+    for name, value in values.items():
+        if hasattr(style, name):
+            setattr(style, name, value)
+
+
 def _apply_style():
+    """The C++ applyStyle(): ImGui's defaults, the density's sizes at 96 dpi, then
+    ScaleAllSizes(dpi), so both ports scale (and round) every size the same way."""
     style = imgui.get_style()
+    _reset_style(style)
     m, s = _state.metrics, _state.dpi
     style.font_size_base = m.font_size
-    style.window_padding = ImVec2(m.window_padding[0] * s, m.window_padding[1] * s)
-    style.frame_padding = ImVec2(m.frame_padding[0] * s, m.frame_padding[1] * s)
-    style.item_spacing = ImVec2(m.item_spacing[0] * s, m.item_spacing[1] * s)
-    style.item_inner_spacing = ImVec2(m.item_inner_spacing[0] * s, m.item_inner_spacing[1] * s)
-    style.cell_padding = ImVec2(m.cell_padding[0] * s, m.cell_padding[1] * s)
-    style.indent_spacing = m.indent * s
-    style.scrollbar_size = m.scrollbar * s
-    style.grab_min_size = m.grab_min * s
+    style.window_padding = ImVec2(*m.window_padding)
+    style.frame_padding = ImVec2(*m.frame_padding)
+    style.item_spacing = ImVec2(*m.item_spacing)
+    style.item_inner_spacing = ImVec2(*m.item_inner_spacing)
+    style.cell_padding = ImVec2(*m.cell_padding)
+    style.indent_spacing = m.indent
+    style.scrollbar_size = m.scrollbar
+    _set_if_present(style, scrollbar_padding=1.0)
+    style.grab_min_size = m.grab_min
     style.window_border_size = 1.0
     style.child_border_size = 1.0
     style.popup_border_size = 1.0
     style.frame_border_size = 0.0
     style.tab_border_size = 0.0
     style.tab_bar_border_size = 1.0
-    style.tab_bar_overline_size = 2.0 * s
-    style.window_rounding = 0.0 if _state.square else m.rounding_large * s
-    style.child_rounding = (m.rounding_large - 1.0) * s
-    style.frame_rounding = m.rounding * s
-    style.popup_rounding = m.rounding_large * s
-    style.scrollbar_rounding = 8.0 * s
-    style.grab_rounding = m.rounding_small * s
-    style.tab_rounding = (m.rounding + 1.0) * s
+    style.tab_bar_overline_size = 2.0
+    style.window_rounding = m.rounding_large
+    style.child_rounding = m.rounding_large - 1.0
+    style.frame_rounding = m.rounding
+    style.popup_rounding = m.rounding_large
+    style.scrollbar_rounding = 8.0
+    style.grab_rounding = m.rounding_small
+    style.tab_rounding = m.rounding + 1.0
+    _set_if_present(style, menu_item_rounding=m.rounding, selectable_rounding=m.rounding)
     style.window_title_align = ImVec2(0.0, 0.5)
     style.window_menu_button_position = imgui.Dir.none
     style.separator_text_border_size = 1.0
-    style.separator_text_padding = ImVec2(10.0 * s, 2.0 * s)
-    style.window_min_size = ImVec2(60.0 * s, 40.0 * s)
+    style.separator_text_padding = ImVec2(10.0, 2.0)
+    _set_if_present(style, docking_separator_size=2.0, docking_node_has_close_button=False)
+    style.window_min_size = ImVec2(60.0, 40.0)
     style.hover_delay_short = 0.25
     style.hover_delay_normal = 0.55
     style.anti_aliased_lines = True
     style.anti_aliased_fill = True
-    style.font_scale_dpi = s
     _apply_colours(style)
+
+    style.scale_all_sizes(s)
+    if _state.square:
+        style.window_rounding = 0.0
+    style.font_scale_dpi = s
 
 
 def set_palette(values):
@@ -463,7 +536,7 @@ def section_title(text):
 
 
 def overline(text, colour=0):
-    """CyEngineHub label: SMALL UPPERCASE, bold, accent-tinted. Pass it uppercased."""
+    """SMALL UPPERCASE, bold, accent-tinted label. Pass it uppercased."""
     p = palette()
     with scoped_font(bold_font(), 0.78), \
             scoped_color(imgui.Col_.text, colour or mix(p.accent, p.text, 0.35)):
@@ -507,6 +580,7 @@ def kbd(keys):
 
 def tooltip(text):
     """A delayed, wrapped tooltip for the last item."""
+    text = tr(text) if text else text
     if not text:
         return
     if not imgui.is_item_hovered(imgui.HoveredFlags_.delay_short | imgui.HoveredFlags_.no_shared_delay):
@@ -620,11 +694,11 @@ def icon_button(glyph, tip='', active=False, active_colour=0, size=(0.0, 0.0)):
     rounding = imgui.get_style().frame_rounding
     maximum = ImVec2(origin.x + width, origin.y + height)
     if active:
-        draw.add_rect_filled(origin, maximum, alpha(colour, 0.28 if held else 0.18), rounding)
+        draw.add_rect_filled(origin, maximum, _faded(alpha(colour, 0.28 if held else 0.18)), rounding)
     elif hovered:
-        draw.add_rect_filled(origin, maximum, p.bg5 if held else p.bg4, rounding)
+        draw.add_rect_filled(origin, maximum, _faded(p.bg5 if held else p.bg4), rounding)
     shown = glyph if icons_available() or len(glyph) > 1 else '?'
-    centred_text(draw, origin, maximum, colour if active else (p.text if hovered else p.textDim), shown)
+    centred_text(draw, origin, maximum, _faded(colour if active else (p.text if hovered else p.textDim)), shown)
     tooltip(tip)
     return clicked
 
@@ -643,6 +717,7 @@ def toggle_switch(label, value):
     clicked = imgui.invisible_button(label, ImVec2(width, height))
     if clicked:
         value = not value
+        _mark_edited()
     hovered = imgui.is_item_hovered()
     storage = imgui.get_state_storage()
     key = imgui.get_item_id()
@@ -656,21 +731,21 @@ def toggle_switch(label, value):
     track_max = ImVec2(track_min.x + track_width, track_min.y + track_height)
     off = p.bg5 if hovered else p.bg4
     on = p.accentHover if hovered else p.accent
-    draw.add_rect_filled(track_min, track_max, mix(off, on, t), track_height * 0.5)
+    draw.add_rect_filled(track_min, track_max, _faded(mix(off, on, t)), track_height * 0.5)
     radius = track_height * 0.5 - dp(2.5)
     centre = ImVec2(track_min.x + track_height * 0.5 + (track_width - track_height) * t,
                     track_min.y + track_height * 0.5)
-    off_knob = p.text if contrast_text(p.bg1) == rgb(0xffffff) else rgb(0xffffff)
-    draw.add_circle_filled(ImVec2(centre.x, centre.y + dp(0.5)), radius + dp(0.5), rgb(0x000000, 0.18), 20)
-    draw.add_circle_filled(centre, radius, mix(off_knob, contrast_text(p.accent), t), 20)
+    # Flat: the knob takes whichever palette colour reads on its track.
+    draw.add_circle_filled(centre, radius, _faded(mix(contrast_text(p.bg4), contrast_text(p.accent), t)), 20)
     if text:
         draw.add_text(ImVec2(track_max.x + style.item_inner_spacing.x,
-                             origin.y + (height - text_size.y) * 0.5), p.text, text)
+                             origin.y + (height - text_size.y) * 0.5), _faded(p.text), text)
     return clicked, value
 
 
 def segmented(identifier, labels, current, width=0.0):
     """Joined buttons, one selected (view modes, units). Returns (changed, current)."""
+    labels = [tr(label) for label in labels]
     p = palette()
     style = imgui.get_style()
     imgui.push_id(identifier)
@@ -682,7 +757,7 @@ def segmented(identifier, labels, current, width=0.0):
     scale = (total - inset * 2.0) / natural if natural > 0 else 1.0
     origin = imgui.get_cursor_screen_pos()
     draw = imgui.get_window_draw_list()
-    draw.add_rect_filled(origin, ImVec2(origin.x + total, origin.y + height), p.bg0,
+    draw.add_rect_filled(origin, ImVec2(origin.x + total, origin.y + height), _faded(p.bg0),
                          style.frame_rounding + inset)
     changed = False
     x = origin.x + inset
@@ -693,18 +768,19 @@ def segmented(identifier, labels, current, width=0.0):
         size = ImVec2(w, height - inset * 2.0)
         if imgui.invisible_button('##segment', size) and current != index:
             current, changed = index, True
+            _mark_edited()
         hovered = imgui.is_item_hovered()
         imgui.pop_id()
         selected = current == index
         minimum, maximum = ImVec2(x, origin.y + inset), ImVec2(x + w, origin.y + height - inset)
         if selected:
-            draw.add_rect_filled(minimum, maximum, p.accentDim, style.frame_rounding)
+            draw.add_rect_filled(minimum, maximum, _faded(p.accentDim), style.frame_rounding)
         elif hovered:
-            draw.add_rect_filled(minimum, maximum, p.bg3, style.frame_rounding)
+            draw.add_rect_filled(minimum, maximum, _faded(p.bg3), style.frame_rounding)
         text = _visible(label)
         text_size = imgui.calc_text_size(text)
         draw.add_text(ImVec2(minimum.x + (w - text_size.x) * 0.5, minimum.y + (size.y - text_size.y) * 0.5),
-                      contrast_text(p.accentDim) if selected else (p.text if hovered else p.textDim), text)
+                      _faded(contrast_text(p.accentDim) if selected else (p.text if hovered else p.textDim)), text)
         x += w
     imgui.set_cursor_screen_pos(origin)
     imgui.dummy(ImVec2(total, height))
@@ -719,7 +795,9 @@ def link_text(label):
 def slider_bar(identifier, value, minimum, maximum, fmt='%.2f', width=0.0, colour=0):
     """A slider drawn as a filled bar with its value in it. Returns (changed, value).
 
-    Drag or click to set it, the mouse wheel nudges (Ctrl fine, Shift fast).
+    Drag or click to set it, the mouse wheel nudges (Ctrl fine, Shift fast) without scrolling
+    the parent, and a double click restores the value from before the first click. (The C++
+    sliderBar also opens its typed entry then; that popover is C++ only.)
     """
     p = palette()
     if width == 0.0:
@@ -731,10 +809,23 @@ def slider_bar(identifier, value, minimum, maximum, fmt='%.2f', width=0.0, colou
     imgui.push_id(identifier)
     imgui.invisible_button('##bar', ImVec2(width, height))
     hovered, active = imgui.is_item_hovered(), imgui.is_item_active()
+    if hovered and hasattr(imgui, 'set_item_key_owner'):
+        # Owned on every hovered frame, so the parent never scrolls on the frame the wheel turns.
+        imgui.set_item_key_owner(imgui.Key.mouse_wheel_y)
     changed = False
     io = imgui.get_io()
     span = maximum - minimum
-    if active and span > 0:
+    storage, before_key, held_key = imgui.get_state_storage(), imgui.get_id('##before'), imgui.get_id('##restored')
+    double = hovered and imgui.is_mouse_double_clicked(imgui.MouseButton_.left)
+    if imgui.is_item_activated():
+        storage.set_bool(held_key, double)
+        if not double:
+            storage.set_float(before_key, value)
+    if double:
+        restored = storage.get_float(before_key, value)
+        if restored != value:
+            value, changed = restored, True
+    elif active and span > 0 and not storage.get_bool(held_key, False):
         t = min(1.0, max(0.0, (io.mouse_pos.x - origin.x) / max(1.0, width)))
         candidate = minimum + span * t
         if candidate != value:
@@ -743,17 +834,19 @@ def slider_bar(identifier, value, minimum, maximum, fmt='%.2f', width=0.0, colou
         speed = 0.15 if io.key_ctrl else 4.0 if io.key_shift else 1.0
         value = min(maximum, max(minimum, value + io.mouse_wheel * span * 0.01 * speed))
         changed = True
+    if changed:
+        _mark_edited()
     draw = imgui.get_window_draw_list()
     rounding = imgui.get_style().frame_rounding
     maximum_corner = ImVec2(origin.x + width, origin.y + height)
-    draw.add_rect_filled(origin, maximum_corner, p.bg5 if active else p.bg4 if hovered else p.bg3, rounding)
+    draw.add_rect_filled(origin, maximum_corner, _faded(p.bg5 if active else p.bg4 if hovered else p.bg3), rounding)
     t = min(1.0, max(0.0, (value - minimum) / span)) if span > 0 else 0.0
     if t > 0.0:
         draw.push_clip_rect(origin, ImVec2(origin.x + width * t, maximum_corner.y), True)
-        draw.add_rect_filled(origin, maximum_corner, alpha(colour or p.accent, 0.55 if hovered or active else 0.42),
+        draw.add_rect_filled(origin, maximum_corner, _faded(alpha(colour or p.accent, 0.55 if hovered or active else 0.42)),
                              rounding)
         draw.pop_clip_rect()
-    centred_text(draw, origin, maximum_corner, p.text, fmt % value)
+    centred_text(draw, origin, maximum_corner, _faded(p.text), fmt % value)
     imgui.pop_id()
     return changed, value
 
@@ -776,6 +869,7 @@ def _draw_cross(draw, centre, size, colour):
 
 def search_field(identifier, text, hint='Search', width=0.0):
     """A search box: magnifier, hint, a clear button. Returns (changed, text)."""
+    hint = tr(hint or '')
     p = palette()
     style = imgui.get_style()
     height = imgui.get_frame_height()
@@ -807,6 +901,7 @@ def search_field(identifier, text, hint='Search', width=0.0):
 
 
 def text_field(identifier, text, hint='', width=0.0):
+    hint = tr(hint or '')
     if width != 0.0:
         imgui.set_next_item_width(width)
     return imgui.input_text_with_hint(identifier, hint or '', text)
@@ -815,7 +910,7 @@ def text_field(identifier, text, hint='', width=0.0):
 def combo(identifier, current, items, width=0.0):
     if width != 0.0:
         imgui.set_next_item_width(width)
-    return imgui.combo(identifier, current, list(items))
+    return imgui.combo(identifier, current, [tr(item) for item in items])
 
 
 # ---- Containers ------------------------------------------------------------------------------
@@ -931,10 +1026,10 @@ def badge(text, tone='neutral'):
         draw = imgui.get_window_draw_list()
         rounding = dp(metrics().rounding_small + 1.0)
         draw.add_rect_filled(origin, ImVec2(origin.x + box.x, origin.y + box.y),
-                             p.bg4 if tone == 'neutral' else alpha(colour, 0.16), rounding)
-        draw.add_rect(origin, ImVec2(origin.x + box.x, origin.y + box.y), alpha(colour, 0.35), rounding)
+                             _faded(p.bg4 if tone == 'neutral' else alpha(colour, 0.16)), rounding)
+        draw.add_rect(origin, ImVec2(origin.x + box.x, origin.y + box.y), _faded(alpha(colour, 0.35)), rounding)
         draw.add_text(ImVec2(origin.x + pad.x, origin.y + pad.y),
-                      p.text if tone == 'neutral' else mix(colour, p.text, 0.3), text)
+                      _faded(p.text if tone == 'neutral' else mix(colour, p.text, 0.3)), text)
         imgui.dummy(box)
 
 
@@ -963,8 +1058,8 @@ def progress_bar(fraction, size=(-1.0, 0.0), overlay='', tone='accent'):
     draw = imgui.get_window_draw_list()
     rounding = min(height * 0.5, imgui.get_style().frame_rounding + dp(2.0))
     maximum = ImVec2(origin.x + width, origin.y + height)
-    colour = p.textDim if tone == 'neutral' else tone_colour(tone)
-    draw.add_rect_filled(origin, maximum, p.bg3, rounding)
+    colour = _faded(p.textDim if tone == 'neutral' else tone_colour(tone))
+    draw.add_rect_filled(origin, maximum, _faded(p.bg3), rounding)
     if fraction >= 0.0:
         t = min(1.0, max(0.0, fraction))
         if t > 0.0:
@@ -978,7 +1073,7 @@ def progress_bar(fraction, size=(-1.0, 0.0), overlay='', tone='accent'):
         draw.add_rect_filled(ImVec2(x0, origin.y), ImVec2(x0 + segment, maximum.y), colour, rounding)
         draw.pop_clip_rect()
     if overlay:
-        centred_text(draw, origin, maximum, p.text, overlay)
+        centred_text(draw, origin, maximum, _faded(p.text), overlay)
 
 
 def spinner(identifier, radius=7.0, colour=0):
@@ -1026,16 +1121,16 @@ def callout(tone, text):
     pad = dp2(10.0, 7.0)
     bar = dp(3.0)
     wrap = max(dp(40.0), width - pad.x * 2.0 - bar)
-    size = imgui.calc_text_size(text, None, False, wrap)
+    size = imgui.calc_text_size(text, wrap_width=wrap)
     origin = imgui.get_cursor_screen_pos()
     maximum = ImVec2(origin.x + width, origin.y + size.y + pad.y * 2.0)
     draw = imgui.get_window_draw_list()
     rounding = imgui.get_style().frame_rounding
     draw.add_rect_filled(origin, maximum, mix(p.bg2, colour, 0.10), rounding)
     draw.add_rect_filled(origin, ImVec2(origin.x + bar, maximum.y), colour, rounding,
-                         imgui.ImDrawFlags_.round_corners_left)
+                         _ROUND_LEFT)
     draw.add_text(imgui.get_font(), imgui.get_font_size(), ImVec2(origin.x + bar + pad.x, origin.y + pad.y),
-                  p.text, text, None, wrap)
+                  p.text, text, wrap_width=wrap)
     imgui.dummy(ImVec2(width, maximum.y - origin.y))
 
 
@@ -1054,18 +1149,28 @@ def notify(text, tone='neutral', seconds=4.0):
     """A toast at the bottom right, for an event. render_notifications() draws them."""
     if not text:
         return
-    _state.toast_ids += 1
-    _state.toasts.append({'text': text, 'tone': tone, 'until': time.monotonic() + seconds,
-                          'id': _state.toast_ids})
-    del _state.toasts[:-6]
+    toasts = _toasts()
+    toasts.append({'text': text, 'tone': tone, 'until': time.monotonic() + seconds})
+    del toasts[:-_MAX_TOASTS]
+
+
+_MAX_TOASTS = 6
+
+
+def _toasts():
+    """The toasts of the current ImGui context (one list per context, like the C++ port)."""
+    return _state.toasts.setdefault(imgui.get_current_context(), [])
 
 
 def render_notifications():
     """Once per frame, after everything else."""
     now = time.monotonic()
-    _state.toasts = [toast for toast in _state.toasts if toast['until'] >= now]
-    if not _state.toasts:
+    context = imgui.get_current_context()
+    toasts = [toast for toast in _state.toasts.get(context, ()) if toast['until'] >= now]
+    if not toasts:
+        _state.toasts.pop(context, None)
         return
+    _state.toasts[context] = toasts
     p = palette()
     viewport = imgui.get_main_viewport()
     y = viewport.work_pos.y + viewport.work_size.y - dp(16.0)
@@ -1075,7 +1180,9 @@ def render_notifications():
              | imgui.WindowFlags_.no_nav | imgui.WindowFlags_.no_move)
     if hasattr(imgui.WindowFlags_, 'no_docking'):
         flags |= imgui.WindowFlags_.no_docking
-    for toast in reversed(_state.toasts):
+    # Windows are named by slot, not by toast: ImGui never frees a window, so an ever-growing
+    # id would leak one per toast over a long session.
+    for slot, toast in enumerate(reversed(toasts)):
         fade = min(1.0, max(0.0, (toast['until'] - now) / 0.3))
         imgui.set_next_window_pos(ImVec2(x, y), imgui.Cond_.always, ImVec2(1.0, 1.0))
         imgui.set_next_window_bg_alpha(0.98 * fade)
@@ -1084,13 +1191,13 @@ def render_notifications():
                         imgui.StyleVar_.window_rounding, dp(metrics().rounding_large + 2.0),
                         imgui.StyleVar_.alpha, fade), \
                 scoped_color(imgui.Col_.window_bg, p.bg2, imgui.Col_.border, p.lineStrong):
-            shown = imgui.begin('##cyuiToast%d' % toast['id'], None, flags)
+            shown = imgui.begin('##cyuiToast%d' % slot, None, flags)
             if (shown[0] if isinstance(shown, tuple) else shown):
                 colour = p.accent if toast['tone'] == 'neutral' else tone_colour(toast['tone'])
                 position, size = imgui.get_window_pos(), imgui.get_window_size()
                 imgui.get_window_draw_list().add_rect_filled(
                     position, ImVec2(position.x + dp(3.0), position.y + size.y), colour,
-                    dp(metrics().rounding_large + 2.0), imgui.ImDrawFlags_.round_corners_left)
+                    dp(metrics().rounding_large + 2.0), _ROUND_LEFT)
                 imgui.push_text_wrap_pos(imgui.get_font_size() * 26.0)
                 imgui.text_unformatted(toast['text'])
                 imgui.pop_text_wrap_pos()
@@ -1214,24 +1321,25 @@ def sidebar_item(glyph, label, active, badge_text=''):
     rounding = imgui.get_style().frame_rounding + dp(2.0)
     maximum = ImVec2(origin.x + width, origin.y + height)
     if active:
-        draw.add_rect_filled(origin, maximum, alpha(p.accent, 0.16), rounding)
-        draw.add_rect(origin, maximum, alpha(p.accent, 0.45), rounding)
+        draw.add_rect_filled(origin, maximum, _faded(alpha(p.accent, 0.16)), rounding)
+        draw.add_rect(origin, maximum, _faded(alpha(p.accent, 0.45)), rounding)
     elif hovered:
-        draw.add_rect_filled(origin, maximum, p.bg3, rounding)
-    colour = p.text if active or hovered else p.textDim
+        draw.add_rect_filled(origin, maximum, _faded(p.bg3), rounding)
+    colour = _faded(p.text if active or hovered else p.textDim)
     x = origin.x + dp(10.0)
     y = origin.y + (height - imgui.get_font_size()) * 0.5
     if glyph and icons_available():
-        draw.add_text(ImVec2(x, y), p.accent if active else colour, glyph)
+        draw.add_text(ImVec2(x, y), _faded(p.accent) if active else colour, glyph)
         x += imgui.get_font_size() + dp(10.0)
     room = maximum.x - x - dp(8.0)
+    label = label.split('##', 1)[0]
     if badge_text:
         with scoped_font(bold_font(), 0.74):
             size = imgui.calc_text_size(badge_text)
             b_max = ImVec2(maximum.x - dp(8.0), origin.y + (height + size.y) * 0.5 + dp(2.0))
             b_min = ImVec2(b_max.x - size.x - dp(10.0), b_max.y - size.y - dp(4.0))
-            draw.add_rect_filled(b_min, b_max, p.accent if active else p.bg4, height)
-            draw.add_text(ImVec2(b_min.x + dp(5.0), b_min.y + dp(2.0)), p.accentText if active else p.textDim,
+            draw.add_rect_filled(b_min, b_max, _faded(p.accent if active else p.bg4), height)
+            draw.add_text(ImVec2(b_min.x + dp(5.0), b_min.y + dp(2.0)), _faded(p.accentText if active else p.textDim),
                           badge_text)
         room = b_min.x - x - dp(6.0)
     if active:
@@ -1243,11 +1351,13 @@ def sidebar_item(glyph, label, active, badge_text=''):
     return clicked
 
 
-def panel_header(title, subtitle=''):
+def panel_header(title, subtitle='', filter_state=None):
     heading(title, 2)
     if subtitle:
         with scoped_font(None, 0.88):
             text_faint(subtitle)
+    if filter_state is not None:
+        filter_box('##panelFilter', filter_state)
 
 
 def begin_toolbar(identifier):
@@ -1271,41 +1381,77 @@ def end_toolbar():
 
 
 def begin_modal(title, open_flag, width=460.0):
-    """A centred modal with a title and a close cross. Returns (shown, open). Call end_modal()
-    only when shown; open becomes False when it closes."""
-    if open_flag and not imgui.is_popup_open(title):
+    """A centred modal with a title and a close cross. Returns (shown, open).
+
+    Assign open back to the flag that opens the modal, and call end_modal() only when shown:
+
+        shown, self.show_delete = cyui.begin_modal('Delete layer?', self.show_delete)
+        if shown:
+            if cyui.modal_buttons('Delete', 'Cancel', True) == 1:
+                remove()
+            cyui.end_modal()
+
+    open is False as soon as the modal closes: at once for the close cross, and on the next
+    call for modal_buttons (which runs after this returned), so the flag never reopens it.
+    open_flag may also be a one-item list, written in place like the C++ bool*.
+    """
+    holder = open_flag if isinstance(open_flag, list) else None
+    wanted = bool(holder[0] if holder is not None else open_flag)
+    key = imgui.get_id(title)
+    closed = _state.closed_modals.pop(key, None)
+    if closed is not None and imgui.get_frame_count() - closed <= 1 and not imgui.is_popup_open(title):
+        # Closed by modal_buttons since the host last read open: report it instead of reopening.
+        wanted = False
+    if wanted and not imgui.is_popup_open(title):
         imgui.open_popup(title)
     viewport = imgui.get_main_viewport()
     imgui.set_next_window_pos(viewport.get_center(), imgui.Cond_.appearing, ImVec2(0.5, 0.5))
     imgui.set_next_window_size(ImVec2(dp(width), 0.0), imgui.Cond_.always)
     with scoped_var(imgui.StyleVar_.window_padding, dp2(18.0, 16.0),
-                    imgui.StyleVar_.window_rounding, dp(metrics().rounding_large + 4.0)), \
-            scoped_color(imgui.Col_.popup_bg, palette().bg2, imgui.Col_.border, palette().lineStrong):
+                    imgui.StyleVar_.window_rounding, dp(metrics().rounding_large + 4.0)),             scoped_color(imgui.Col_.popup_bg, palette().bg2, imgui.Col_.border, palette().lineStrong):
         result = imgui.begin_popup_modal(title, None, imgui.WindowFlags_.no_title_bar
                                          | imgui.WindowFlags_.no_saved_settings)
     shown = result[0] if isinstance(result, tuple) else result
     if not shown:
+        if holder is not None:
+            holder[0] = False
         return False, False
-    _state.modal_open = True
+    # A stack, so that a modal opened from inside another one closes only itself.
+    entry = {'key': key, 'holder': holder, 'open': True}
+    _state.modals.append(entry)
     with scoped_font(bold_font(), 1.15):
         imgui.text_unformatted(_visible(title))
     imgui.same_line()
     align_right(imgui.get_frame_height())
     if icon_button(icon.close if icons_available() else 'x', 'Close (Esc)'):
         imgui.close_current_popup()
-        _state.modal_open = False
+        _close_modal(entry)
     space(6.0)
-    return True, _state.modal_open
+    return True, entry['open']
+
+
+def _close_modal(entry):
+    entry['open'] = False
+    if entry['holder'] is not None:
+        entry['holder'][0] = False
+    _state.closed_modals[entry['key']] = imgui.get_frame_count()
 
 
 def end_modal():
     imgui.end_popup()
+    if _state.modals:
+        _state.modals.pop()
 
 
 def modal_buttons(confirm, cancel='Cancel', danger=False):
-    """Buttons at the foot of a modal: 0 nothing, 1 confirm, 2 cancel. Enter / Escape work."""
+    """Buttons at the foot of a modal: 0 nothing, 1 confirm, 2 cancel. Enter / Escape work.
+
+    The modal closes on 1 and 2; begin_modal() then returns open False (see there).
+    """
     space(10.0)
     style = imgui.get_style()
+    cancel = tr_label(cancel) if cancel else cancel
+    confirm = tr_label(confirm)
     confirm_width = max(dp(84.0), button_width(confirm))
     cancel_width = max(dp(84.0), button_width(cancel)) if cancel else 0.0
     align_right(confirm_width + ((cancel_width + style.item_spacing.x) if cancel else 0.0))
@@ -1314,12 +1460,12 @@ def modal_buttons(confirm, cancel='Cancel', danger=False):
         if button(cancel, 'secondary', (cancel_width, 0.0)) or imgui.is_key_pressed(imgui.Key.escape, False):
             result = 2
         imgui.same_line()
-    if button(confirm, 'danger' if danger else 'primary', (confirm_width, 0.0)) \
-            or (imgui.is_key_pressed(imgui.Key.enter, False) and not imgui.is_any_item_active()):
+    if button(confirm, 'danger' if danger else 'primary', (confirm_width, 0.0))             or (imgui.is_key_pressed(imgui.Key.enter, False) and not imgui.is_any_item_active()):
         result = 1
     if result:
         imgui.close_current_popup()
-        _state.modal_open = False
+        if _state.modals:
+            _close_modal(_state.modals[-1])
     return result
 
 
@@ -1352,7 +1498,7 @@ class icon:  # noqa: N801 - read as cyui.icon.save, like the C++ cyui::icon::sav
     back, forward, previous, next, sync = chr(0xE72B), chr(0xE72A), chr(0xE892), chr(0xE893), chr(0xE895)
     dock_left, new_window, back_to_window = chr(0xE90C), chr(0xE8A7), chr(0xE73F)
     dock_right, dock_bottom, full_screen, menu = chr(0xE90D), chr(0xE90E), chr(0xE740), chr(0xE700)
-    touch, crop, trim, download, presets = chr(0xE815), chr(0xE7A8), chr(0xE78A), chr(0xE896), chr(0xE8F1)
+    touch, crop, trim, download, presets = chr(0xE815), chr(0xE7A8), chr(0xE78A), chr(0xE896), chr(0xE8FD)
     keyboard, lightbulb, home, globe, people = chr(0xE765), chr(0xE82F), chr(0xE80F), chr(0xE774), chr(0xE716)
     contact, mail, calendar, clock, cloud = chr(0xE77B), chr(0xE715), chr(0xE787), chr(0xE823), chr(0xE753)
     upload, sort, view_all, hide, error = chr(0xE898), chr(0xE8CB), chr(0xE8A9), chr(0xED1A), chr(0xE783)

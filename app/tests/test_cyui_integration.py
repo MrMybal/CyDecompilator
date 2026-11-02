@@ -53,3 +53,7 @@ def test_upstream_cyui_is_shipped_with_license_and_matching_source_hash():
     assert hashlib.sha256((APP / 'vendor/cyui.py').read_bytes()).hexdigest() == metadata['sha256']
     assert 'MIT License' in (APP / 'vendor/CYUI_LICENSE.txt').read_text('utf-8')
     assert {entry[0] for entry in cyui.THEMES} == set(ui_common.THEME_KEYS)
+    for name, digest in metadata['files'].items():
+        assert hashlib.sha256((APP / name).read_bytes()).hexdigest() == digest, name
+    assert metadata['revision'] == 'ff023e646c6a3038b3dfbfd53f6d2b4a2f5955e3'
+    assert not {'Audio', 'Gallery', 'Web', 'WebCEF', 'Plots'} & set(metadata['modules'])

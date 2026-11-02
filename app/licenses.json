@@ -17,8 +17,8 @@
     "kind": "Component",
     "name": "CyUI",
     "license": "MIT",
-    "url": "",
-    "notes": "Bundled upstream Python port for imgui_bundle. Original license: app/vendor/CYUI_LICENSE.txt. Source and SHA256: app/vendor/cyui-source.json."
+    "url": "https://github.com/MrMybal/CyUI/blob/ff023e646c6a3038b3dfbfd53f6d2b4a2f5955e3/LICENSE",
+    "notes": "Selected unmodified Python Core and optional modules, pinned to ff023e646c6a3038b3dfbfd53f6d2b4a2f5955e3. The source repository currently requires GitHub access. The MIT notice is included in app/vendor/CYUI_LICENSE.txt. Per-file SHA256 and dependency selection: app/vendor/cyui-source.json. Existing imgui-bundle supplies the single ImGui instance and retained native source-editor binding."
   },
   {
     "kind": "Engine",

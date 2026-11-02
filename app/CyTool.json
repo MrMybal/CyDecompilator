@@ -4,7 +4,7 @@
   "id": "cy.tool.decompilator",
   "name": "CyDecompilator",
   "displayName": "CyDecompilator",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "AI assisted multi-engine decompiler: native code (Ghidra, own x86/x64 C decompiler, built-in disassembler), .NET (ILSpy), Java (Vineflower), Android (JADX), Python bytecode and shaders (own DXBC/SPIR-V/DXIL engine), with an assistant that explains, renames and converts pseudo-code into real code.",
   "vendor": "Cyberalien",
   "author": "Cyberalien",

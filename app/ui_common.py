@@ -318,6 +318,21 @@ def label(text):
         translated += ' '
     return translated+'###'+identity
 
+_cyui_catalog_registered = False
+
+def sync_cyui_locale():
+    """Share application captions with upstream controls, leaving model data intact."""
+    global _cyui_catalog_registered
+    from cyui_modules import locale
+    if not _cyui_catalog_registered:
+        for code, name in LANGUAGES:
+            translations = ({entry.get('en', key): entry.get(code, entry.get('en', key))
+                             for key, entry in catalog.items()} if code in ('en', 'fr')
+                            else language_catalog(code))
+            locale.register_translations(code, translations, name)
+        _cyui_catalog_registered = True
+    locale.set_locale(preferences.values['language'])
+
 class ImGuiFacade:
     texts = {'text', 'text_wrapped', 'text_disabled', 'text_unformatted', 'set_tooltip', 'bullet_text', 'separator_text'}
     labels = {'button','small_button','checkbox','radio_button','input_text','input_text_multiline',
@@ -383,6 +398,7 @@ imgui = ImGuiFacade()
 
 def apply_style():
     import cyui
+    sync_cyui_locale()
     native = raw()
     dpi = native.get_main_viewport().dpi_scale or 1.0
     test_dpi = next((a.split('=',1)[1] for a in sys.argv if a.startswith('--ui-test-dpi=')), None)
@@ -518,6 +534,7 @@ def run(runner, *, shell_navigation=False):
     def draw():
         nonlocal frames
         frames+=1
+        sync_cyui_locale()
         journal.poll()
         if _mesh_panel is not None: _mesh_panel.poll()
         import cyui

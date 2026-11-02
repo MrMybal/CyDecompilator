@@ -7,12 +7,16 @@ User guides: [English](../README.md) (default on GitHub) · [Français](../LISEZ
 
 ## Native interface (CyUI)
 
-The window uses the upstream **CyUI Python port for imgui_bundle** from
-`CyImgui_Interface/python/cyui.py`. It is shipped unchanged in `vendor/cyui.py`, with
-its MIT license and source SHA256 in `vendor/cyui-source.json`; no sibling checkout
-is required to launch the delivered application. `cyui.py` exposes that port and
-`cyui_shell.py` owns the viewport bars, sidebar and page routing. Panels still submit
-their existing Runtime jobs.
+The window ships **CyUI 1.2's modular Python port for imgui_bundle**, pinned to
+`ff023e646c6a3038b3dfbfd53f6d2b4a2f5955e3`. `vendor/cyui.py` contains Core;
+`cyui_modules/` contains only the selected optional families and their dependency
+closure, unchanged from upstream. MIT licensing and per-file SHA256 hashes are in
+`vendor/CYUI_LICENSE.txt` and `vendor/cyui-source.json`. No sibling checkout is needed.
+`cyui_shell.py` owns page routing and the Ctrl+Shift+P command palette; `ui_views.py`
+connects shared Code, Diff, Diagnostics, DocumentViews, Inspector and Images models
+to application data. Advanced JSON uses the Python CodeEditor. Panels retain their
+existing Runtime jobs. See [CyUIMigration.md](Docs/CyUIMigration.md) for the module
+map, reproducible refresh, retained native editor adapter and Python API limits.
 
 `ui_common.apply_style()` applies the semantic palette, density and current viewport
 DPI; it also retains the user's text scale. Options offers all five CyUI themes and
