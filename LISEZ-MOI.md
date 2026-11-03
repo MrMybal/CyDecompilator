@@ -15,6 +15,17 @@ CyDecompilator ouvre presque n'importe quel binaire, montre son code reconstruit
 le comprendre, à le renommer et à le réécrire en vrai code source. Il fonctionne aussi comme
 serveur MCP, pour qu'une IA (Claude Code, Codex…) l'utilise directement.
 
+## Captures d’écran
+
+CyDecompilator 1.5.0 sous Windows, avec le shader DXBC fourni et un petit projet
+CMake d’exemple. L’interface est ici en anglais. Cliquez sur une image pour l’agrandir.
+
+[![Espace de travail avec un shader DXBC décompilé en HLSL, navigation dans les fonctions et panneau IA](docs/screenshots/workspace.png)](docs/screenshots/workspace.png)
+
+| Éditeur de projet source | Historique Git et comparaison des sources |
+|---|---|
+| [![IDE avec arborescence CMake, éditeur C++ et outils de compilation](docs/screenshots/project-ide.png)](docs/screenshots/project-ide.png) | [![Historique Git et comparaison côte à côte des sources C++ sauvegardées et modifiées](docs/screenshots/git-history.png)](docs/screenshots/git-history.png) |
+
 ## Lancer
 
 - **Windows** : double-cliquer sur `CyDecompilator.exe`.

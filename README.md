@@ -15,6 +15,17 @@ CyDecompilator opens a wide range of binaries and displays their reconstructed c
 assistant helps explain, rename and rewrite that code into editable source. It also works
 as an MCP server, so AI clients such as Claude Code and Codex can use it directly.
 
+## Screenshots
+
+CyDecompilator 1.5.0 on Windows, shown with the included DXBC shader sample and a
+small CMake example project. Click an image to view it at full size.
+
+[![Workspace with a DXBC shader decompiled to HLSL, function navigation and the AI workflow panel](docs/screenshots/workspace.png)](docs/screenshots/workspace.png)
+
+| Source project editor | Git history and source comparison |
+|---|---|
+| [![Project IDE with a CMake file tree, C++ source editor and build tools](docs/screenshots/project-ide.png)](docs/screenshots/project-ide.png) | [![Git history with a side-by-side comparison of saved and modified C++ sources](docs/screenshots/git-history.png)](docs/screenshots/git-history.png) |
+
 ## Launch
 
 - **Windows**: double-click `CyDecompilator.exe`.
