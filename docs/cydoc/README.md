@@ -1,5 +1,8 @@
 # CyDecompilator documentation — CyDoc
 
+**[Documentation](https://mrmybal.github.io/CyDecompilator/#/en/start)** ·
+[Français](https://mrmybal.github.io/CyDecompilator/#/fr/start)
+
 The application is Python 3.11 + Dear ImGui/CyUI, with Windows x64 support and
 experimental Linux x64 support. Its help reader is the **local CyDoc browser export**,
 opened by the native Documentation page, command palette, contextual F1, and Xbox
@@ -42,6 +45,22 @@ providers use CyDoc's classic-script contracts, avoiding file-origin fetch/CORS.
 into the committed-source release ZIP. Run `--setup` before the first release build.
 Normal launcher startup needs no documentation generation. Commit authored inputs,
 the pinned dependency archive and `app/help/` together after regeneration.
+
+## GitHub Pages
+
+`.github/workflows/documentation-pages.yml` regenerates this same CyDoc export on
+every push to `main` and can also be run manually through Actions. Build-only Python
+3.11 and Node.js 22 use the pinned CyDoc archive and npm lock; the application runtime
+and optional engines are not installed by this workflow. Resource/link validation
+and the exported hash check must succeed before deployment.
+
+Only `app/help/` is uploaded to the Pages artifact. The repository root, runtime,
+local projects and application data directories are not publishing sources.
+Pages uses the GitHub Actions publishing mode and the `github-pages` environment.
+The English README opens `#/en/start`; the French README opens `#/fr/start`.
+Hash routes and relative asset/module URLs work under the repository subdirectory
+as well as through `file://`; no separate web reader or documentation content is used.
+The native help entry points continue opening the installed local export.
 
 ## Inputs and preservation
 

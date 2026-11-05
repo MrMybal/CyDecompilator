@@ -5,6 +5,9 @@
 AI-assisted multi-engine decompiler built on CyToolsCore 0.10 (Python 3.11, Dear ImGui).
 User guides: [English](../README.md) (default on GitHub) · [Français](../LISEZ-MOI.md).
 
+**[Documentation](https://mrmybal.github.io/CyDecompilator/#/en/start)** — the complete
+CyDoc HTML reader, also shipped offline with the application.
+
 ## Native interface (CyUI)
 
 The **Documentation** page, command palette, contextual **F1** and Xbox guide button

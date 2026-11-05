@@ -17,6 +17,9 @@ as an MCP server, so AI clients such as Claude Code and Codex can use it directl
 
 ## Built-in documentation
 
+**[Documentation](https://mrmybal.github.io/CyDecompilator/#/en/start)** — open the
+same CyDoc reader online, with navigation, search, images, diagrams and language selection.
+
 Open **Documentation** in the sidebar, or press **F1** for help about the current page.
 The bundled **CyDoc** reader opens in your browser through a local `file://` URL,
 without a server or internet connection. It includes 22 chapters in English (default)

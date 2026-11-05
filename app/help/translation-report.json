@@ -295,7 +295,7 @@
       "id": "ref-app-readme",
       "title": "CyDecompilator — developer guide",
       "locale": "fr",
-      "expectedRevision": "a3626568cd02"
+      "expectedRevision": "70911cd9d70b"
     },
     {
       "id": "ref-app-skills-cydecompilator-references-analysis",
@@ -361,13 +361,13 @@
       "id": "ref-docs-cydoc-readme",
       "title": "CyDecompilator documentation — CyDoc",
       "locale": "fr",
-      "expectedRevision": "ad4c1ff747fc"
+      "expectedRevision": "d51c668c96cf"
     },
     {
       "id": "ref-lisez-moi",
       "title": "LISEZ-MOI",
       "locale": "fr",
-      "expectedRevision": "0f59a902206a"
+      "expectedRevision": "84fcf01a98ba"
     },
     {
       "id": "ref-modules-unreal-reconstruction-docs-a10-a30-corrections",
@@ -541,7 +541,7 @@
       "id": "ref-readme",
       "title": "README",
       "locale": "fr",
-      "expectedRevision": "dbebe8557d82"
+      "expectedRevision": "1c146f00a8d9"
     },
     {
       "id": "help-route-api",

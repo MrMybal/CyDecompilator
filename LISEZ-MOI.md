@@ -17,6 +17,9 @@ serveur MCP, pour qu'une IA (Claude Code, Codex…) l'utilise directement.
 
 ## Documentation intégrée
 
+**[Documentation](https://mrmybal.github.io/CyDecompilator/#/fr/start)** — ouvrez en
+ligne le même lecteur CyDoc, avec navigation, recherche, images, schémas et choix de langue.
+
 Ouvrez **Documentation** dans la barre latérale, ou appuyez sur **F1** pour l’aide
 de la page courante. Le lecteur **CyDoc** fourni s’ouvre dans le navigateur par URL
 locale `file://`, sans serveur ni connexion. Il comprend 22 chapitres en anglais (par

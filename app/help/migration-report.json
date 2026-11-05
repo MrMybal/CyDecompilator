@@ -394,7 +394,7 @@
     {
       "source": "docs/cydoc/README.md",
       "id": "ref-docs-cydoc-readme",
-      "sha256": "ad4c1ff747fca14d262f32032cddbe7a0229817605c4ef3be10aca98ea8fc217",
+      "sha256": "d51c668c96cf5bda310aaa5063a369559bc3dded177a146c4f4d926add2a49a3",
       "translation": "original-language-unreviewed",
       "status": "preserved-technical-reference",
       "rewrittenLinks": []
@@ -402,7 +402,7 @@
     {
       "source": "README.md",
       "id": "ref-readme",
-      "sha256": "dbebe8557d8211fd0d14cba61da8fc12f5fffb95c1156bdbc60467dc3c655d4c",
+      "sha256": "1c146f00a8d997b3f97a34c7f0dba4a0f85b75842f3ba570c16127730cf46a76",
       "translation": "original-language-unreviewed",
       "status": "preserved-technical-reference",
       "rewrittenLinks": [
@@ -431,7 +431,7 @@
     {
       "source": "LISEZ-MOI.md",
       "id": "ref-lisez-moi",
-      "sha256": "0f59a902206a20957b424f6a23397cce68b074f2c5b27c42e937256ca71bd1c3",
+      "sha256": "84fcf01a98ba506f1cbf253e46567b327ddf833aa9610c69fd7921f756ac0913",
       "translation": "original-language-unreviewed",
       "status": "preserved-technical-reference",
       "rewrittenLinks": [
@@ -481,7 +481,7 @@
     {
       "source": "app/README.md",
       "id": "ref-app-readme",
-      "sha256": "a3626568cd02dcf272e32a0ff85de0b471e2dd934eb803cb2a2620eb8d3d5975",
+      "sha256": "70911cd9d70b381f5fdb727b8b7ba2c47ad8a52b269b2abf51ca37093850ea7a",
       "translation": "original-language-unreviewed",
       "status": "preserved-technical-reference",
       "rewrittenLinks": []

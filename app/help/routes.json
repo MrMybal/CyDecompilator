@@ -17589,6 +17589,7 @@
         "en": [
           "cydecompilator-documentation-cydoc",
           "generate-and-check",
+          "github-pages",
           "inputs-and-preservation",
           "modules-and-appearance",
           "authoring-and-translation-tracking",
@@ -17603,6 +17604,7 @@
         "fr": [
           "cydecompilator-documentation-cydoc",
           "generate-and-check",
+          "github-pages",
           "inputs-and-preservation",
           "modules-and-appearance",
           "authoring-and-translation-tracking",

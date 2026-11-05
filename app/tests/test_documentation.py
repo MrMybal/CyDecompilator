@@ -252,6 +252,30 @@ def test_input_text_hashes_survive_git_line_ending_conversion(tmp_path, name):
     assert builder().source_digest(source) == expected
 
 
+def test_pages_deployment_uploads_only_the_verified_reader_export():
+    import yaml
+    workflow = yaml.load((ROOT / '.github/workflows/documentation-pages.yml').read_text('utf-8'), Loader=yaml.BaseLoader)
+    assert workflow['on']['push']['branches'] == ['main']
+    build = workflow['jobs']['build']
+    steps = build['steps']
+    uploads = [step for step in steps if step.get('uses', '').startswith('actions/upload-pages-artifact@')]
+    assert len(uploads) == 1 and uploads[0]['with']['path'] == 'app/help'
+    checks = [index for index, step in enumerate(steps) if step.get('run') == 'python app/scripts/build_documentation.py --check']
+    assert checks and checks[0] < steps.index(uploads[0])
+    deploy = workflow['jobs']['deploy']
+    assert deploy['needs'] == 'build' and deploy['environment']['name'] == 'github-pages'
+    assert deploy['permissions'] == {'pages':'write', 'id-token':'write'}
+
+
+@pytest.mark.parametrize(('filename', 'language'), [('README.md','en'), ('LISEZ-MOI.md','fr'), ('app/README.md','en'), ('docs/cydoc/README.md','en')])
+def test_readme_documentation_links_open_the_html_reader_in_the_expected_language(filename, language):
+    text = (ROOT / filename).read_text('utf-8')
+    href = re.search(r'\[Documentation\]\(([^)]+)\)', text)[1]
+    route = urlsplit(href)
+    assert (route.scheme, route.netloc, route.path) == ('https', 'mrmybal.github.io', '/CyDecompilator/')
+    assert route.fragment == '/' + language + '/start'
+
+
 def test_release_overlays_the_complete_fresh_export_without_old_help(tmp_path, monkeypatch):
     """Exercise release ZIP assembly without publishing, compiling a launcher or committing unrelated work."""
     import io
