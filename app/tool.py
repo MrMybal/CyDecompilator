@@ -68,7 +68,7 @@ def create_runtime(data_dir, **options):
     options.setdefault('event_limit', EVENT_LIMIT)
     runtime = Runtime(load_manifest(APP / 'CyTool.json'), data_dir, **options)
     runtime.configure_inputs(ROOT / 'data/inputs', max_bytes=1024**4,
-                             fields={'open_file': ['path'], 'porting_open': ['file']})
+                             fields={'open_file': ['path'], 'porting_open': ['file'], 'xbox_open':['file']})
 
     def handler(function):
         def run(context, parameters):
@@ -129,11 +129,30 @@ def create_runtime(data_dir, **options):
         return porting.open_input(service.store, file or directory, engine_context(context),
                                   p.get('entry',''), original, p.get('maxBytes',porting.DEFAULT_LIMIT))
 
+    def xbox_open(context,p):
+        from cydec import xbox
+        from cydec.inputs import original_path
+        file,directory=p.get('file',''),p.get('directory','')
+        if bool(file)==bool(directory):
+            raise CyToolError('InvalidParameters','Choose one Xbox game file or directory.')
+        original=original_path(context,'xbox_open','file') if file else str(Path(directory).resolve())
+        return xbox.open_input(service.store,file or directory,engine_context(context),
+                               p.get('entry',''),original,p.get('maxBytes',xbox.DEFAULT_LIMIT))
 
-    from cydec import porting,porting_analysis,unreal
+    from cydec import porting,porting_analysis,xbox,unreal
     registrations = {
         'unreal_rules':lambda c,p:unreal.rules(p.get('profile','halo-cea-x360'),p.get('category',''),p.get('language','en')),
         'unreal_guide':lambda c,p:unreal.guide(p.get('profile','halo-cea-x360'),p.get('category',''),p.get('language','en')),
+        'xbox_open':xbox_open,
+        'xbox_info':lambda c,p:xbox.input_info(service.project_for(p['projectId']),p.get('importId','')),
+        'xbox_tools':lambda c,p:xbox.tools(p.get('settings')),
+        'xbox_install':lambda c,p:xbox.install(engine_context(c)),
+        'xbox_attach':lambda c,p:xbox.attach(service.store,p['directory'],engine_context(c)),
+        'xbox_create':lambda c,p:xbox.create(service.project_for(p['projectId']),engine_context(c),p.get('importId',''),p.get('name','')),
+        'xbox_build':lambda c,p:xbox.build(service.project_for(p['projectId']),engine_context(c),p.get('buildId',''),p.get('jobs',4)),
+        'xbox_run':lambda c,p:xbox.run(service.project_for(p['projectId']),engine_context(c),p.get('buildId',''),
+                                     p.get('coop',False),p.get('fullscreen',False),p.get('timeout',14400)),
+        'xbox_guide':lambda c,p:xbox.guide(p.get('language','en')),
         'porting_open': porting_open,
         'porting_info': lambda c,p: porting.info(service.project_for(p['projectId']),p.get('importId','')),
         'porting_tools': lambda c,p: porting.tools(p.get('settings')),

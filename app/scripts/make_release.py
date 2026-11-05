@@ -38,6 +38,13 @@ def build():
     if git('status', '--porcelain', '--untracked-files=no'):
         raise SystemExit('Commit your changes first: the release is built from HEAD.')
     commit = git('rev-parse', 'HEAD')
+    # Build from the committed inputs before archiving; overlay this freshly validated
+    # file:// export so stale/missing generated help can never reach a release.
+    from scripts import build_documentation
+    uncommitted_inputs = set(build_documentation.input_hashes()) - set(git('ls-files').splitlines())
+    if uncommitted_inputs:
+        raise SystemExit('Commit documentation inputs before release: ' + ', '.join(sorted(uncommitted_inputs)))
+    documentation = build_documentation.build()
     launcher = None
     if sys.platform == 'win32':
         subprocess.run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
@@ -50,8 +57,12 @@ def build():
     target = DIST / ('CyDecompilator-%s.zip' % version)
     with zipfile.ZipFile(io.BytesIO(archive)) as source, zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as out:
         for item in source.infolist():
-            if item.filename not in ('CyDecompilator/app/release.json', 'CyDecompilator/CyDecompilator.exe'):
+            if (item.filename not in ('CyDecompilator/app/release.json', 'CyDecompilator/CyDecompilator.exe')
+                    and not item.filename.startswith('CyDecompilator/app/help/')):
                 out.writestr(item, source.read(item))
+        for path in sorted(documentation.rglob('*')):
+            if path.is_file():
+                out.write(path, 'CyDecompilator/app/help/' + path.relative_to(documentation).as_posix())
         if launcher:
             out.write(launcher, 'CyDecompilator/CyDecompilator.exe')
         out.writestr('CyDecompilator/app/release.json', json.dumps(

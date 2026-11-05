@@ -282,8 +282,12 @@ class App:
         self.investigation = InvestigationUI(self, make_editor, set_language, palette, render_editor)
         from porting_ui import PortingUI
         self.porting = PortingUI(self)
+        from xbox_ui import XboxUI
+        self.xbox = XboxUI(self)
         from unreal_ui import UnrealUI
         self.unreal = UnrealUI(self)
+        from documentation_ui import DocumentationUI
+        self.documentation = DocumentationUI()
         self.projects = []
         self.project = None           # project_info output
         self.engine = ''
@@ -543,9 +547,17 @@ class App:
         from cyui_shell import draw, utility_page
         panels = {'workspace': self.workspace, 'project': self.ide.draw, 'investigation': self.investigation.draw,
                   'assistant': self.assistant_page, 'engines': self.engines_tab, 'ai': self.ai_tab,
-                  'porting':self.porting.draw,'unreal':self.unreal.draw}
+                  'porting':self.porting.draw,'xbox':self.xbox.draw,'unreal':self.unreal.draw,
+                  'help':lambda:self.documentation.draw(self)}
+        if imgui.is_key_pressed(imgui.Key.f1):
+            self.open_help(context=getattr(self, 'active_page', 'workspace'))
         if imgui.is_key_chord_pressed(imgui.Key.mod_ctrl | imgui.Key.o): self.choose_file()
         draw(self, lambda page: panels[page]() if page in panels else utility_page(page))
+
+    def open_help(self, topic=None, anchor='', media='', context=None):
+        opened = self.documentation.open(topic, anchor, media, context)
+        self.force_tab = 'help'
+        return opened
 
     def choose_file(self):
         self.dialog = pfd.open_file(tr('Open a file to decompile'), str(Path.home()), ['All files', '*'])

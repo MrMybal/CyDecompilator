@@ -1,0 +1,13 @@
+{
+  "library": "CyDoc",
+  "version": "0.1.0",
+  "repository": "https://github.com/MrMybal/CyDoc",
+  "revision": "774f2a7eabf7dd181a98ffc5add115b580b67f42",
+  "package": "docs/cydoc/vendor/cydoc-0.1.0.tgz",
+  "sha256": "c7a6acf0e7ff982a937312ac43fda4393fea200094e0563ca10c2221b0b10ea7",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/MrMybal/CyDoc/blob/774f2a7eabf7dd181a98ffc5add115b580b67f42/LICENSE",
+  "modules": [
+    "image"
+  ]
+}

@@ -11358,5 +11358,261 @@
  "No matching properties": {
   "en": "No matching properties",
   "fr": "Aucune propriété correspondante"
+ },
+ "Configure or install the AnyPS5 converter.": {
+  "en": "Configure or install the AnyPS5 converter.",
+  "fr": "Configurer ou installer le convertisseur AnyPS5."
+ },
+ "Configure the compatibility libraries for the selected target.": {
+  "en": "Configure the compatibility libraries for the selected target.",
+  "fr": "Configurer les bibliothèques de compatibilité de la cible choisie."
+ },
+ "Xbox porting": {
+  "en": "Xbox porting",
+  "fr": "Portage Xbox"
+ },
+ "Xbox game input": {
+  "en": "Xbox game input",
+  "fr": "Jeu Xbox à importer"
+ },
+ "Prepare a game, compile a native PC project and launch it.": {
+  "en": "Prepare a game, compile a native PC project and launch it.",
+  "fr": "Préparer un jeu, compiler un projet PC natif et le lancer."
+ },
+ "Xbox: inspection. Xbox 360: static recompilation with ReXGlue.": {
+  "en": "Xbox: inspection. Xbox 360: static recompilation with ReXGlue.",
+  "fr": "Xbox : inspection. Xbox 360 : recompilation statique avec ReXGlue."
+ },
+ "Game file or extracted folder": {
+  "en": "Game file or extracted folder",
+  "fr": "Fichier de jeu ou dossier extrait"
+ },
+ "Choose Xbox game input": {
+  "en": "Choose Xbox game input",
+  "fr": "Choisir un fichier de jeu Xbox"
+ },
+ "Choose Xbox game folder": {
+  "en": "Choose Xbox game folder",
+  "fr": "Choisir un dossier de jeu Xbox"
+ },
+ "Prepare Xbox game": {
+  "en": "Prepare Xbox game",
+  "fr": "Préparer le jeu Xbox"
+ },
+ "Use a game folder or ISO to include resources. An XEX or XBE file alone only imports the executable.": {
+  "en": "Use a game folder or ISO to include resources. An XEX or XBE file alone only imports the executable.",
+  "fr": "Utiliser un dossier de jeu ou une ISO pour inclure les ressources. Un XEX ou XBE seul importe uniquement l’exécutable."
+ },
+ "Existing Xbox native project": {
+  "en": "Existing Xbox native project",
+  "fr": "Projet Xbox natif existant"
+ },
+ "Choose native Xbox project": {
+  "en": "Choose native Xbox project",
+  "fr": "Choisir un projet Xbox natif"
+ },
+ "Attach Xbox project": {
+  "en": "Attach Xbox project",
+  "fr": "Rattacher le projet Xbox"
+ },
+ "Only the executable was imported. Prepare its game folder for a complete resource snapshot.": {
+  "en": "Only the executable was imported. Prepare its game folder for a complete resource snapshot.",
+  "fr": "Seul l’exécutable a été importé. Préparer le dossier du jeu pour conserver toutes ses ressources."
+ },
+ "Create Xbox native project": {
+  "en": "Create Xbox native project",
+  "fr": "Créer le projet Xbox natif"
+ },
+ "Compile Xbox project": {
+  "en": "Compile Xbox project",
+  "fr": "Compiler le projet Xbox"
+ },
+ "Edit native sources": {
+  "en": "Edit native sources",
+  "fr": "Modifier les sources natives"
+ },
+ "Local campaign coop (Halo profile)": {
+  "en": "Local campaign coop (Halo profile)",
+  "fr": "Campagne coop locale (profil Halo)"
+ },
+ "Fullscreen at launch": {
+  "en": "Fullscreen at launch",
+  "fr": "Plein écran au lancement"
+ },
+ "Launch native Xbox game": {
+  "en": "Launch native Xbox game",
+  "fr": "Lancer le jeu Xbox natif"
+ },
+ "Cancel the running job to stop the game. Saved in-game settings may override fullscreen.": {
+  "en": "Cancel the running job to stop the game. Saved in-game settings may override fullscreen.",
+  "fr": "Annuler la tâche active pour arrêter le jeu. Ses réglages enregistrés peuvent remplacer le plein écran demandé."
+ },
+ "Xbox methods and pitfalls": {
+  "en": "Xbox methods and pitfalls",
+  "fr": "Méthodes Xbox et problèmes à éviter"
+ },
+ "Keep original files unchanged. Apply patches only to an exact executable SHA-256.": {
+  "en": "Keep original files unchanged. Apply patches only to an exact executable SHA-256.",
+  "fr": "Conserver les originaux. Appliquer les correctifs uniquement au SHA-256 exact de l’exécutable."
+ },
+ "Unlocked FPS, simulation timing and animation interpolation require separate checks.": {
+  "en": "Unlocked FPS, simulation timing and animation interpolation require separate checks.",
+  "fr": "Vérifier séparément les FPS débloqués, le temps de simulation et l’interpolation des animations."
+ },
+ "Ray tracing and direct IP campaign networking remain experimental. Competitive multiplayer is excluded.": {
+  "en": "Ray tracing and direct IP campaign networking remain experimental. Competitive multiplayer is excluded.",
+  "fr": "Le ray tracing et la campagne par IP directe restent expérimentaux. Le multijoueur compétitif est exclu."
+ },
+ "Read Xbox integration guide": {
+  "en": "Read Xbox integration guide",
+  "fr": "Lire le guide d’intégration Xbox"
+ },
+ "Xbox native tools": {
+  "en": "Xbox native tools",
+  "fr": "Outils Xbox natifs"
+ },
+ "Install ReXGlue SDK": {
+  "en": "Install ReXGlue SDK",
+  "fr": "Installer le SDK ReXGlue"
+ },
+ "ReXGlue SDK folder": {
+  "en": "ReXGlue SDK folder",
+  "fr": "Dossier du SDK ReXGlue"
+ },
+ "Optional native GPU plugin": {
+  "en": "Optional native GPU plugin",
+  "fr": "Plugin GPU natif optionnel"
+ },
+ "Save Xbox tool settings": {
+  "en": "Save Xbox tool settings",
+  "fr": "Enregistrer les outils Xbox"
+ },
+ "Compiler processes": {
+  "en": "Compiler processes",
+  "fr": "Processus de compilation"
+ },
+ "Native builds require Windows x64, CMake, Ninja and Visual Studio C++ with Clang.": {
+  "en": "Native builds require Windows x64, CMake, Ninja and Visual Studio C++ with Clang.",
+  "fr": "Les builds natifs nécessitent Windows x64, CMake, Ninja et Visual Studio C++ avec Clang."
+ },
+ "Native project created": {
+  "en": "Native project created",
+  "fr": "Projet natif créé"
+ },
+ "Native build completed": {
+  "en": "Native build completed",
+  "fr": "Compilation native terminée"
+ },
+ "Native build failed": {
+  "en": "Native build failed",
+  "fr": "Échec de la compilation native"
+ },
+ "Xbox projects": {
+  "en": "Xbox projects",
+  "fr": "Projets Xbox"
+ },
+ "Select Xbox project": {
+  "en": "Select Xbox project",
+  "fr": "Choisir un projet Xbox"
+ },
+ "Installing ReXGlue SDK": {
+  "en": "Installing ReXGlue SDK",
+  "fr": "Installation du SDK ReXGlue"
+ },
+ "Preparing Xbox input": {
+  "en": "Preparing Xbox input",
+  "fr": "Préparation du jeu Xbox"
+ },
+ "Xbox input prepared": {
+  "en": "Xbox input prepared",
+  "fr": "Jeu Xbox préparé"
+ },
+ "Creating native Xbox project": {
+  "en": "Creating native Xbox project",
+  "fr": "Création du projet Xbox natif"
+ },
+ "Native Xbox project created": {
+  "en": "Native Xbox project created",
+  "fr": "Projet Xbox natif créé"
+ },
+ "Native Xbox build completed": {
+  "en": "Native Xbox build completed",
+  "fr": "Compilation Xbox native terminée"
+ },
+ "Native Xbox game running; cancel this job to stop it": {
+  "en": "Native Xbox game running; cancel this job to stop it",
+  "fr": "Jeu Xbox natif lancé ; annuler cette tâche pour l’arrêter"
+ },
+ "Documentation": {
+  "en": "Documentation",
+  "fr": "Documentation"
+ },
+ "Documentation language": {
+  "en": "Documentation language",
+  "fr": "Langue de la documentation"
+ },
+ "Search documentation": {
+  "en": "Search documentation",
+  "fr": "Rechercher dans la documentation"
+ },
+ "Contents": {
+  "en": "Contents",
+  "fr": "Sommaire"
+ },
+ "Copy page": {
+  "en": "Copy page",
+  "fr": "Copier la page"
+ },
+ "Home": {
+  "en": "Home",
+  "fr": "Accueil"
+ },
+ "Follow interface language": {
+  "en": "Follow interface language",
+  "fr": "Suivre la langue de l’interface"
+ },
+ "No matching chapters.": {
+  "en": "No matching chapters.",
+  "fr": "Aucun chapitre correspondant."
+ },
+ "This chapter is shown in English because its translation is unavailable.": {
+  "en": "This chapter is shown in English because its translation is unavailable.",
+  "fr": "Ce chapitre est affiché en anglais car sa traduction est indisponible."
+ },
+ "Link unavailable: %s": {
+  "en": "Link unavailable: %s",
+  "fr": "Lien indisponible : %s"
+ },
+ "Chapters": {
+  "en": "Chapters",
+  "fr": "Chapitres"
+ },
+ "Open image": {
+  "en": "Open image",
+  "fr": "Agrandir l’image"
+ },
+ "Documentation unavailable: %s": {
+  "en": "Documentation unavailable: %s",
+  "fr": "Documentation indisponible : %s"
+ },
+ "Image unavailable: %s": {
+  "en": "Image unavailable: %s",
+  "fr": "Image indisponible : %s"
+ },
+ "Diagram unavailable: %s": {
+  "en": "Diagram unavailable: %s",
+  "fr": "Schéma indisponible : %s"
+ },
+ "Read the bundled CyDoc documentation in your browser. No internet or server is required.": {
+  "en": "Read the bundled CyDoc documentation in your browser. No internet or server is required.",
+  "fr": "Consultez la documentation CyDoc fournie dans votre navigateur. Aucune connexion ni aucun serveur ne sont nécessaires."
+ },
+ "Open documentation": {
+  "en": "Open documentation",
+  "fr": "Ouvrir la documentation"
+ },
+ "Copy local documentation link": {
+  "en": "Copy local documentation link",
+  "fr": "Copier le lien local de la documentation"
  }
 }

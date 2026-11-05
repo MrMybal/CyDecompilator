@@ -1,6 +1,20 @@
 [
   {
     "kind": "Engine",
+    "name": "ReXGlue Xbox 360 (separate SDK and local profile overlay)",
+    "license": "BSD-3-Clause; dependencies retain their own notices",
+    "url": "https://github.com/rexglue/rexglue-sdk",
+    "notes": "SDK 0.10.0 installed separately. Three unmodified source files needed for per-project profile overlays are shipped with original notices and hashes in app/xbox_support/third_party/rexglue. No game content or SDK binaries are shipped."
+  },
+  {
+    "kind": "Component",
+    "name": "SMAA reference sources and lookup tables",
+    "license": "MIT",
+    "url": "https://github.com/iryoku/smaa",
+    "notes": "License and pinned source metadata are preserved in app/xbox_support/third_party/smaa. Used by the optional separately built native GPU plugin."
+  },
+  {
+    "kind": "Engine",
     "name": "AnyPS5 (optional separate executable and compatibility libraries)",
     "license": "GPL-2.0-only; see upstream for included dependencies",
     "url": "https://github.com/boykopovar/AnyPS5",
@@ -131,5 +145,12 @@
     "license": "MIT",
     "url": "https://github.com/pthom/imgui_bundle/blob/main/LICENSE",
     "notes": "Includes ImGuiColorTextEdit and the Inconsolata font (SIL OFL 1.1)."
+  },
+  {
+    "kind": "Component",
+    "name": "CyDoc",
+    "license": "MIT",
+    "url": "https://github.com/MrMybal/CyDoc/blob/774f2a7eabf7dd181a98ffc5add115b580b67f42/LICENSE",
+    "notes": "Offline file:// documentation reader, core and image module, pinned to 774f2a7eabf7dd181a98ffc5add115b580b67f42. MIT notice ships in app/help/CyDoc-LICENSE.txt. Source package provenance and SHA256: app/vendor/cydoc-source.json. Node/npm are build-only; no Three.js or web server is shipped. CyDecompilator retains GPL-3.0-only."
   }
 ]

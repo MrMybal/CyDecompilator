@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "defaultLanguage": "en",
+  "languages": [
+    "en",
+    "fr"
+  ],
+  "groups": {
+    "start": {
+      "en": "Get started",
+      "fr": "Bien démarrer"
+    },
+    "analysis": {
+      "en": "Analyze code",
+      "fr": "Analyser le code"
+    },
+    "sources": {
+      "en": "Edit and rebuild",
+      "fr": "Modifier et reconstruire"
+    },
+    "evidence": {
+      "en": "Investigate behavior",
+      "fr": "Examiner les comportements"
+    },
+    "automation": {
+      "en": "AI and automation",
+      "fr": "IA et automatisation"
+    },
+    "ports": {
+      "en": "Console and Unreal workflows",
+      "fr": "Consoles et Unreal"
+    },
+    "reference": {
+      "en": "Settings and reference",
+      "fr": "Réglages et repères"
+    }
+  },
+  "topics": [
+    {
+      "id": "start",
+      "group": "start",
+      "title": {
+        "en": "Welcome to CyDecompilator",
+        "fr": "Bienvenue dans CyDecompilator"
+      },
+      "short": {
+        "en": "Welcome",
+        "fr": "Bienvenue"
+      }
+    },
+    {
+      "id": "installation",
+      "group": "start",
+      "title": {
+        "en": "Installation and first launch",
+        "fr": "Installation et premier lancement"
+      },
+      "short": {
+        "en": "Install and launch",
+        "fr": "Installation et lancement"
+      }
+    },
+    {
+      "id": "engines",
+      "group": "start",
+      "title": {
+        "en": "Engines and supported inputs",
+        "fr": "Moteurs et formats pris en charge"
+      },
+      "short": {
+        "en": "Engine selection",
+        "fr": "Choisir un moteur"
+      }
+    },
+    {
+      "id": "workspace",
+      "group": "analysis",
+      "title": {
+        "en": "Workspace: inspect and navigate",
+        "fr": "Espace de travail : inspection et navigation"
+      },
+      "short": {
+        "en": "Workspace",
+        "fr": "Espace de travail"
+      }
+    },
+    {
+      "id": "native",
+      "group": "analysis",
+      "title": {
+        "en": "Native code and executable details",
+        "fr": "Code natif et détails des exécutables"
+      },
+      "short": {
+        "en": "Native code",
+        "fr": "Code natif"
+      }
+    },
+    {
+      "id": "languages",
+      "group": "analysis",
+      "title": {
+        "en": ".NET, Java, Python and shaders",
+        "fr": ".NET, Java, Python et shaders"
+      },
+      "short": {
+        "en": ".NET, Java, Python, shaders",
+        "fr": ".NET, Java, Python, shaders"
+      }
+    },
+    {
+      "id": "projects",
+      "group": "sources",
+      "title": {
+        "en": "Editable source projects",
+        "fr": "Projets sources modifiables"
+      },
+      "short": {
+        "en": "Editable projects",
+        "fr": "Projets modifiables"
+      }
+    },
+    {
+      "id": "reconstruction",
+      "group": "sources",
+      "title": {
+        "en": "Reconstruct, compile and validate",
+        "fr": "Reconstruire, compiler et valider"
+      },
+      "short": {
+        "en": "Reconstruct and validate",
+        "fr": "Reconstruire et valider"
+      }
+    },
+    {
+      "id": "history",
+      "group": "sources",
+      "title": {
+        "en": "Git history and source comparisons",
+        "fr": "Historique Git et comparaison des sources"
+      },
+      "short": {
+        "en": "Git history",
+        "fr": "Historique Git"
+      }
+    },
+    {
+      "id": "patching",
+      "group": "sources",
+      "title": {
+        "en": "Replace a function in an application copy",
+        "fr": "Remplacer une fonction dans une copie"
+      },
+      "short": {
+        "en": "Replace a function",
+        "fr": "Remplacer une fonction"
+      }
+    },
+    {
+      "id": "debugging",
+      "group": "sources",
+      "title": {
+        "en": "Debug reconstructed .NET sources",
+        "fr": "Déboguer les sources .NET reconstruites"
+      },
+      "short": {
+        "en": ".NET debugging",
+        "fr": "Débogage .NET"
+      }
+    },
+    {
+      "id": "investigation",
+      "group": "evidence",
+      "title": {
+        "en": "Connect a feature to code and evidence",
+        "fr": "Relier une fonctionnalité au code et aux preuves"
+      },
+      "short": {
+        "en": "Feature investigation",
+        "fr": "Investigation fonctionnelle"
+      }
+    },
+    {
+      "id": "observations",
+      "group": "evidence",
+      "title": {
+        "en": "Compare output, network and graphical behavior",
+        "fr": "Comparer sorties, réseau et comportement graphique"
+      },
+      "short": {
+        "en": "Network and graphics",
+        "fr": "Réseau et interface"
+      }
+    },
+    {
+      "id": "ai",
+      "group": "automation",
+      "title": {
+        "en": "AI assistance and autonomous workflows",
+        "fr": "Assistance IA et parcours autonomes"
+      },
+      "short": {
+        "en": "AI workflows",
+        "fr": "Parcours IA"
+      }
+    },
+    {
+      "id": "automation",
+      "group": "automation",
+      "title": {
+        "en": "MCP, CLI and operation reference",
+        "fr": "MCP, CLI et référence des opérations"
+      },
+      "short": {
+        "en": "MCP and CLI",
+        "fr": "MCP et CLI"
+      }
+    },
+    {
+      "id": "ps5",
+      "group": "ports",
+      "title": {
+        "en": "PS5 input preparation and desktop conversion",
+        "fr": "Préparation PS5 et conversion pour ordinateur"
+      },
+      "short": {
+        "en": "PS5 porting",
+        "fr": "Portage PS5"
+      }
+    },
+    {
+      "id": "xbox",
+      "group": "ports",
+      "title": {
+        "en": "Xbox preparation and native projects",
+        "fr": "Préparation Xbox et projets natifs"
+      },
+      "short": {
+        "en": "Xbox porting",
+        "fr": "Portage Xbox"
+      }
+    },
+    {
+      "id": "unreal",
+      "group": "ports",
+      "title": {
+        "en": "Unreal reconstruction knowledge",
+        "fr": "Connaissances de reconstruction Unreal"
+      },
+      "short": {
+        "en": "Unreal reconstruction",
+        "fr": "Reconstruction Unreal"
+      }
+    },
+    {
+      "id": "settings",
+      "group": "reference",
+      "title": {
+        "en": "Preferences, updates and licenses",
+        "fr": "Préférences, mises à jour et licences"
+      },
+      "short": {
+        "en": "Preferences and updates",
+        "fr": "Préférences et mises à jour"
+      }
+    },
+    {
+      "id": "storage",
+      "group": "reference",
+      "title": {
+        "en": "Storage, backups and original files",
+        "fr": "Stockage, sauvegardes et originaux"
+      },
+      "short": {
+        "en": "Storage and backups",
+        "fr": "Stockage et sauvegardes"
+      }
+    },
+    {
+      "id": "troubleshooting",
+      "group": "reference",
+      "title": {
+        "en": "Troubleshooting and result states",
+        "fr": "Dépannage et états des résultats"
+      },
+      "short": {
+        "en": "Troubleshooting",
+        "fr": "Dépannage"
+      }
+    },
+    {
+      "id": "shortcuts",
+      "group": "reference",
+      "title": {
+        "en": "Shortcuts, glossary and reference map",
+        "fr": "Raccourcis, glossaire et repères"
+      },
+      "short": {
+        "en": "Shortcuts and glossary",
+        "fr": "Raccourcis et glossaire"
+      }
+    }
+  ]
+}

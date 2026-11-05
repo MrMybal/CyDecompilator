@@ -1,0 +1,8 @@
+{
+  "name": "cydecompilator-documentation-build",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {"node": ">=22"},
+  "dependencies": {"cydoc": "file:vendor/cydoc-0.1.0.tgz"}
+}

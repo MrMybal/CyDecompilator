@@ -5,7 +5,7 @@
 <p align="center">
 Décompilateur multi-moteurs assisté par IA — Windows, Linux · x86, x64, ARM64 · .NET, Java, Android, Python, shaders
 <br>
-<img src="https://img.shields.io/badge/version-1.4.0-1f4e8c" alt="version 1.4.0">
+<img src="https://img.shields.io/badge/version-1.5.0-1f4e8c" alt="version 1.5.0">
 <img src="https://img.shields.io/badge/licence-GPL--3.0-1f4e8c" alt="GPL-3.0">
 </p>
 
@@ -14,6 +14,19 @@ Décompilateur multi-moteurs assisté par IA — Windows, Linux · x86, x64, ARM
 CyDecompilator ouvre presque n'importe quel binaire, montre son code reconstruit, et une IA aide à
 le comprendre, à le renommer et à le réécrire en vrai code source. Il fonctionne aussi comme
 serveur MCP, pour qu'une IA (Claude Code, Codex…) l'utilise directement.
+
+## Documentation intégrée
+
+Ouvrez **Documentation** dans la barre latérale, ou appuyez sur **F1** pour l’aide
+de la page courante. Le lecteur **CyDoc** fourni s’ouvre dans le navigateur par URL
+locale `file://`, sans serveur ni connexion. Il comprend 22 chapitres en anglais (par
+défaut) et en français, la recherche, les liens de sections, des captures agrandissables
+dans la fenêtre et sept schémas SVG, ainsi que les annexes techniques et références
+d’opérations/sources générées. Il couvre analyse, projets,
+compilation, Git, remplacement de fonction, débogage, investigation, IA/MCP,
+consoles, réglages, stockage et dépannage. Les guides [anglais](docs/cydoc/content/en/start.md)
+et [français](docs/cydoc/content/fr/start.md) sont aussi fournis en Markdown.
+Voir [la génération et la distribution hors ligne](docs/cydoc/README.md).
 
 ## Captures d’écran
 
@@ -60,6 +73,16 @@ les détails de la fonction depuis un onglet près du code.
 | Shaders DXBC (`.cso`, `.fxc`), DXIL SM6, SPIR-V (`.spv`) | **Moteur shader de CyDecompilator** | HLSL (SM4/5 et SM6), GLSL |
 
 Le format est reconnu à partir du contenu du fichier, pas de son extension.
+
+## Portage Xbox natif
+
+La page **Portage Xbox** prépare les dossiers de jeu, XBE Xbox, XEX Xbox 360 et
+images ISO/ZIP XDVDFS. Elle permet de créer un projet Xbox 360 CMake/ReXGlue
+modifiable, le compiler ou rattacher un build natif existant puis le lancer depuis
+CyDecompilator. Le SDK reste séparé et les originaux sont conservés.
+La Xbox première génération reste limitée à l'inspection et à la préparation.
+Le [guide intégré](app/Docs/XboxPorting.fr.md) documente aussi les méthodes utilisées,
+les problèmes rencontrés et les limites ; une compilation ne prouve pas la compatibilité.
 
 ## Portage PS5 vers ordinateur
 

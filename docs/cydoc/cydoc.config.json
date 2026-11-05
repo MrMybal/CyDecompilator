@@ -1,0 +1,14 @@
+{
+  "name": "CyDecompilator",
+  "version": "1.5.0",
+  "defaultLocale": "en",
+  "locales": [{"code": "en", "label": "English"}, {"code": "fr", "label": "Français"}],
+  "homePage": "start",
+  "content": ".generated/content",
+  "assets": "assets",
+  "out": ".generated/site",
+  "modules": ["image"],
+  "translationReport": true,
+  "sources": [".generated/sources"],
+  "sourceIndex": {"enabled": true, "includeDirs": [".generated/sources/app"]}
+}

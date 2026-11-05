@@ -7,6 +7,16 @@ User guides: [English](../README.md) (default on GitHub) · [Français](../LISEZ
 
 ## Native interface (CyUI)
 
+The **Documentation** page, command palette, contextual **F1** and Xbox guide button
+open the bundled CyDoc reader through validated `file://` links in `documentation.py`.
+`documentation_ui.py` provides the native chapter/language selector and launch errors.
+The complete `help/` export ships 22 EN/FR chapters, screenshots, SVG workflows,
+technical appendices, operation contracts and an allowlisted Python source index.
+Reading needs no Node, server, internet or open project. English is the default,
+French is retained, and old chapter/heading inputs use a compatibility map.
+See [authoring and packaging](../docs/cydoc/README.md) and `tests/test_documentation.py`.
+No engine/job/permission contract is added; the existing UI already opens system URLs.
+
 The window ships **CyUI 1.2's modular Python port for imgui_bundle**, pinned to
 `ff023e646c6a3038b3dfbfd53f6d2b4a2f5955e3`. `vendor/cyui.py` contains Core;
 `cyui_modules/` contains only the selected optional families and their dependency
@@ -50,6 +60,17 @@ observations never imply equivalence. Replayable Windows UI Automation and Chrom
 CDP scenarios retain control states, screenshots, HTTP metadata and owned-process TCP
 observations. Browser recording requires Node.js 22+; Windows uses a privately compiled
 .NET Framework helper. Indirect native calls and cross-function value resolution remain unresolved.
+
+## Xbox native porting
+
+The **Xbox porting** page and shared `xbox_*` operations prepare XBE/XEX, extracted
+game folders and XDVDFS ISO/ZIP inputs, create/build Xbox 360 ReXGlue CMake projects,
+attach existing native builds and launch verified outputs through cancellable jobs.
+`cydec/xbox.py` owns the workflow; `xbox_support/` ships first-party templates and
+exact-image Halo overlays, without games, SDK binaries or a private research checkout.
+The optional SDK is installed separately. Original Xbox is inspection/preparation
+only. [Methods and limits](Docs/XboxPorting.md) cover timing, rendering, input,
+occlusion, profile identity, networking and validation; [French guide](Docs/XboxPorting.fr.md).
 
 ## PS5 desktop porting
 

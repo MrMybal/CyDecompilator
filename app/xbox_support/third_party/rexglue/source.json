@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/rexglue/rexglue-sdk",
+  "commit": "f5337cdc947ff6d4c4196737e2c807a48f2a1fc2",
+  "version": "0.10.0",
+  "license": "BSD-3-Clause",
+  "files": {
+    "include/rex/system/xam/user_profile.h": "1ed6d5426f560f362835b89cd5c10b72988a0ba620afe395fa8ff22b08a31dbb",
+    "src/system/xam/user_profile.cpp": "790775ccdd34852b74a25d7ba95b014daa06682456b3e1acaf114f13360923f2",
+    "src/kernel/xam/xam_user.cpp": "7b84ddf00e12b1c9de33e00df75d8d692a686fcbbd939a0d706fecd36bc609e9",
+    "LICENSE": "8e065be1da2ff9a16b1f063d4636d8b67e6a654bb90583ea4332e66ac421bb18"
+  }
+}

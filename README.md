@@ -15,6 +15,18 @@ CyDecompilator opens a wide range of binaries and displays their reconstructed c
 assistant helps explain, rename and rewrite that code into editable source. It also works
 as an MCP server, so AI clients such as Claude Code and Codex can use it directly.
 
+## Built-in documentation
+
+Open **Documentation** in the sidebar, or press **F1** for help about the current page.
+The bundled **CyDoc** reader opens in your browser through a local `file://` URL,
+without a server or internet connection. It includes 22 chapters in English (default)
+and French, full-text search, section links, screenshots enlarged inside the window,
+seven SVG workflows, technical appendices and generated operation/source references.
+It covers analysis, source projects, builds, Git, function replacement, debugging,
+investigation, AI/MCP, console workflows, settings, storage and troubleshooting.
+The [English guide](docs/cydoc/content/en/start.md) and [French guide](docs/cydoc/content/fr/start.md)
+are also available as Markdown. See [authoring, regeneration and offline packaging](docs/cydoc/README.md).
+
 ## Screenshots
 
 CyDecompilator 1.5.0 on Windows, shown with the included DXBC shader sample and a
@@ -63,6 +75,15 @@ from its dedicated sidebar page, and function details move into a tab beside the
 | DXBC shaders (`.cso`, `.fxc`), DXIL SM6, SPIR-V (`.spv`) | **CyDecompilator shader engine** | HLSL (SM4/5 and SM6), GLSL |
 
 Formats are detected from file contents rather than extensions.
+
+## Xbox native porting
+
+The **Xbox porting** page prepares game folders, Xbox XBE/Xbox 360 XEX files and
+XDVDFS ISO/ZIP images. Create an editable Xbox 360 CMake/ReXGlue project, compile it,
+or attach a previous native build and launch it directly from CyDecompilator.
+The SDK remains separate; game files are preserved. Original Xbox currently supports
+inspection/preparation only. Compilation does not establish game compatibility.
+See [methods, prerequisites and known pitfalls](app/Docs/XboxPorting.md).
 
 ## PS5 desktop porting
 

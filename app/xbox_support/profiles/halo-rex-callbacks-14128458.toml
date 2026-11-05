@@ -1,0 +1,75 @@
+# Exact Halo XEX 14128458...: code addresses constructed and stored/passed as callbacks.
+# Verified instruction patterns include virtual-call and member-adjustor thunks.
+# PSFD00 entry 0x83428768 was validated later by native execution; see main profile.
+
+# Canonical four-instruction virtual-call thunks use verified 16-byte bounds.
+
+[functions]
+0x82447458 = { size = 16 }
+0x82447468 = { size = 16 }
+0x82447478 = { size = 16 }
+0x82447488 = { size = 16 }
+0x82447498 = { size = 16 }
+0x824474A8 = { size = 16 }
+0x824474B8 = { size = 16 }
+0x824474C8 = { size = 16 }
+0x824474D8 = { size = 16 }
+0x824765A8 = { size = 0 }
+0x824765D0 = { size = 0 }
+0x82493BE8 = { size = 16 }
+0x82493BF8 = { size = 16 }
+0x82517380 = { size = 16 }
+0x825D6398 = { size = 16 }
+0x825D63A8 = { size = 16 }
+0x826C36D8 = { size = 16 }
+0x826C36E8 = { size = 16 }
+0x826C36F8 = { size = 16 }
+0x826C3708 = { size = 16 }
+0x8270DC20 = { size = 16 }
+0x8270DC30 = { size = 16 }
+0x8273ED88 = { size = 16 }
+0x8273ED98 = { size = 16 }
+0x8273EDA8 = { size = 16 }
+0x8273EDB8 = { size = 16 }
+0x8273EDC8 = { size = 16 }
+0x8273EDD8 = { size = 16 }
+0x8273EDE8 = { size = 16 }
+0x8273EDF8 = { size = 16 }
+0x8273EE08 = { size = 16 }
+0x8273EE18 = { size = 16 }
+0x8273EE28 = { size = 16 }
+0x8273EE38 = { size = 16 }
+0x8273EE48 = { size = 16 }
+0x8273EE58 = { size = 16 }
+0x8273EE68 = { size = 16 }
+0x8273EE78 = { size = 16 }
+0x8273EE88 = { size = 16 }
+0x8273EE98 = { size = 16 }
+0x8273EEA8 = { size = 16 }
+0x8273EEB8 = { size = 16 }
+0x8273EEC8 = { size = 16 }
+0x827B4560 = { size = 16 }
+0x827B4570 = { size = 16 }
+0x827D2298 = { size = 16 }
+0x827D22A8 = { size = 16 }
+0x82847DA0 = { size = 0 }
+0x829FC350 = { size = 16 }
+0x829FC360 = { size = 16 }
+0x829FC370 = { size = 16 }
+0x82BD44E0 = { size = 0 }
+0x82C1B0E0 = { size = 0 }
+0x82C1B0F8 = { size = 0 }
+0x82C1B110 = { size = 0 }
+0x82DF1D38 = { size = 0 }
+0x82F8A930 = { size = 16 }
+0x82F8A940 = { size = 16 }
+0x82F8A950 = { size = 16 }
+0x82F8A960 = { size = 16 }
+0x82F8A970 = { size = 16 }
+0x82F8A980 = { size = 16 }
+0x82F8A990 = { size = 16 }
+0x82F8A9A0 = { size = 16 }
+0x82F8A9B0 = { size = 16 }
+0x82F8A9C0 = { size = 16 }
+0x83016E20 = { size = 0 }
+0x8304CA40 = { size = 0 }

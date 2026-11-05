@@ -23,6 +23,8 @@ Read [the MCP contract](references/mcp.md) first. Then read the relevant workflo
 - [PS5 desktop porting](references/porting.md): local input containers, separate
   official backends, conversion receipts, host execution and compatibility limits.
 - [Unreal reconstruction rules](references/unreal.md): portable rules, campaign profiles, source snapshots and validation requirements; conversion remains separate.
+- [Xbox native porting](references/xbox.md): XBE/XEX and disc preparation, ReXGlue
+  projects, exact-image overlays, native builds, input/timing/rendering pitfalls.
 
 Use the user's chosen engine and settings. Otherwise let the server select a
 compatible engine, inspect missing components, and resolve dependencies needed

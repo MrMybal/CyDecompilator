@@ -1,0 +1,6 @@
+tools/
+work/
+build/
+bin/
+obj/
+__pycache__/

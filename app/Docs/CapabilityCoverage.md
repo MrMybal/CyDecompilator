@@ -6,6 +6,16 @@ Status values: **Tested** (exercised on this machine, with the proof named), **I
 
 ## Modular desktop interface
 
+The native **Documentation** page opens a bundled CyDoc `file://` reader: 22 complete
+EN/FR chapters, three screenshots, seven SVG workflows, full-text search, sections,
+reading history/positions and image zoom/enlargement inside the window. Technical
+appendices, operation schemas and an allowlisted Python source index are generated.
+F1 opens the active page's guide. Other UI languages fall back to English; explicit
+help-language preferences remain supported. Historical single-language references
+are marked as original-language appendices and have untracked translation status.
+`tests/test_documentation.py` checks routing, sources, translations and distribution;
+`tests/documentation_browser.mjs` exercises the real offline browser export.
+
 CyUI 1.2 is pinned and shipped selectively: Core, Code/CodeEditor, Diff, Commands,
 Diagnostics, DocumentViews, Inspector and Images, with Canvas as a dependency.
 Actual ImGui frame tests cover all five themes, both densities, DPI 1/1.5,
@@ -14,6 +24,16 @@ image navigation, diagnostic confinement and unchanged source/document data.
 Windows native captures exercise the migrated application views. Linux/macOS
 execution is unverified. The richer native source editor and application file tree
 remain intentional adapters; see [CyUIMigration.md](CyUIMigration.md).
+
+## Xbox native porting
+
+| Capability | Operation / control | Status and limits |
+|---|---|---|
+| XBE/XEX metadata, game folders and XDVDFS ISO/ZIP | `xbox_open/info`, Xbox porting | Tested with actual child workers on synthetic folder/disc/archive fixtures; originals preserved, byte limits and Runtime file staging checked. Bare executables import no sibling resources. |
+| Separate official SDK | `xbox_tools/install` | Pinned ReXGlue 0.10.0 Windows archive with SHA-256 verification; existing local SDK detection tested. No new network download required for this integration. |
+| Native projects/builds | `xbox_create/build/attach` | Tested: actual SDK generation and Windows x64 compilation/link of a self-authored PowerPC XEX through the integrated workflow; existing Halo EXE/GPU identities checked. Exact-SHA overlays and local profile sources ship in app. Generic game compatibility unverified; original Xbox native recompilation unavailable. |
+| Native launch and process ownership | `xbox_run` | Receipt/guest/plugin checks; job-owned game process, cancellation and logs. A clean exit remains executed-unverified. Local two-profile coop is a Halo-specific experiment; direct-IP campaign sessions incomplete, competitive multiplayer excluded. |
+| Methods and pitfalls | `xbox_guide`, Xbox methods and pitfalls | English/French guide and MCP reference cover ABI, stubs, patches, frame/simulation timing, interpolation, GFx input, occlusion, split screen and experimental RT limits. |
 
 ## PS5 desktop porting
 

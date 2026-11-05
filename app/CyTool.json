@@ -166,6 +166,398 @@
       "supportsProgress": true
     },
     {
+      "id": "xbox_open",
+      "name": "Prepare Xbox game input",
+      "description": "Prepare a preserved Xbox XBE/Xbox 360 XEX, extracted game folder, XDVDFS ISO or ZIP containing one ISO. Folder/disc resources are copied into a persistent game project. No emulator or game is started.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Absolute game file. Supply file OR directory.",
+            "default": ""
+          },
+          "directory": {
+            "type": "string",
+            "description": "Absolute extracted game folder. Supply file OR directory.",
+            "default": ""
+          },
+          "entry": {
+            "type": "string",
+            "description": "Relative executable path when several entries are present.",
+            "default": ""
+          },
+          "maxBytes": {
+            "type": "integer",
+            "description": "Maximum input/expanded game bytes.",
+            "default": 68719476736,
+            "minimum": 1024,
+            "maximum": 274877906944
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "xbox-import"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "xbox_info",
+      "name": "Inspect Xbox game project",
+      "description": "Read preserved console metadata, exact executable identity, prepared assets and native build state.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "importId": {
+            "type": "string",
+            "description": "Prepared input id; empty selects latest.",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "xbox_tools",
+      "name": "Xbox native tool settings",
+      "description": "Inspect or configure the separate ReXGlue SDK and optional locally built native GPU plugin.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sdkRoot": {
+                "type": "string",
+                "description": "Existing absolute SDK folder with bin/rexglue.exe; empty clears it."
+              },
+              "gpuPlugin": {
+                "type": "string",
+                "description": "Optional existing native GPU plugin DLL; empty clears it."
+              }
+            }
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "xbox-tools"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "xbox_install",
+      "name": "Install Xbox recompilation SDK",
+      "description": "Install the official pinned ReXGlue 0.10.0 Windows SDK separately under runtime/engines, with SHA-256 verification.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864,
+        "networkRequired": true
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "network",
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "install",
+        "xbox-tools"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "xbox_attach",
+      "name": "Attach existing Xbox native project",
+      "description": "Register a local ReXGlue native project after checking its manifest, original XEX and existing build receipt. No compilation, game execution or asset copy occurs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "directory": {
+            "type": "string",
+            "description": "Absolute native project folder containing its ReXGlue manifest; existing native-build.json is verified when present."
+          }
+        },
+        "required": [
+          "directory"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "xbox-tools"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "xbox_create",
+      "name": "Create native Xbox 360 project",
+      "description": "Generate an editable CMake/ReXGlue project from prepared input. Exact-SHA Halo profiles are applied only to their matching executable. Original Xbox XBE native recompilation is not implemented.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "importId": {
+            "type": "string",
+            "description": "Prepared input id; empty selects latest.",
+            "default": ""
+          },
+          "name": {
+            "type": "string",
+            "description": "Optional ASCII C++ project identifier.",
+            "default": ""
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn"
+      ],
+      "exclusiveGroups": [
+        "xbox-tools"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "xbox_build",
+      "name": "Compile native Xbox 360 project",
+      "description": "Generate CPU C++ and build the selected native project through cancellable owned subprocesses. Compilation/link success does not establish gameplay compatibility.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "buildId": {
+            "type": "string",
+            "description": "Native project id; empty selects latest.",
+            "default": ""
+          },
+          "jobs": {
+            "type": "integer",
+            "description": "Parallel compiler processes.",
+            "default": 4,
+            "minimum": 1,
+            "maximum": 16
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn",
+        "filesystemExternal"
+      ],
+      "exclusiveGroups": [
+        "xbox-tools"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "xbox_run",
+      "name": "Launch native Xbox game",
+      "description": "Verify original executable, compiled executable and recorded GPU plugin hashes, then run the native PC game. The Runtime owns the process tree; cancellation stops the game. No Xbox Live or emulator process.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id returned by open_file or list_projects."
+          },
+          "buildId": {
+            "type": "string",
+            "description": "Native project id; empty selects latest.",
+            "default": ""
+          },
+          "coop": {
+            "type": "boolean",
+            "description": "Verified Halo profile: reserve keyboard/mouse for player 1 and first controller for player 2.",
+            "default": false
+          },
+          "fullscreen": {
+            "type": "boolean",
+            "description": "Initial fullscreen setting; saved in-game settings may override it.",
+            "default": false
+          },
+          "timeout": {
+            "type": "integer",
+            "description": "Maximum game session seconds; cancel the job to stop sooner.",
+            "default": 14400,
+            "minimum": 1,
+            "maximum": 28800
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "processSpawn",
+        "filesystemExternal",
+        "network"
+      ],
+      "exclusiveGroups": [
+        "xbox-tools"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
+      "id": "xbox_guide",
+      "name": "Xbox native porting methods and pitfalls",
+      "description": "Read the shipped method, exact-image patching rules, renderer/input/timing pitfalls and current compatibility limits.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "description": "Guide language.",
+            "enum": [
+              "en",
+              "fr"
+            ],
+            "default": "en"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "resourceRequirements": {
+        "ramBytes": 67108864
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "exclusiveGroups": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": true
+    },
+    {
       "id": "porting_open",
       "name": "Prepare PS5 application input",
       "description": "Persistently import one local file or folder. Built-in ZIP and plaintext SELF preparation; PKG/PFS/RAR/7z use a configured separate UltraPack backend. Originals are preserved. No decryption.",

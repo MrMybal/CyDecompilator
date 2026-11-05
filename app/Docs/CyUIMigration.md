@@ -19,7 +19,7 @@ The bundled MIT notice remains available in every application archive.
 | Code | Investigation/porting sources, converted code, operation contracts and syntax in diffs/documents |
 | CodeEditor | Python JSON editing in Advanced operations and PS5 scenarios, including ImGui Undo; advanced parameters also have a syntax preview |
 | Diff | Per-file Git comparisons, C# rename/format previews and observed behavior comparisons |
-| Diagnostics | Application/build/debugger/PS5 logs and navigable build/C# diagnostics |
+| Diagnostics | Application/build/debugger/PS5/Xbox logs and navigable build/C# diagnostics |
 | DocumentViews | Markdown AI reports and cached, streaming conversation transcripts |
 | Commands | Ctrl+Shift+P palette for navigation, opening a file, saving sources and building |
 | Inspector | Read-only, filterable function properties |
@@ -31,6 +31,10 @@ revision checks, Git actions, build processes, language services, debugger sessi
 and project history remain in the existing application/Runtime layer. Rendering
 never invokes a toolchain. Document/diff preparation is cached until inputs change.
 IDs come from stable 64-bit hashes; translated captions do not change their identity.
+
+The EN/FR user manual now uses the separate bundled **CyDoc** file reader. Its native
+launcher panel uses CyUI, while documentation search, images and SVG diagrams belong
+to the offline browser export. See [CyDoc integration](../../docs/cydoc/README.md).
 
 The shared views retain a raw-text mode for text selection, Ctrl+A/Ctrl+C and exact
 copying. Diagnostic requests are resolved inside the attached source directory.

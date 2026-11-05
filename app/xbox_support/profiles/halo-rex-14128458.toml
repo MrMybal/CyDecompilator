@@ -1,0 +1,44 @@
+includes = ["halo-rex-vtables-14128458.toml", "halo-rex-callbacks-14128458.toml"]
+
+# ReXGlue 0.10.0 hints for default.xex SHA-256:
+# 1412845884eba9eb61cdc00213ca3777be19c71f6196faea69e435a350fd3f19
+# Verified executable branch destinations missing from automatic discovery.
+# Size 0 requests control-flow discovery; no executable instruction is replaced.
+generate_exception_handlers = true
+
+[functions]
+0x823F0A30 = { size = 0 }
+0x823F0A68 = { size = 0 }
+0x823F0AC0 = { size = 0 }
+0x823F0AF8 = { size = 0 }
+0x823F0B30 = { size = 0 }
+0x82B692A0 = { size = 0 }
+0x82C2E0BC = { size = 8 }
+0x82C480E0 = { size = 8 }
+0x82C481D8 = { size = 8 }
+0x82CCE510 = { size = 0 }
+0x82D24AD8 = { size = 8 }
+0x82DC59E0 = { size = 0 }
+0x83199A50 = { size = 8 }
+0x831AEF60 = { size = 16 }
+0x831AEF78 = { size = 8 }
+0x831AEF80 = { size = 8 }
+0x831AEF88 = { size = 8 }
+0x831AEF90 = { size = 8 }
+0x831C7568 = { size = 0 }
+0x831C7570 = { size = 0 }
+0x831C7578 = { size = 0 }
+# Missing entries in the static constructor array 0x834310DC..0x83431E58.
+# The other 860 entries already have recompiled implementations.
+0x833FAD28 = { size = 32 }
+0x833FAD48 = { size = 32 }
+0x833FAD68 = { size = 32 }
+# Native launch reached this virtual method table (0x8207F0E8..0x8207F1B0).
+# Four forwarding methods lack .pdata and were absent from discovery.
+0x82A4DB18 = { size = 32 }
+0x82A4DB38 = { size = 36 }
+0x82A4DB80 = { size = 32 }
+0x82A4DBA0 = { size = 20 }
+# PSFD00 callback observed on four guest worker threads during native loading.
+# Ends in a tail dispatch at 0x83428810. Both possible table targets are registered.
+0x83428768 = { size = 172 }

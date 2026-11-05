@@ -10,6 +10,7 @@ PAGES = (
     ('project', 'Project IDE', 'document', 'Explore'),
     ('investigation', 'Investigation', 'search', 'Explore'),
     ('porting', 'PS5 porting', 'sync', 'Explore'),
+    ('xbox', 'Xbox porting', 'sync', 'Explore'),
     ('unreal', 'Unreal reconstruction', 'library', 'Explore'),
     ('assistant', 'AI', 'people', 'Explore'),
     ('engines', 'Engines', 'library', 'Tools'),
@@ -17,12 +18,13 @@ PAGES = (
     ('log', 'Application log', 'list', 'System'),
     ('advanced', 'Advanced operations', 'settings', 'System'),
     ('options', 'Options', 'colour', 'System'),
+    ('help', 'Documentation', 'document', 'System'),
 )
 
 
 def command_model(app):
     result = [commands.Command(stable_id('command', 'open'), 'Open file...', 'Ctrl+O')]
-    result += [commands.Command(stable_id('page', key), caption, category=section)
+    result += [commands.Command(stable_id('page', key), caption, 'F1' if key == 'help' else '', category=section)
                for key, caption, _, section in PAGES]
     pid = (app.project or {}).get('projectId')
     session = app.ide.sessions.get(pid, {})
@@ -41,7 +43,10 @@ def execute_command(app, identifier):
         return
     for key, _, _, _ in PAGES:
         if identifier == stable_id('page', key):
-            app.force_tab = key
+            if key == 'help':
+                app.open_help('start')
+            else:
+                app.force_tab = key
             return
     allowed = next((c.enabled for c in command_model(app) if c.id == identifier), False)
     if allowed:
@@ -126,6 +131,8 @@ def draw(app, render):
                 height = imgui.get_frame_height() + cyui.dp(8)
                 if cyui.sidebar_item(getattr(cyui.icon, glyph), cyui.tr_label(caption + '###page-' + key), key == page):
                     page = key
+                    if key == 'help':
+                        app.open_help('start')
                 # CyUI ends with a spacer, so its last-item tooltip cannot target the row.
                 maximum = imgui.ImVec2(origin.x + width, origin.y + height)
                 if imgui.is_window_hovered() and imgui.is_mouse_hovering_rect(origin, maximum):
