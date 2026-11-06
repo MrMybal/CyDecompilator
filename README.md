@@ -5,7 +5,7 @@
 <p align="center">
 AI-assisted multi-engine decompiler — Windows, Linux · x86, x64, ARM64 · .NET, Java, Android, Python, shaders
 <br>
-<img src="https://img.shields.io/badge/version-1.5.0-1f4e8c" alt="version 1.5.0">
+<img src="https://img.shields.io/badge/version-1.5.1-1f4e8c" alt="version 1.5.1">
 <img src="https://img.shields.io/badge/license-GPL--3.0-1f4e8c" alt="GPL-3.0">
 </p>
 
@@ -24,11 +24,11 @@ Open **Documentation** in the sidebar, or press **F1** for help about the curren
 The bundled **CyDoc** reader opens in your browser through a local `file://` URL,
 without a server or internet connection. It includes 22 chapters in English (default)
 and French, full-text search, section links, screenshots enlarged inside the window,
-seven SVG workflows, technical appendices and generated operation/source references.
+seven SVG workflows, public operation and help-link API references.
 It covers analysis, source projects, builds, Git, function replacement, debugging,
 investigation, AI/MCP, console workflows, settings, storage and troubleshooting.
-The [English guide](docs/cydoc/content/en/start.md) and [French guide](docs/cydoc/content/fr/start.md)
-are also available as Markdown. See [authoring, regeneration and offline packaging](docs/cydoc/README.md).
+Offline entry point: `app/Documentation/Documentation.html`. Maintainers can find
+the sources and build instructions in [.CyDocBuild](app/.CyDocBuild/README.md).
 
 ## Screenshots
 

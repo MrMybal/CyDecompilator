@@ -20,10 +20,11 @@ app/vendor/CYUI_LICENSE.txt -text
 app/engine-patches/*.patch text eol=lf -whitespace
 
 # Generated offline-reader hashes and pinned source notices require exact bytes.
-app/help/** -text -whitespace
+app/Documentation/** -text -whitespace
+app/help/index.html -text
 app/xbox_support/** -text whitespace=cr-at-eol
 app/xbox_support/third_party/** -whitespace
-docs/cydoc/vendor/*.tgz binary
-docs/cydoc/vendor/CyDoc-LICENSE.txt -text
+app/.CyDocBuild/vendor/*.tgz binary
+app/.CyDocBuild/vendor/CyDoc-LICENSE.txt -text
 # Preserve the original reference snapshot's paragraph spacing.
 modules/xbox-native/docs/HALO_REPORT.md whitespace=-blank-at-eof

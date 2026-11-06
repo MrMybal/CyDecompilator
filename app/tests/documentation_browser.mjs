@@ -1,5 +1,5 @@
 // Real file:// verification, with the user's installed Chromium. No test server,
-// browser download or Playwright dependency. All temporary files stay in runtime/.
+// browser download or Playwright dependency. All temporary files stay in the private documentation workspace.
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -7,7 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import assert from 'node:assert/strict';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const output = resolve(root, 'runtime/build/cydoc-browser'); mkdirSync(output, {recursive:true});
+const output = resolve(root, 'app/.CyDocBuild/internal/browser'); mkdirSync(output, {recursive:true});
 const browser = process.argv.find(arg=>arg.startsWith('--browser='))?.slice(10) || [
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
@@ -43,9 +43,9 @@ async function key(key,code=key,modifiers=0) {
   await call('Input.dispatchKeyEvent',{type:'keyDown',key,code,modifiers,windowsVirtualKeyCode});
   await call('Input.dispatchKeyEvent',{type:'keyUp',key,code,modifiers,windowsVirtualKeyCode});
 }
-async function navigate(hash) {
+async function navigate(hash, canonicalPage) {
   await evaluate(`location.hash=${JSON.stringify(hash)}`);
-  const page=hash.split('/')[2]?.split('?')[0];
+  const page=canonicalPage || hash.split('/')[2]?.split('?')[0];
   await wait(`document.querySelector('.side-nav [data-page=${JSON.stringify(page)}]')?.classList.contains('active')`);
   await sleep(80);
 }
@@ -56,7 +56,13 @@ async function screenshot(name) {
 
 try {
   for(let i=0;i<100&&!existsSync(resolve(profile,'DevToolsActivePort'));i++)await sleep(100);
-  const port=readFileSync(resolve(profile,'DevToolsActivePort'),'utf8').split('\n')[0];
+  let port;
+  // Chromium creates this file before releasing its Windows write lock.
+  for(let i=0;i<40&&!port;i++) {
+    try {port=readFileSync(resolve(profile,'DevToolsActivePort'),'utf8').split('\n')[0];}
+    catch(error){if(!['EBUSY','ENOENT'].includes(error.code))throw error;await sleep(50);}
+  }
+  assert(port,'Chromium did not finish writing its debugging port');
   const targets=await(await fetch(`http://127.0.0.1:${port}/json/list`)).json();
   socket=new WebSocket(targets.find(target=>target.type==='page').webSocketDebuggerUrl);
   socket.onmessage=event=>{
@@ -71,7 +77,7 @@ try {
   // Block external resources and put the browser offline before reading the file export.
   await call('Network.setBlockedURLs',{urls:['http://*','https://*']});
   await call('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
-  const base=pathToFileURL(resolve(root,'app/help/index.html')).href;
+  const base=pathToFileURL(resolve(root,'app/Documentation/Documentation.html')).href;
   await call('Page.navigate',{url:base+'#/en/overview/welcome-to-cydecompilator'});
   await wait(`document.querySelector('article')?.textContent.includes('CyDecompilator')`);
   assert.equal(await evaluate('location.hash'),'#/en/start');
@@ -88,6 +94,17 @@ try {
   await evaluate(`location.hash='#/fr/workspace/suivre-le-code'`);
   await wait(`location.hash==='#/fr/workspace/follow-the-code'`);
   checks.push('historic French heading links redirect to the canonical section');
+
+  assert.equal(await evaluate(`Math.round(document.querySelector('.sidebar').getBoundingClientRect().width)`),330);
+  assert(await evaluate(`document.querySelector('.topbar [data-header-search]')!==null`));
+  await evaluate(`const field=document.querySelector('[data-header-search]');field.focus();field.value='reconstruction_run';field.dispatchEvent(new Event('input',{bubbles:true}));`);
+  await wait(`document.querySelectorAll('.search-result').length>0`);
+  await key('Escape');
+  await evaluate(`document.querySelector('.brand').focus()`);
+  await wait(`document.querySelector('.reader-tooltip:not([hidden])')!==null`);
+  assert(await evaluate(`document.querySelector('.reader-tooltip').textContent.includes('CyDecompilator')`));
+  await key('Escape');
+  checks.push('330px nested sidebar, top global search and keyboard-focus full-title tooltip');
 
   await key('k','KeyK',2);
   await wait(`document.querySelector('dialog').open && document.activeElement.type==='search'`);
@@ -135,17 +152,18 @@ try {
   assert(await evaluate(`document.querySelector('article').textContent.includes('95')`));
   await navigate('#/en/op-reconstruction-run/contract');
   assert(await evaluate(`document.querySelector('article').textContent.includes('inputSchema')`));
-  await navigate('#/fr/source-policy');
-  await navigate('#/en/source-generated-sources-app-documentation-py/L1');
-  assert(await evaluate(`document.querySelector('#L1')!==null`));
-  await navigate('#/fr/translation-report');
-  checks.push('generated operation schemas, allowlisted sources/line link and translation report');
+  await navigate('#/fr/help-route-api/parameters');
+  assert(await evaluate(`document.querySelector('article').textContent.includes('Documentation.url')`));
+  await navigate('#/fr/translation-report','settings');
+  await wait(`location.hash.includes('/settings/language-and-appearance')`);
+  assert(await evaluate(`!globalThis.CYDOC_DATA.pages.some(p=>p.kind==='source'||p.id==='translation-report')`));
+  checks.push('public operation/help APIs; obsolete report links redirect without publishing internal pages');
   await evaluate(`document.querySelector('[data-set-theme="paper"]').click()`);
   await call('Page.reload');
   await wait(`document.querySelector('#app').dataset.theme==='paper'`);
   await evaluate(`document.querySelector('[data-set-theme="nord"]').click()`);
-  assert(await evaluate(`document.querySelector('.footer').textContent.includes('GPL-3.0-only')`));
-  checks.push('saved theme survives reload and reader/application licenses remain distinct');
+  assert(await evaluate(`!document.querySelector('.sidebar .mit-tag,.sidebar .local-card,.sidebar .offline-card')`));
+  checks.push('saved theme survives reload; no decorative offline cards or CyDoc sidebar badge');
 
   await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
   await call('Emulation.setTouchEmulationEnabled',{enabled:true});

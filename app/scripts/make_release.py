@@ -58,11 +58,16 @@ def build():
     with zipfile.ZipFile(io.BytesIO(archive)) as source, zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as out:
         for item in source.infolist():
             if (item.filename not in ('CyDecompilator/app/release.json', 'CyDecompilator/CyDecompilator.exe')
-                    and not item.filename.startswith('CyDecompilator/app/help/')):
+                    and not item.filename.startswith(('CyDecompilator/app/help/',
+                        'CyDecompilator/app/Documentation/', 'CyDecompilator/app/.CyDocBuild/',
+                        'CyDecompilator/docs/cydoc/'))):
                 out.writestr(item, source.read(item))
         for path in sorted(documentation.rglob('*')):
             if path.is_file():
-                out.write(path, 'CyDecompilator/app/help/' + path.relative_to(documentation).as_posix())
+                out.write(path, 'CyDecompilator/app/Documentation/' + path.relative_to(documentation).as_posix())
+        legacy = APP / 'help/index.html'
+        if legacy.is_file():
+            out.write(legacy, 'CyDecompilator/app/help/index.html')
         if launcher:
             out.write(launcher, 'CyDecompilator/CyDecompilator.exe')
         out.writestr('CyDecompilator/app/release.json', json.dumps(

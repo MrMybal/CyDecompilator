@@ -1,5 +1,16 @@
 # Changements
 
+## 1.5.1 — 6 novembre 2026
+
+- Documentation CyDoc mise à jour : manuel humain complet en anglais et français,
+  navigation hiérarchique, recherche globale en haut et infobulles détaillées.
+- Références publiques des opérations et des liens d’aide, avec paramètres, retours
+  et exemples traduits ; consignes IA séparées dans `DocAI.md`.
+- Nouveau dossier `app/Documentation/` autonome, utilisable hors ligne ; F1,
+  aides contextuelles et anciens liens conservés.
+- Génération et distribution du lecteur complet dans l’application et sur GitHub Pages.
+  Sources et outils documentaires séparés dans `.CyDocBuild/`.
+
 ## 1.5.0 — 2 novembre 2026
 
 - Migration vers CyUI 1.2 modulaire : vues de code, édition JSON, différences Git et

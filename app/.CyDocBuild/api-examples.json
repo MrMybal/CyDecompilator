@@ -1,0 +1,20 @@
+{
+  "open_file": {"path":"C:/samples/App.dll","engine":"ilspy"},
+  "list_functions": {"projectId":"<project-id>","limit":20},
+  "decompile": {"projectId":"<project-id>","function":"<function-id>"},
+  "workspace_create": {"projectId":"<project-id>"},
+  "workspace_read": {"projectId":"<project-id>","path":"Program.cs"},
+  "workspace_save": {"projectId":"<project-id>","path":"Program.cs","text":"class Program { static void Main() {} }","revision":"<revision-from-workspace-read>"},
+  "workspace_execute": {"projectId":"<project-id>","action":"build","configuration":"Debug"},
+  "workspace_history": {"projectId":"<project-id>","action":"snapshot","message":"Update source behavior"},
+  "reconstruction_run": {"projectId":"<project-id>","maxRounds":3,"repair":false,"runTests":true},
+  "managed_methods": {"projectId":"<project-id>"},
+  "patch_outputs": {"projectId":"<project-id>"},
+  "debug_status": {"projectId":"<project-id>"},
+  "application_open": {"path":"C:/samples/electron-app"},
+  "investigation_query": {"projectId":"<project-id>","query":"settings"},
+  "xbox_info": {"projectId":"<project-id>"},
+  "porting_info": {"projectId":"<project-id>"},
+  "list_engines": {},
+  "update_state": {}
+}

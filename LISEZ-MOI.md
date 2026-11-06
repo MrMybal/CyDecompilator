@@ -5,7 +5,7 @@
 <p align="center">
 Décompilateur multi-moteurs assisté par IA — Windows, Linux · x86, x64, ARM64 · .NET, Java, Android, Python, shaders
 <br>
-<img src="https://img.shields.io/badge/version-1.5.0-1f4e8c" alt="version 1.5.0">
+<img src="https://img.shields.io/badge/version-1.5.1-1f4e8c" alt="version 1.5.1">
 <img src="https://img.shields.io/badge/licence-GPL--3.0-1f4e8c" alt="GPL-3.0">
 </p>
 
@@ -24,12 +24,11 @@ Ouvrez **Documentation** dans la barre latérale, ou appuyez sur **F1** pour l�
 de la page courante. Le lecteur **CyDoc** fourni s’ouvre dans le navigateur par URL
 locale `file://`, sans serveur ni connexion. Il comprend 22 chapitres en anglais (par
 défaut) et en français, la recherche, les liens de sections, des captures agrandissables
-dans la fenêtre et sept schémas SVG, ainsi que les annexes techniques et références
-d’opérations/sources générées. Il couvre analyse, projets,
+dans la fenêtre et sept schémas SVG, ainsi que les références publiques des opérations
+et des liens d’aide. Il couvre analyse, projets,
 compilation, Git, remplacement de fonction, débogage, investigation, IA/MCP,
-consoles, réglages, stockage et dépannage. Les guides [anglais](docs/cydoc/content/en/start.md)
-et [français](docs/cydoc/content/fr/start.md) sont aussi fournis en Markdown.
-Voir [la génération et la distribution hors ligne](docs/cydoc/README.md).
+consoles, réglages, stockage et dépannage. Le point d’entrée hors ligne est `app/Documentation/Documentation.html`.
+Les sources et instructions de génération sont dans [.CyDocBuild](app/.CyDocBuild/README.md).
 
 ## Captures d’écran
 

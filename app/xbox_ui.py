@@ -128,8 +128,7 @@ class XboxUI:
             imgui.text_wrapped(tr('Unlocked FPS, simulation timing and animation interpolation require separate checks.'))
             imgui.text_wrapped(tr('Ray tracing and direct IP campaign networking remain experimental. Competitive multiplayer is excluded.'))
             if cyui.button(label('Read Xbox integration guide')):
-                suffix = '-fr' if self.app.documentation.language() == 'fr' else ''
-                self.app.open_help('ref-app-docs-xboxporting' + suffix)
+                self.app.open_help('xbox-methods')
             cyui.end_section()
         self.app.jobs.progress_widget('xbox')
         if self.app.jobs.message:cyui.callout('warning',tr(self.app.jobs.message))

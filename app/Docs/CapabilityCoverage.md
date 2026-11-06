@@ -1,4 +1,4 @@
-# Capability coverage — CyDecompilator 1.5.0
+# Capability coverage — CyDecompilator 1.5.1
 
 Status values: **Tested** (exercised on this machine, with the proof named), **Implemented**
 (code path present, not run end to end here), **Not exposed** (engine feature not offered),
@@ -8,12 +8,17 @@ Status values: **Tested** (exercised on this machine, with the proof named), **I
 
 The native **Documentation** page opens a bundled CyDoc `file://` reader: 22 complete
 EN/FR chapters, three screenshots, seven SVG workflows, full-text search, sections,
-reading history/positions and image zoom/enlargement inside the window. Technical
-appendices, operation schemas and an allowlisted Python source index are generated.
+reading history/positions and image zoom/enlargement inside the window. Public
+operation schemas and annotated help-link APIs complete 130 pages in each language.
+The reader has nested navigation, header search and full-title/description tooltips.
+The distributable entry point is `Documentation/Documentation.html`; authoring and
+build tools remain in `.CyDocBuild/`, outside release archives. AI guidance is a
+separate `DocAI.md` sidecar, outside the human reader's navigation and search.
 F1 opens the active page's guide. Other UI languages fall back to English; explicit
-help-language preferences remain supported. Historical single-language references
-are marked as original-language appendices and have untracked translation status.
-`tests/test_documentation.py` checks routing, sources, translations and distribution;
+help-language preferences remain supported. All published pages have current English
+and French versions. Old appendix links redirect to current task guides; raw source
+listings, build notes and historical reports are not included in the human reader.
+`tests/test_documentation.py` checks routing, public APIs, translations and distribution;
 `tests/documentation_browser.mjs` exercises the real offline browser export.
 
 CyUI 1.2 is pinned and shipped selectively: Core, Code/CodeEditor, Diff, Commands,

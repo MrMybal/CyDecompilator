@@ -1,0 +1,487 @@
+Read bundled reconstruction rules, validation requirements and campaign profiles from the Halo CEA Unreal prototype. Read-only knowledge integration; does not import assets, build or convert a game.	Consulter les règles de reconstruction, les conditions de validation et les profils de campagne du prototype Unreal Halo CEA. La consultation n’importe aucune ressource et ne compile ni ne convertit de jeu.
+Render the same bundled rules as a portable Markdown guide, with source snapshot hashes and explicit limits. No game execution.	Obtenir les règles intégrées sous forme de guide Markdown, avec les empreintes des références et leurs limites. Aucun jeu n’est exécuté.
+Prepare a preserved Xbox XBE/Xbox 360 XEX, extracted game folder, XDVDFS ISO or ZIP containing one ISO. Folder/disc resources are copied into a persistent game project. No emulator or game is started.	Préparer une copie conservée d’un XBE Xbox, d’un XEX Xbox 360, d’un dossier extrait, d’une image XDVDFS ISO ou d’un ZIP contenant une ISO. Les ressources du dossier ou du disque sont copiées dans un projet persistant. Aucun émulateur ni jeu n’est lancé.
+Read preserved console metadata, exact executable identity, prepared assets and native build state.	Consulter les métadonnées conservées, l’identité exacte de l’exécutable, les ressources préparées et l’état de compilation native.
+Inspect or configure the separate ReXGlue SDK and optional locally built native GPU plugin.	Consulter ou configurer le SDK ReXGlue séparé et le module GPU natif facultatif compilé localement.
+Install the official pinned ReXGlue 0.10.0 Windows SDK separately under runtime/engines, with SHA-256 verification.	Installer séparément le SDK Windows officiel ReXGlue 0.10.0 dans runtime/engines, après vérification SHA-256.
+Register a local ReXGlue native project after checking its manifest, original XEX and existing build receipt. No compilation, game execution or asset copy occurs.	Rattacher un projet natif ReXGlue après vérification de son manifeste, du XEX original et du reçu de compilation existant. Cette opération ne compile rien, ne lance pas le jeu et ne copie pas de ressources.
+Generate an editable CMake/ReXGlue project from prepared input. Exact-SHA Halo profiles are applied only to their matching executable. Original Xbox XBE native recompilation is not implemented.	Générer un projet CMake/ReXGlue modifiable depuis l’entrée préparée. Les profils Halo sont réservés à l’exécutable possédant l’empreinte exacte attendue. La recompilation native des XBE de la première Xbox n’est pas disponible.
+Generate CPU C++ and build the selected native project through cancellable owned subprocesses. Compilation/link success does not establish gameplay compatibility.	Générer le C++ du processeur et compiler le projet natif avec des sous-processus annulables. La réussite de la compilation et de l’édition de liens ne garantit pas le fonctionnement du jeu.
+Verify original executable, compiled executable and recorded GPU plugin hashes, then run the native PC game. The Runtime owns the process tree; cancellation stops the game. No Xbox Live or emulator process.	Vérifier les empreintes de l’exécutable original, du programme compilé et du module GPU enregistré, puis lancer le jeu PC natif. Le Runtime contrôle les processus ; annuler la tâche arrête le jeu. Aucun processus d’émulateur ni service Xbox Live n’est lancé.
+Read the shipped method, exact-image patching rules, renderer/input/timing pitfalls and current compatibility limits.	Consulter la méthode intégrée, les règles de modification selon l’identité de l’image, les difficultés de rendu, de commandes et de cadence, ainsi que les limites actuelles.
+Persistently import one local file or folder. Built-in ZIP and plaintext SELF preparation; PKG/PFS/RAR/7z use a configured separate UltraPack backend. Originals are preserved. No decryption.	Importer durablement un fichier ou dossier local. La préparation ZIP et SELF en clair est intégrée ; PKG, PFS, RAR et 7z utilisent UltraPack, configuré séparément. Les originaux sont conservés. Aucun déchiffrement n’est effectué.
+Read the saved input manifest, ELF evidence and preparation limits.	Consulter le manifeste d’entrée enregistré, les informations ELF et les limites de préparation.
+Read or configure separate converter, target-library and UltraPack CLI paths. Does not execute tools.	Consulter ou configurer les chemins séparés du convertisseur, des bibliothèques cibles et de la ligne de commande UltraPack, sans exécuter ces outils.
+Install separate official AnyPS5 converter and target libraries with published SHA-256 digests, or UltraPack source at a resolved Git commit with a private Python environment and optional .NET package helper.	Installer séparément le convertisseur officiel AnyPS5 et ses bibliothèques avec les empreintes SHA-256 publiées, ou les sources UltraPack à une révision Git précise avec un environnement Python privé et l’outil .NET facultatif pour les paquets.
+Check prepared input and selected tools. This is not a claim of game compatibility.	Vérifier l’entrée préparée et les outils choisis. Ce contrôle ne garantit pas la compatibilité du jeu.
+Convert a verified application snapshot using the separately configured AnyPS5 converter. Write a separate receipt-verified output with libraries and resources; behavior remains unverified.	Convertir un instantané vérifié avec le convertisseur AnyPS5 configuré séparément. Écrire une sortie distincte, avec bibliothèques, ressources et reçu de vérification ; le comportement reste à vérifier.
+Read the saved conversion receipt and output manifest.	Consulter le reçu de conversion et le manifeste de sortie enregistrés.
+Verify receipt hashes, copy the output into a job-owned directory, then run bounded scenarios on the matching host. No assertions means executed-unverified, not behavioral validation.	Vérifier les empreintes du reçu, copier la sortie dans le dossier de la tâche et exécuter des scénarios bornés sur le système correspondant. Sans assertions, l’état reste executed-unverified : le comportement n’est pas validé.
+Analyze verified guest ELF bytes with cdec, native or Ghidra. Link saved AnyPS5 registry file offsets and conversion errors to decoded instructions/functions; include assembly/C samples and runtime trace candidates without guessing host-to-guest address mappings. Does not patch or execute the application.	Analyser les octets ELF vérifiés avec cdec, native ou Ghidra. Relier les positions de fichiers du registre AnyPS5 et les erreurs aux instructions et fonctions décodées, avec des extraits assembleur/C et des pistes de trace. Les correspondances d’adresses inconnues restent explicites. L’application n’est ni modifiée ni exécutée.
+Capture a bounded immutable folder, ASAR or JS/TS/HTML artifact snapshot and analyze it with the inert TypeScript AST parser. Excluded artifacts are reported.	Conserver un instantané borné et immuable d’un dossier, d’un ASAR ou de fichiers JS/TS/HTML, puis l’analyser avec l’analyseur syntaxique TypeScript, sans exécution. Les éléments exclus sont signalés.
+Read-only Ghidra function dossier: type layouts, instruction references, call sites and bounded high p-code SSA value dependencies. Requires existing Ghidra analysis.	Consulter un dossier de fonction Ghidra : disposition des types, références d’instructions, appels et dépendances de valeurs SSA du p-code de haut niveau, avec des limites explicites. Une analyse Ghidra préalable est nécessaire.
+Find feature text, names or endpoints and return related graph nodes with explicit relationship paths, hash-bound source locations, observations, inferences and unknowns.	Rechercher un texte fonctionnel, un nom ou une adresse et obtenir les nœuds liés, les chemins de relations, les emplacements associés à leurs empreintes, les observations, les déductions et les inconnues.
+Read a source from the immutable application snapshot and verify its SHA256.	Lire un fichier source de l’instantané immuable de l’application et vérifier son empreinte SHA-256.
+Import HAR metadata and correlate exact literal URLs or paths with route/endpoint candidates. Request headers, cookies and bodies are not retained; no URL is fetched.	Importer les métadonnées HAR et rapprocher les URL ou chemins littéraux des routes et adresses candidates. Les en-têtes, cookies et corps des requêtes ne sont pas conservés ; aucune URL n’est chargée.
+Run an explicitly selected executable in a fresh working directory. Record text streams, exit status, file changes, optional owned TCP connections and Windows/Chromium/Electron graphical scenarios. This is not an OS sandbox; external file writes and traffic outside the observation scope are not captured.	Exécuter le programme choisi dans un nouveau dossier de travail. Enregistrer les flux texte, le code de sortie, les modifications de fichiers et, sur demande, les connexions TCP et les scénarios graphiques Windows/Chromium/Electron. Ce dossier n’isole pas le système : les écritures externes et le trafic hors périmètre ne sont pas observés.
+Recordings retained for this project.	Enregistrements conservés pour ce projet.
+Read retained GUI steps, DOM/UI Automation states, HTTP/TCP observations and hash-verified screenshot paths.	Consulter les étapes graphiques, les états DOM ou UI Automation, les observations HTTP/TCP et les chemins des captures vérifiées par empreinte.
+Compare recorded text outputs, termination, file hashes, HTTP/TCP observations, GUI states and screenshots for the same replay scenario. Matching observations do not establish program equivalence.	Comparer les sorties texte, la terminaison, les empreintes de fichiers, les observations HTTP/TCP, les états graphiques et les captures pour un même scénario rejoué. Des observations concordantes ne prouvent pas l’équivalence des programmes.
+Keep exact source/resource/dependency snapshots in a private local Git repository per attached folder. Status lists versions; snapshot saves a described version; compare previews changes against a commit. Restore requires its preview revision, saves current files first and creates a restoration commit. Build output and VCS folders are excluded. No remotes, user index or hooks are used.	Conserver des instantanés exacts des sources, ressources et dépendances dans un dépôt Git local privé par dossier rattaché. status liste les versions, snapshot enregistre une version décrite et compare prépare un aperçu. restore exige la révision de cet aperçu, sauvegarde d’abord les fichiers actuels et crée un commit de restauration. Les sorties de compilation et dossiers de gestion de versions sont exclus. Aucun dépôt distant, index utilisateur ni hook n’est utilisé.
+Reject a stale source snapshot before applying a refactoring to editor buffers.	Refuser un instantané périmé avant d’appliquer une transformation aux tampons de l’éditeur.
+Explicitly execute ResolveReferences and read evaluated Compile/ReferencePath/ProjectReference metadata. Custom MSBuild targets may run. Cache the model for editor requests until project configuration changes.	Exécuter explicitement ResolveReferences et lire les métadonnées Compile, ReferencePath et ProjectReference évaluées. Des cibles MSBuild personnalisées peuvent s’exécuter. Le modèle est conservé pour l’éditeur jusqu’au changement de configuration du projet.
+Snapshot of the in-memory .NET debug session, current pause and console.	État de la session de débogage .NET en mémoire, de la pause actuelle et de la console.
+Read or replace persistent C# source breakpoints while no debug session is active.	Consulter ou remplacer les points d’arrêt C# persistants lorsqu’aucune session de débogage n’est active.
+Build the startup C# project in Debug with portable PDB, or launch a verified modified-copy receipt with regenerated symbols, then launch NetCoreDbg. This job owns the session until it ends: cancel it to kill the adapter and application tree. Use separate debug_status/debug_control jobs while it runs. NetCoreDbg must be installed explicitly.	Compiler le projet C# de démarrage en Debug avec PDB portable, ou utiliser une copie modifiée vérifiée avec symboles régénérés, puis lancer NetCoreDbg. Cette tâche contrôle la session jusqu’à sa fin ; l’annuler arrête l’adaptateur et l’application. Utiliser des tâches debug_status et debug_control distinctes pendant la session. NetCoreDbg doit être installé explicitement.
+Continue, pause, step, stop, inspect threads/frames/locals or expand a variable. Paused commands require the current stopId to reject stale frame/variable handles. No arbitrary DAP requests, expression evaluation or attach to an existing process.	Continuer, mettre en pause, avancer, arrêter, examiner les threads, piles et variables locales ou développer une variable. À l’arrêt, les commandes exigent le stopId courant pour refuser les anciennes références. Les requêtes DAP arbitraires, l’évaluation d’expressions et le rattachement à un processus existant ne sont pas proposés.
+Source workspace, editable files and last build.	Espace source, fichiers modifiables et dernière compilation.
+Reconstruct an editable .NET solution, native executable/shared/static project, or Node/web/Electron source workspace. Report missing entry points, dependencies, exports and initialization rather than inventing recovered behavior.	Reconstruire une solution .NET modifiable, un projet natif exécutable ou de bibliothèque partagée/statique, ou un espace Node/web/Electron. Les points d’entrée, dépendances, exports et initialisations manquants sont signalés sans inventer le comportement récupéré.
+Attach an existing C#, VC++, CMake or multi-project solution folder to an analysis project.	Rattacher un dossier C#, VC++, CMake ou une solution de plusieurs projets à un projet d’analyse.
+Read a confined UTF-8 source file and its revision.	Lire un fichier source UTF-8 contenu dans l’espace de travail et sa révision.
+Save edited source atomically, refusing concurrent disk changes.	Enregistrer le texte modifié de façon atomique en refusant les modifications concurrentes du fichier sur disque.
+Search saved UTF-8 source files by literal text and return clickable file/line/column matches. Exclude build output and binary files; bound results and scan size.	Rechercher du texte littéral dans les sources UTF-8 enregistrées et obtenir les correspondances par fichier, ligne et colonne. Les sorties de compilation et fichiers binaires sont exclus ; le nombre de résultats et le volume lu sont bornés.
+Use installed SDK Roslyn for completion, definitions, references, diagnostics and reviewed semantic rename/format edits across source projects and unsaved buffers. Read project/reference metadata without executing user MSBuild targets or analyzers. Custom build targets/generators require a normal build for complete diagnostics.	Utiliser Roslyn du SDK installé pour la complétion, les définitions, références, diagnostics et aperçus de renommage ou formatage sémantiques, y compris dans les tampons non enregistrés. Les métadonnées sont lues sans exécuter les cibles MSBuild ni les analyseurs du projet. Une compilation reste nécessaire pour les cibles et générateurs personnalisés.
+Run cancellable .NET SDK, MSBuild, CMake/CTest or JavaScript/TypeScript/npm jobs; return output and file/line diagnostics. Run and test execute code. A native library needs an executable/test harness.	Exécuter des tâches annulables .NET SDK, MSBuild, CMake/CTest ou JavaScript/TypeScript/npm et obtenir leurs sorties et diagnostics par fichier et ligne. run et test exécutent du code. Une bibliothèque native nécessite un programme ou banc d’essai.
+Explicit npm ci from the recovered lockfile, with lifecycle scripts disabled. Native modules may still require ABI rebuilds.	Exécuter explicitement npm ci depuis le fichier de verrouillage récupéré, avec les scripts de cycle de vie désactivés. Les modules natifs peuvent encore nécessiter une recompilation adaptée à l’ABI.
+Read the last durable reconstruction report, build rounds, Git commits and scenario evidence.	Consulter le dernier rapport persistant de reconstruction, les cycles de compilation, les commits Git et les observations des scénarios.
+Create a workspace if necessary and perform up to ten build rounds. Optional AI source corrections use the configured provider, revision guards and private Git history. Compare original/rebuilt outputs, files, network and graphics with recorded scenarios. scenarios-matched applies only to observed scenarios; compiled-unverified is not equivalence.	Créer un espace source si nécessaire et effectuer jusqu’à dix cycles de compilation. Les corrections IA facultatives utilisent le fournisseur configuré, les contrôles de révision et l’historique Git privé. Comparer les sorties, fichiers, réseau et images avec les scénarios enregistrés. scenarios-matched ne couvre que ces observations ; compiled-unverified ne prouve pas l’équivalence.
+Compile a native x86/x64 PE replacement. Default mode verifies a leaf function in place; extended mode appends linked code/data, resolves existing functions/imports, merges x64 unwind tables and ASLR relocations, and redirects the original entry. Preserve the original signature/ABI.	Compiler un remplacement PE natif x86/x64. Le mode normal vérifie une fonction autonome à son emplacement ; le mode étendu ajoute code et données liés, résout les fonctions et imports existants, fusionne les tables d’exception x64 et les déplacements ASLR, puis redirige l’entrée originale. La signature et l’ABI doivent être conservées.
+Revalidate a prepared patch and write a separate EXE/DLL copy with checksum and receipt. Never overwrite the original or an existing output. Authenticode signatures are invalidated.	Revérifier le remplacement préparé et écrire une copie EXE/DLL distincte avec somme de contrôle et reçu. L’original et les sorties existantes ne sont jamais écrasés. Les signatures Authenticode deviennent invalides.
+List persistent verified patch receipts and the last completed copy run.	Lister les reçus persistants des copies vérifiées et la dernière exécution terminée.
+Execute a saved modified application copy after revalidating its hash and copied dependencies. Never run the original or load a DLL into the Tool. Stream stdout/stderr, kill the process tree on cancellation or timeout.	Exécuter une copie modifiée enregistrée après vérification de son empreinte et de ses dépendances copiées. L’original n’est pas exécuté et aucune DLL n’est chargée dans l’outil. Les flux stdout/stderr sont transmis ; une annulation ou expiration arrête tous les processus de la tâche.
+Read metadata tokens and exact method signatures without executing the assembly. Build the private dnlib helper from pinned, hash-locked NuGet dependencies when needed.	Lire les jetons de métadonnées et signatures exactes sans exécuter l’assembly. Si nécessaire, compiler l’outil dnlib privé depuis des dépendances NuGet fixées et vérifiées par empreinte.
+Build the edited C# project and replace a selected source method in a verified preview of the original assembly. Import isolated compiler-generated closures/local functions and async/iterator state machines. Remap IL and verify all existing other method bodies/tokens unchanged. Optionally import compatible new user-defined dependencies and emit remapped portable PDBs. Reject signature/layout/initializer changes, R2R and mixed mode.	Compiler le projet C# modifié et remplacer la méthode choisie dans un aperçu vérifié de l’assembly original. Importer sous des noms isolés les fermetures, fonctions locales et machines à états générées ; remapper l’IL et vérifier les autres corps et jetons. L’import de nouvelles dépendances compatibles et la production de PDB portables remappés sont facultatifs. Les changements de signature, disposition ou initialisation, R2R et le mode mixte sont refusés.
+Open a binary, assembly, archive, bytecode or shader file as a project (deduplicated by SHA256), detect its format and, by default, analyze it with the best installed engine.	Ouvrir un binaire, une assembly, une archive, du bytecode ou un shader comme projet dédupliqué par SHA-256. Détecter le format puis, par défaut, l’analyser avec le meilleur moteur installé.
+Analyze a project with an engine (Ghidra, native, ILSpy, Vineflower, JADX, Python, shader).	Analyser un projet avec un moteur : Ghidra, native, ILSpy, Vineflower, JADX, Python ou shader.
+Every project with its analyses.	Tous les projets avec leurs analyses.
+Format, architecture, sections, imports, exports, counts, shader reflection and notes.	Format, architecture, sections, imports, exports, compteurs, réflexion des shaders et notes.
+Delete a project and its analyses, caches and AI results. The original file is untouched.	Supprimer un projet, ses analyses, caches et résultats IA. Le fichier original est conservé.
+Functions, types or code units of an analysis, filtered and paginated.	Fonctions, types ou unités de code d’une analyse, avec filtre et pagination.
+One unit: signature, callers, callees, imports, strings, comment and local renames.	Détails d’une unité : signature, appelants, fonctions appelées, imports, chaînes, commentaire et noms locaux.
+Decompiled source (or disassembly) of one unit, with the user's renames and comments applied.	Source décompilée ou désassemblage d’une unité, avec les noms et commentaires de l’utilisateur.
+Callers, callees and imports of a unit.	Appelants, fonctions appelées et imports d’une unité.
+Strings found by the analysis, filtered and paginated.	Chaînes trouvées par l’analyse, avec filtre et pagination.
+Search function names, cached decompiled code and strings.	Rechercher dans les noms de fonctions, le code décompilé en cache et les chaînes.
+Rename a function/global (or, with function, a local identifier). Applied to every view.	Renommer une fonction ou un symbole global, ou un identifiant local si function est précisé. Le nom est appliqué dans toutes les vues.
+Attach a comment to a unit (empty text removes it).	Associer un commentaire à une unité ; un texte vide le supprime.
+Free-form notes for the whole project.	Notes libres pour l’ensemble du projet.
+Write every unit's code (annotations applied) as files: into the job workspace, or into destination when given. .NET can also produce a compilable C# project.	Écrire le code de chaque unité avec ses annotations dans les fichiers du dossier de tâche, ou dans destination si précisé. Pour .NET, un projet C# compilable peut aussi être produit.
+x86 / x86-64 / ARM64: decompile functions (and, by default, everything they call) with the built-in C decompiler into ONE C file meant to compile again (MSVC / clang): globals are initialised from the image, constants inlined, prototypes emitted. Empty functions = every exported function.	Sur x86, x86-64 et ARM64, décompiler les fonctions et, par défaut, leurs appels dans un seul fichier C destiné à être recompilé avec MSVC ou clang. Les variables globales sont initialisées depuis l’image, les constantes intégrées et les prototypes déclarés. Une liste functions vide sélectionne tous les exports.
+Extract what an executable carries: PyInstaller bundles (entry scripts and modules as .pyc), .NET single-file bundles (assemblies), UPX-packed files (unpacked original) and appended zip archives. Each extracted file can then be opened with open_file.	Extraire le contenu d’un exécutable : paquets PyInstaller avec scripts et modules .pyc, assemblies .NET regroupées, fichiers compressés UPX et archives ZIP ajoutées. Chaque fichier extrait peut ensuite être ouvert avec open_file.
+List the files of a previous extraction.	Lister les fichiers d’une extraction précédente.
+Find the PDB of a PE file (local folders, next to the original file, then the symbol server) and read its function names. Re-analyze afterwards to apply them.	Rechercher le PDB d’un PE dans les dossiers locaux, à côté de l’original puis sur le serveur de symboles, et lire les noms de fonctions. Relancer l’analyse pour les appliquer.
+PDB lookup: enable/disable, symbol server (HTTPS; empty = local folders only) and local folders.	Configurer la recherche PDB : activation, serveur HTTPS et dossiers locaux. Un serveur vide limite la recherche aux dossiers locaux.
+Engines with formats, licence and availability.	Moteurs avec formats, licence et disponibilité.
+Downloadable components (JDK, Ghidra, .NET, ILSpy, Vineflower, JADX, Python decompilers) with installed versions, system installs and overrides.	Composants téléchargeables : JDK, Ghidra, .NET, ILSpy, Vineflower, JADX et décompilateurs Python, avec versions privées, installations système et chemins personnalisés.
+Download the current release of a component from its official source, verify it (SHA256/SHA512 when published) and install it under runtime/engines.	Télécharger la version courante d’un composant depuis sa source officielle, la vérifier avec SHA-256 ou SHA-512 lorsque l’empreinte est publiée et l’installer dans runtime/engines.
+Remove a privately installed component version (system installs are never touched).	Supprimer une version d’un composant privé, sans modifier les installations système.
+Use a component already installed elsewhere (e.g. a Ghidra folder or a JDK). Empty clears it.	Utiliser un composant déjà installé ailleurs, par exemple Ghidra ou un JDK. Une valeur vide efface ce chemin personnalisé.
+Configured AI provider/model, availability of every provider and compile checkers.	Fournisseur et modèle IA configurés, disponibilité des fournisseurs et des outils de vérification de compilation.
+Choose the AI provider and model and the assistant limits. API keys are not accepted here; store them in the window (Options > AI) or in the provider environment variable.	Choisir le fournisseur, le modèle IA et les limites de l’assistant. Les clés d’API ne sont pas acceptées ici : les saisir dans Options > IA ou dans la variable d’environnement du fournisseur.
+Explain a function/unit in Markdown: summary, step by step, inputs/outputs, notable details.	Expliquer une fonction ou unité en Markdown : résumé, étapes, entrées, sorties et points particuliers.
+Propose names for the function and its variables (and a one-line comment); apply=true stores them as renames.	Proposer des noms pour la fonction et ses variables, avec un commentaire court. apply=true enregistre les noms proposés.
+Turn pseudo-code, disassembly or bytecode into clean compilable source in a target language, then compile-check it and let the AI repair errors.	Réécrire du pseudocode, du désassemblage ou du bytecode dans un langage cible, vérifier la compilation et laisser l’IA corriger les erreurs.
+Autonomously investigate, reconstruct, patch or port the selected project using live operation schemas and authenticated child jobs. Recovers from tool/build errors, installs missing official components when enabled, saves checkpoints and requires recorded validation before completion. Existing AI provider credentials are required.	Examiner, reconstruire, modifier ou porter le projet de façon autonome avec les schémas actuels des opérations et des tâches enfants authentifiées. Le parcours traite les erreurs, installe les composants officiels manquants si autorisé, enregistre des points de reprise et exige une validation observée avant de terminer. Un fournisseur IA doit être authentifié.
+Read persisted autonomous task progress and evidence, including after cancellation or a restart.	Consulter la progression et les observations enregistrées d’une tâche autonome, y compris après annulation ou redémarrage.
+Ask a question about the program. The assistant navigates the analysis with tools (list, decompile, xrefs, strings, search) and answers; conversations can be continued.	Poser une question sur le programme. L’assistant explore l’analyse avec les outils de liste, décompilation, références, chaînes et recherche, puis répond. Une conversation peut être poursuivie.
+Name many auto-named functions (FUN_*, sub_*) in one job and apply the names.	Nommer en une tâche plusieurs fonctions portant des noms automatiques FUN_* ou sub_*, puis appliquer les propositions.
+Conversations stored for a project.	Conversations enregistrées pour un projet.
+Turns of one conversation.	Messages d’une conversation.
+Installed version, configured repository, staged update and kept versions.	Version installée, dépôt configuré, mise à jour préparée et versions conservées.
+Set the GitHub repository (owner/name) that publishes CyDecompilator releases, and automatic checks.	Définir le dépôt GitHub owner/name qui publie les versions de CyDecompilator et configurer la recherche automatique.
+Ask GitHub for the latest application release.	Demander à GitHub la dernière version publiée de l’application.
+Download a release into runtime/updates and verify it (identity, runtime ABI, digest, compilation).	Télécharger une version dans runtime/updates et vérifier son identité, son ABI d’exécution, son empreinte et sa compilation.
+Activate the staged update (keeps the current app/ in runtime/backups; data/ is untouched). Restart afterwards.	Activer la mise à jour préparée en conservant l’ancien app/ dans runtime/backups et les données data/. Redémarrer ensuite l’application.
+Restore the app/ kept by the last update.	Restaurer le dossier app/ conservé lors de la dernière mise à jour.
+.NET only: also write a compilable C# project with ILSpy.	.NET uniquement : produire aussi un projet C# compilable avec ILSpy.
+A newer release exists.	Une version plus récente existe.
+AI settings.	Réglages IA.
+Absolute .c file to write. Empty = only returned.	Chemin absolu du fichier .c à écrire. Vide : retourner le texte seulement.
+Absolute HAR file path.	Chemin absolu du fichier HAR.
+Absolute application folder or artifact path.	Chemin absolu du dossier ou fichier de l’application.
+Absolute application folder, imported with modules and resources. Supply file OR directory.	Dossier absolu de l’application, importé avec modules et ressources. Fournir file ou directory, pas les deux.
+Absolute executable path.	Chemin absolu de l’exécutable.
+Absolute existing project folder.	Dossier absolu d’un projet existant.
+Absolute extracted game folder. Supply file OR directory.	Dossier absolu du jeu extrait. Fournir file ou directory, pas les deux.
+Absolute folder to write into (created if missing). Empty = job workspace.	Dossier absolu de sortie, créé si absent. Vide : dossier de la tâche.
+Absolute game file. Supply file OR directory.	Chemin absolu du fichier de jeu. Fournir file ou directory, pas les deux.
+Absolute native project folder containing its ReXGlue manifest; existing native-build.json is verified when present.	Dossier absolu du projet natif contenant son manifeste ReXGlue. Le fichier native-build.json est vérifié s’il existe.
+Absolute path of the file to open.	Chemin absolu du fichier à ouvrir.
+Action.	Action demandée.
+All added fields.	Tous les champs ajoutés.
+All added methods.	Toutes les méthodes ajoutées.
+All added types.	Tous les types ajoutés.
+All retained observations match.	Toutes les observations conservées concordent.
+All units.	Toutes les unités.
+Allow rename/comment tools.	Autoriser les outils de renommage et de commentaire.
+Also decompile every function they call.	Décompiler aussi toutes les fonctions appelées.
+Also install what it needs (e.g. the JDK for Ghidra).	Installer aussi ses prérequis, par exemple le JDK de Ghidra.
+Also search decompiled code.	Rechercher aussi dans le code décompilé.
+Analyses by engine.	Analyses regroupées par moteur.
+Analyses.	Analyses disponibles.
+Analysis engine.	Moteur d’analyse.
+Answer (Markdown).	Réponse en Markdown.
+Answer language for the AI.	Langue de réponse de l’IA.
+AnyPS5 library target OS.	Système cible des bibliothèques AnyPS5.
+Append linked code/data/unwind/ASLR tables and redirect the original entry. Supports calls and larger functions.	Ajouter le code, les données, les tables d’exception et les déplacements ASLR liés, puis rediriger l’entrée originale. Les appels et les fonctions plus grandes sont pris en charge.
+Application arguments.	Arguments de l’application.
+Application exit code.	Code de sortie de l’application.
+Application project.	Projet de l’application.
+Applied.	Modification appliquée.
+Apply bounded AI source repairs saved to Git.	Appliquer des corrections IA bornées et enregistrées dans Git.
+Apply renames and comments.	Appliquer les noms et commentaires.
+Apply the proposal.	Appliquer la proposition.
+Attached folder.	Dossier rattaché.
+Authenticated owning child jobs.	Tâches enfants authentifiées et contrôlées par la tâche principale.
+Available.	Disponible.
+Binary, unsupported or oversized files omitted.	Fichiers binaires, incompatibles ou trop volumineux exclus.
+Build configuration.	Configuration de compilation.
+Build portable symbols and remap selected/imported method sequence points into the patched assembly.	Produire des symboles portables et remapper les points de séquence des méthodes choisies ou importées dans l’assembly modifié.
+Build results, repair evidence, comparisons and Git commits.	Résultats de compilation, corrections observées, comparaisons et commits Git.
+Build the attached source project before preparing.	Compiler le projet rattaché avant la préparation.
+Build/repair/comparison rounds.	Cycles de compilation, correction et comparaison.
+C source containing the replacement function and optional helpers in extended mode.	Source C contenant la fonction de remplacement et, en mode étendu, ses auxiliaires facultatifs.
+C source.	Source C.
+C# source path relative to the workspace.	Chemin du fichier C# relatif à l’espace source.
+Callees.	Fonctions appelées.
+Callers.	Fonctions appelantes.
+Capture and compare behavior after a successful build.	Enregistrer et comparer le comportement après une compilation réussie.
+Check at start-up.	Vérifier au démarrage.
+Checkpoint id.	Identifiant du point de reprise.
+Checkpoint id; empty selects the latest task.	Identifiant du point de reprise ; vide pour la dernière tâche.
+Chromium only: render without a visible browser window.	Chromium uniquement : effectuer le rendu sans fenêtre visible.
+Code.	Code produit.
+Command arguments, including an absolute script path for Node.js.	Arguments de commande, avec le chemin absolu du script pour Node.js.
+Command.	Commande demandée.
+Comment text.	Texte du commentaire.
+Compile-check and repair.	Vérifier la compilation et corriger.
+Compiled replacement.	Remplacement compilé.
+Compiler/program output.	Sortie du compilateur ou du programme.
+Completion candidates and a single undoable source edit.	Suggestions de complétion et modification source unique annulable.
+Component id.	Identifiant du composant.
+Component status.	État du composant.
+Components.	Composants disponibles.
+Concrete requested task and representative scenarios.	Objectif précis et scénarios représentatifs.
+Configuration.	Configuration utilisée.
+Configured repository.	Dépôt configuré.
+Console output.	Sortie console.
+Content revision.	Révision du contenu.
+Continue this conversation.	Poursuivre cette conversation.
+Conversation id.	Identifiant de conversation.
+Conversations.	Conversations enregistrées.
+Conversion receipt id; empty selects latest.	Identifiant du reçu de conversion ; vide pour le dernier.
+Converted source.	Source convertie.
+Correlation limitations.	Limites du rapprochement.
+Created, modified and deleted files.	Fichiers créés, modifiés et supprimés.
+Current (original or renamed) name.	Nom actuel, original ou renommé.
+Current files saved before restoration.	Fichiers actuels sauvegardés avant restauration.
+Current pause generation.	Identifiant de génération de la pause actuelle.
+Current stack frames.	Appels de la pile actuelle.
+Current variable reference to expand.	Référence actuelle de la variable à développer.
+Current variables.	Variables actuelles.
+Currently open unit (context).	Unité actuellement ouverte, utilisée comme contexte.
+Decompile units not yet cached (slow on large binaries).	Décompiler les unités absentes du cache ; cette opération peut être lente sur les gros binaires.
+Deleted.	Suppression effectuée.
+Detected format.	Format détecté.
+Editable files.	Fichiers modifiables.
+Edited buffers, up to 200; disk files are unchanged.	Tampons modifiés, au maximum 200. Les fichiers sur disque ne sont pas modifiés.
+Editor action.	Action de l’éditeur.
+Enabled.	Activé.
+Engine id. Empty selects the analysed (or best available) engine for the file.	Identifiant du moteur. Vide : moteur déjà utilisé, ou meilleur moteur disponible pour le fichier.
+Engine options.	Options du moteur.
+Engine used.	Moteur utilisé.
+Engines.	Moteurs disponibles.
+Entry executable relative to the imported root. Empty selects a unique eboot or ELF.	Exécutable d’entrée relatif à la racine importée. Vide : sélection de l’unique eboot ou ELF.
+Ephemeral session id.	Identifiant de session temporaire.
+Evaluated projects.	Projets évalués.
+Evaluated source files.	Fichiers sources évalués.
+Evidence graph.	Graphe des éléments observés.
+Evidence nodes.	Nœuds des éléments observés.
+Evidence paths from matching nodes.	Chemins de relations depuis les nœuds correspondants.
+Exact expected stdout.	Sortie stdout exacte attendue.
+Exact renderer URL when multiple pages exist.	URL exacte du moteur de rendu si plusieurs pages existent.
+Executable relative to input root; empty selects the application entry.	Exécutable relatif à la racine d’entrée. Vide : point d’entrée de l’application.
+Executed copy.	Copie exécutée.
+Existing absolute SDK folder with bin/rexglue.exe; empty clears it.	Dossier absolu du SDK contenant bin/rexglue.exe. Vide : effacer le chemin configuré.
+Existing absolute directory path; empty clears it.	Chemin absolu d’un dossier existant. Vide : effacer le chemin configuré.
+Existing absolute file path; empty clears it.	Chemin absolu d’un fichier existant. Vide : effacer le chemin configuré.
+Exit code.	Code de sortie.
+Expanded variable members.	Membres de la variable développée.
+Expected process exit code.	Code de sortie attendu du processus.
+Explanation (Markdown).	Explication en Markdown.
+Explicit analysis limits.	Limites explicites de l’analyse.
+Explicit standalone homebrew only: no bundled executable modules. Never use for an incomplete game dump.	Mode explicite pour un programme amateur autonome sans modules exécutables associés. Ne pas l’utiliser pour un jeu extrait de façon incomplète.
+Explicitly allow removing an existing strong-name signature; may break dependent assemblies.	Autoriser explicitement la suppression d’une signature de nom fort existante ; les assemblies dépendantes peuvent cesser de fonctionner.
+Extra instructions for the rewrite.	Consignes supplémentaires de réécriture.
+Extracted files with their detected format.	Fichiers extraits et formats détectés.
+Extraction folder.	Dossier d’extraction.
+Extraction kind.	Type d’extraction.
+Feature text or symbol.	Texte fonctionnel ou symbole recherché.
+File written.	Fichier écrit.
+File/line diagnostics.	Diagnostics par fichier et ligne.
+Files written.	Fichiers écrits.
+Files.	Fichiers concernés.
+Filesystem differences.	Différences dans les fichiers.
+Final status.	État final.
+Finite stdin batch.	Entrée standard finie transmise en un lot.
+Finite text input.	Entrée texte finie.
+First capture id.	Identifiant de la première capture.
+First result.	Position du premier résultat.
+Folder or file of the existing installation; empty to clear.	Dossier ou fichier d’une installation existante. Vide : effacer ce choix.
+Folder written.	Dossier écrit.
+Folders searched for PDBs first.	Dossiers où rechercher les PDB en premier.
+Full commit id from history for compare/restore.	Identifiant complet du commit de l’historique pour compare ou restore.
+Functions (id, name or address). Empty = exported functions.	Fonctions désignées par identifiant, nom ou adresse. Vide : fonctions exportées.
+Functions to process.	Fonctions à traiter.
+Ghidra: auto-analysis timeout, seconds.	Ghidra : délai maximal de l’analyse automatique, en secondes.
+Ghidra: decompiler timeout per function, seconds.	Ghidra : délai maximal de décompilation par fonction, en secondes.
+Ghidra: functions decompiled during analysis; others on demand.	Ghidra : nombre de fonctions décompilées pendant l’analyse ; les autres le sont sur demande.
+Ghidra: language id for raw binaries, e.g. ARM:LE:32:v8 or x86:LE:64:default.	Ghidra : identifiant du langage des binaires bruts, par exemple ARM:LE:32:v8 ou x86:LE:64:default.
+Graphical driver.	Pilote d’interaction graphique.
+Guide language.	Langue du guide.
+HTTP/TCP and console differences.	Différences HTTP/TCP et console.
+History action.	Action de l’historique.
+Hits.	Occurrences trouvées.
+Id from debug_status.	Identifiant obtenu avec debug_status.
+Ignore the cache and decompile again.	Ignorer le cache et décompiler à nouveau.
+Immutable prepared input identifier.	Identifiant de l’entrée préparée immuable.
+Import new reachable user-defined methods/types and compatible fields; existing constructors/layouts remain protected.	Importer les nouvelles méthodes et types accessibles définis par l’utilisateur, ainsi que les champs compatibles. Les constructeurs et dispositions existants restent protégés.
+Include AnyPS5 startup dependency diagnostics (Windows only).	Inclure les diagnostics des dépendances au démarrage d’AnyPS5, sous Windows uniquement.
+Initial fullscreen setting; saved in-game settings may override it.	Réglage initial du plein écran ; les paramètres enregistrés dans le jeu peuvent le remplacer.
+Input ELF, plaintext SELF, ZIP or application container. Supply file OR directory.	Entrée ELF, SELF en clair, ZIP ou conteneur d’application. Fournir file ou directory, pas les deux.
+Install missing official engine components for this task.	Installer les composants officiels manquants pour cette tâche.
+Install status.	État de l’installation.
+Installed components.	Composants installés.
+Installed version.	Version installée.
+Instrument imports for explicit bounded runtime tracing (Windows only).	Instrumenter les imports pour une trace d’exécution explicite et bornée, sous Windows uniquement.
+Isolated generated methods added by this replacement.	Méthodes générées isolées ajoutées par ce remplacement.
+Isolated generated types added by this replacement.	Types générés isolés ajoutés par ce remplacement.
+JADX: Java heap in MiB.	JADX : taille du tas Java en Mio.
+JADX: decode AndroidManifest.xml and resources.	JADX : décoder AndroidManifest.xml et les ressources.
+JADX: rename obfuscated short names.	JADX : renommer les noms courts obscurcis.
+Language of the code.	Langage du code.
+Last run result.	Résultat de la dernière exécution.
+Latest commit.	Dernier commit.
+Let the assistant rename and comment when asked.	Autoriser l’assistant à renommer et commenter sur demande.
+Limit the number of units (0 = all).	Limiter le nombre d’unités ; 0 pour toutes.
+Literal single-line text, maximum 256 characters.	Texte littéral sur une ligne, limité à 256 caractères.
+Load PDB symbols during analysis.	Charger les symboles PDB pendant l’analyse.
+Locals.	Variables locales.
+Match letter case.	Respecter la casse.
+Match whole words.	Rechercher des mots entiers.
+Matches.	Correspondances trouvées.
+Matching inputs, initial files and graphical scenario.	Entrées, fichiers initiaux et scénario graphique identiques.
+Matching units.	Unités correspondantes.
+Maximum build rounds.	Nombre maximal de cycles de compilation.
+Maximum capture seconds.	Durée maximale d’enregistrement, en secondes.
+Maximum child operation duration in seconds.	Durée maximale d’une opération enfant, en secondes.
+Maximum debug session duration in seconds.	Durée maximale de la session de débogage, en secondes.
+Maximum discovered functions inspected for instructions.	Nombre maximal de fonctions découvertes dont examiner les instructions.
+Maximum expanded application and extraction scratch bytes (256 GiB by default). Runtime file staging accepts up to 1 TiB.	Taille maximale, en octets, de l’application déployée et des fichiers temporaires d’extraction : 256 Gio par défaut. Le transfert de fichiers du Runtime accepte jusqu’à 1 Tio.
+Maximum game session seconds; cancel the job to stop sooner.	Durée maximale de session du jeu, en secondes. Annuler la tâche pour l’arrêter plus tôt.
+Maximum hits.	Nombre maximal d’occurrences.
+Maximum input/expanded game bytes.	Taille maximale, en octets, de l’entrée ou du jeu déployé.
+Maximum matches.	Nombre maximal de correspondances.
+Maximum results.	Nombre maximal de résultats.
+Maximum returned nodes.	Nombre maximal de nœuds retournés.
+Maximum run duration in seconds.	Durée maximale d’exécution, en secondes.
+Maximum seconds per scenario.	Durée maximale de chaque scénario, en secondes.
+Maximum tokens per reply.	Nombre maximal de jetons par réponse.
+Maximum tool decisions per invocation.	Nombre maximal de décisions d’outils par appel.
+Metadata token returned by managed_methods, e.g. 0x06000001.	Jeton de métadonnées obtenu avec managed_methods, par exemple 0x06000001.
+Methods and metadata tokens.	Méthodes et jetons de métadonnées.
+Model id (empty = provider default).	Identifiant du modèle ; vide pour le modèle par défaut du fournisseur.
+Modified copy receipts.	Reçus des copies modifiées.
+Modified copy.	Copie modifiée.
+More results or scan limit reached.	D’autres résultats existent ou la limite de lecture est atteinte.
+Named functions.	Fonctions nommées.
+Native project id; empty selects latest.	Identifiant du projet natif ; vide pour le dernier.
+Native project target.	Cible du projet natif.
+Native root functions; empty selects exports or entry point.	Fonctions natives de départ ; vide pour les exports ou le point d’entrée.
+Native run: executable relative to workspace. Electron: absolute runtime executable.	Programme natif : exécutable relatif à l’espace source. Electron : chemin absolu du moteur d’exécution.
+Navigate the owned renderer to this URL.	Ouvrir cette URL dans le moteur de rendu contrôlé par la tâche.
+New C# identifier for action=rename.	Nouvel identifiant C# pour action=rename.
+New absolute folder; empty = persistent project/source.	Nouveau dossier absolu ; vide pour le dossier source persistant du projet.
+New absolute output filename; empty = persistent project patches/output.	Nouveau fichier de sortie absolu ; vide pour patches/output dans le projet persistant.
+New absolute reconstruction folder if no workspace exists.	Nouveau dossier absolu de reconstruction si aucun espace source n’existe.
+New content revision.	Nouvelle révision du contenu.
+New identifier.	Nouvel identifiant.
+New native target.	Nouvelle cible native.
+Notes (Markdown).	Notes en Markdown.
+Observed network and UI evidence.	Observations du réseau et de l’interface.
+One argument.	Un argument.
+One-based Unicode character column.	Colonne en caractères Unicode, à partir de 1.
+One-based source line.	Ligne source, à partir de 1.
+Only functions with generated names.	Uniquement les fonctions portant un nom généré.
+Only this kind (function, class, entry, code...).	Uniquement ce type d’unité : function, class, entry, code, etc.
+Optional .csproj/.vcxproj path relative to the solution folder; run requires a startup project.	Chemin .csproj ou .vcxproj facultatif relatif au dossier de solution. run exige un projet de démarrage.
+Optional ASCII C++ project identifier.	Identifiant ASCII facultatif du projet C++.
+Optional C symbol to original virtual address mapping; only analyzed functions/exports/IAT slots.	Correspondances facultatives entre symboles C et adresses virtuelles originales, limitées aux fonctions analysées, exports et entrées IAT.
+Optional analyzed native application entry function.	Fonction d’entrée native analysée, facultative.
+Optional built .dll relative to workspace for multi-target/custom output projects.	DLL compilée facultative, relative à l’espace source pour les projets multicibles ou à sortie personnalisée.
+Optional category id returned by unreal_rules.	Identifiant de catégorie facultatif obtenu avec unreal_rules.
+Optional declaring type filter.	Filtre facultatif sur le type déclarant.
+Optional existing native GPU plugin DLL; empty clears it.	DLL facultative d’un module GPU natif existant. Vide : effacer le chemin configuré.
+Optional folder copied into the working directory.	Dossier facultatif à copier dans le répertoire de travail.
+Optional frame to inspect.	Appel de pile facultatif à examiner.
+Optional native application entry function.	Fonction d’entrée native facultative de l’application.
+Optional owning .csproj path; empty selects the file owner.	Chemin facultatif du .csproj propriétaire. Vide : choisir le projet du fichier.
+Optional replacement list of {path,line}, relative to the source workspace; at most 200.	Liste de remplacement facultative de couples {path,line}, relatifs à l’espace source, limitée à 200 entrées.
+Optional replay and network recording.	Rejeu et observation réseau facultatifs.
+Optional startup/source .csproj relative to the solution folder.	Projet .csproj de démarrage ou source facultatif, relatif au dossier de solution.
+Optional thread to inspect.	Thread facultatif à examiner.
+Optional verified modified-copy receipt: debug its regenerated symbols without rebuilding.	Reçu facultatif d’une copie modifiée vérifiée : déboguer ses symboles régénérés sans recompiler.
+Optional {path,line} breakpoints; otherwise use saved breakpoints.	Points d’arrêt facultatifs {path,line} ; sinon utiliser les points enregistrés.
+Original preserved.	Original conservé.
+Original size.	Taille d’origine.
+Other methods verified unchanged.	Autres méthodes vérifiées inchangées.
+Output OS.	Système de sortie.
+Output diffs.	Différences de sortie.
+Output hash.	Empreinte de sortie.
+Override the configured AI provider for this call.	Remplacer le fournisseur IA configuré pour cet appel.
+Override the model id for this call (empty = configured/default).	Remplacer le modèle pour cet appel. Vide : modèle configuré ou par défaut.
+PE files: load PDB debug symbols (local folders, then the configured symbol server) and apply their names (native engine and Ghidra).	Pour les PE, charger les symboles PDB depuis les dossiers locaux puis le serveur configuré, et appliquer les noms avec les moteurs native et Ghidra.
+Page size.	Nombre d’éléments par page.
+Parallel compiler processes.	Nombre de processus de compilation parallèles.
+Pause at the entry point.	S’arrêter au point d’entrée.
+Pause generation from debug_status.	Génération de pause obtenue avec debug_status.
+Per-function results.	Résultats par fonction.
+Per-provider options: {"ollama": {"base_url": "..."}}; keys: base_url, timeout_seconds, executable.	Options par fournisseur, par exemple {"ollama": {"base_url": "..."}}. Clés : base_url, timeout_seconds et executable.
+Per-step state and screenshot differences.	Différences d’état et de capture à chaque étape.
+Persistent recording id.	Identifiant persistant d’enregistrement.
+Plan id returned by patch_prepare or managed_patch_prepare.	Identifiant de plan obtenu avec patch_prepare ou managed_patch_prepare.
+Prepared input id; empty selects latest.	Identifiant de l’entrée préparée ; vide pour la dernière.
+Prepared input id; empty selects the latest.	Identifiant de l’entrée préparée ; vide pour la dernière entrée.
+Prepared plan id.	Identifiant du plan préparé.
+Preview edits with before/text; apply only if every buffer remains unchanged.	Aperçus de modifications before/text. Appliquer uniquement si tous les tampons sont restés inchangés.
+Probe providers (spawns CLIs / contacts endpoints).	Vérifier les fournisseurs en lançant leurs commandes ou en contactant leurs adresses.
+Probe the system again.	Détecter à nouveau les outils du système.
+Process observation completed within limits.	Observation du processus terminée dans les limites prévues.
+Project id returned by open_file or list_projects.	Identifiant de projet obtenu avec open_file ou list_projects.
+Project id.	Identifiant de projet.
+Project model limitations.	Limites du modèle de projet.
+Projects.	Projets disponibles.
+Proposed function name.	Nom de fonction proposé.
+Proposed variable names.	Noms de variables proposés.
+Provider id.	Identifiant du fournisseur.
+Providers.	Fournisseurs disponibles.
+Question.	Question posée.
+Re-analyze even if an analysis already exists.	Relancer l’analyse même si elle existe déjà.
+Re-analyze even if done.	Relancer l’analyse même si elle est terminée.
+Re-export the dossier.	Exporter à nouveau le dossier d’analyse.
+Rebuilt assembly path relative to source workspace; empty = unique matching bin output.	Chemin de l’assembly recompilée relatif à l’espace source. Vide : unique sortie correspondante dans bin.
+Receipt id returned by patch_apply or patch_outputs.	Identifiant de reçu obtenu avec patch_apply ou patch_outputs.
+Reconstruction knowledge profile.	Profil de connaissances de reconstruction.
+Reconstruction status.	État de reconstruction.
+Recording id.	Identifiant d’enregistrement.
+Recordings.	Enregistrements disponibles.
+Regenerated portable PDB available.	PDB portable régénéré disponible.
+Relationship distance.	Distance entre les relations.
+Relationships.	Relations entre éléments.
+Relative C# source path.	Chemin relatif du fichier source C#.
+Relative executable path when several entries are present.	Chemin relatif de l’exécutable lorsque plusieurs entrées existent.
+Relative file path inside the workspace.	Chemin relatif du fichier dans l’espace source.
+Relative file path.	Chemin relatif du fichier.
+Relative filename to UTF-8 text; same setup for both versions.	Correspondances de noms de fichiers relatifs vers leurs textes UTF-8 ; préparation identique pour les deux versions.
+Relative snapshot path.	Chemin relatif dans l’instantané.
+Release tag; empty = latest.	Étiquette de version ; vide pour la dernière.
+Removed versions.	Versions supprimées.
+Repair rounds after a failed compile check.	Nombre de cycles de correction après échec du contrôle de compilation.
+Replacement C function name.	Nom de la fonction C de remplacement.
+Replacement IL.	IL de remplacement.
+Replacement {path,line} list for action=breakpoints.	Liste {path,line} de remplacement pour action=breakpoints.
+Restored.	Restauration effectuée.
+Result with evidence and remaining limits.	Résultat avec observations et limites restantes.
+Result.	Résultat obtenu.
+Resume an existing checkpoint with the same objective/workflow.	Reprendre un point enregistré avec le même objectif et le même parcours.
+Revision returned by workspace_read; empty creates a new file.	Révision obtenue avec workspace_read ; une valeur vide crée un nouveau fichier.
+Rewrite AMD-specific instructions supported by the selected converter.	Réécrire les instructions propres à AMD prises en charge par le convertisseur choisi.
+Root functions.	Fonctions de départ.
+Roslyn errors and warnings.	Erreurs et avertissements Roslyn.
+Run arguments.	Arguments d’exécution.
+Run the analysis immediately.	Lancer immédiatement l’analyse.
+Run the recovered project tests.	Exécuter les tests du projet récupéré.
+Sample owned TCP connections and record selected renderer HTTP metadata.	Échantillonner les connexions TCP des processus contrôlés et enregistrer les métadonnées HTTP du moteur de rendu sélectionné.
+Sampling temperature (null = default).	Température d’échantillonnage ; null pour la valeur par défaut.
+Saved Git versions.	Versions Git enregistrées.
+Saved breakpoints.	Points d’arrêt enregistrés.
+Saved conversion attempt; empty selects latest matching input.	Tentative de conversion enregistrée ; vide pour la dernière correspondant à l’entrée.
+Saved file.	Fichier enregistré.
+Saved settings.	Réglages enregistrés.
+Saved-file revision.	Révision du fichier enregistré.
+Search again even if symbols were already looked up.	Relancer la recherche même si les symboles ont déjà été recherchés.
+Second capture id.	Identifiant de la seconde capture.
+Semantic references.	Références sémantiques.
+Separate backend to install.	Outil externe à installer séparément.
+Server-checked completion proof.	Preuve d’achèvement vérifiée par le serveur.
+Session id.	Identifiant de session.
+Session status.	État de session.
+Snapshot description, up to 500 characters.	Description de l’instantané, limitée à 500 caractères.
+Snapshot file digest.	Empreinte du fichier de l’instantané.
+Snapshot unchanged.	Instantané inchangé.
+Source declarations.	Déclarations source.
+Source definition locations.	Emplacements des définitions dans les sources.
+Source directory.	Dossier source.
+Source matches.	Correspondances dans les sources.
+Source revision from rename/format preview.	Révision source de l’aperçu de renommage ou de formatage.
+Source text.	Texte source.
+Specific successful conversion; overrides latest attempt.	Conversion réussie précise, prioritaire sur la dernière tentative.
+Stack frames.	Appels de la pile.
+Staged and verified.	Préparation et vérification terminées.
+Startup .csproj relative to the source workspace.	Projet .csproj de démarrage relatif à l’espace source.
+Startup project relative to workspace for multi-project .NET solutions.	Projet de démarrage relatif à l’espace source pour les solutions .NET de plusieurs projets.
+Static and observed evidence.	Informations statiques et observations d’exécution.
+Stop the owned target after the scenario, including a failed step.	Arrêter la cible contrôlée après le scénario, même si une étape échoue.
+Stored comment.	Commentaire enregistré.
+Stored notes.	Notes enregistrées.
+Strings.	Chaînes de caractères.
+Strong-name signed.	Signé avec un nom fort.
+Substring filter on id/name/address.	Filtre de sous-chaîne sur identifiant, nom ou adresse.
+Substring filter.	Filtre de sous-chaîne.
+Symbol server URL, e.g. https://msdl.microsoft.com/download/symbols; empty = none.	URL du serveur de symboles, par exemple https://msdl.microsoft.com/download/symbols ; vide pour aucun serveur.
+Target language; same keeps the source language (asm -> C).	Langage cible ; same conserve le langage source, sauf asm qui devient C.
+Task effects and completion proof.	Effets de la tâche et preuve d’achèvement.
+Task state.	État de la tâche.
+Text diffs or binary change markers.	Différences texte ou marqueurs de modifications binaires.
+Text to find (case-insensitive).	Texte recherché sans distinction de casse.
+Text.	Texte fourni.
+Tool calls allowed per question.	Nombre d’appels d’outils autorisés par question.
+Tool calls.	Appels d’outils.
+Tool decisions and actual results.	Décisions d’outils et résultats réels.
+Trace instrumented calls: all or comma-separated library names. Requires conversion with traceImports=true.	Tracer les appels instrumentés : all ou noms de bibliothèques séparés par des virgules. Exige une conversion avec traceImports=true.
+Transport for agent CLIs (empty = preferred).	Transport des lignes de commande des agents ; vide pour le choix préféré.
+Turns.	Messages de conversation.
+Types, instructions, references and value dependencies.	Types, instructions, références et dépendances de valeurs.
+UTF-8 source text.	Texte source UTF-8.
+UltraPack: build its package helper; requires .NET SDK 9+.	UltraPack : compiler son outil de paquets ; exige le SDK .NET 9 ou ultérieur.
+Unit details.	Détails de l’unité.
+Unit for a local rename; empty for a global rename.	Unité du renommage local ; vide pour un renommage global.
+Unit to use: function id, original or renamed name, or address (0x401000). For .NET/Java units are fully qualified type names; shaders use the entry point name.	Unité désignée par identifiant de fonction, nom original ou renommé, ou adresse comme 0x401000. En .NET/Java, utiliser le nom de type qualifié ; pour un shader, son point d’entrée.
+Units.	Unités de code.
+Unsaved source text.	Texte source non enregistré.
+Unverified behavior and missing evidence.	Comportement non vérifié et observations manquantes.
+Up to 30 click/fill/wait/assertText/snapshot steps; CSS selectors for web, selector object with automationId/name/controlType for Windows. Windows also toggle/select; web also press/navigate.	Jusqu’à 30 étapes click, fill, wait, assertText ou snapshot. Utiliser des sélecteurs CSS pour le web et un objet automationId/name/controlType pour Windows. Windows propose aussi toggle/select ; le web propose press/navigate.
+Up to ten scenarios: name, arguments, stdin, timeout, seedFiles, assetsDirectory, observation (same behavior_capture contract), runtimeExecutable (absolute Electron/Chromium runtime), optional originalExecutable/originalArguments, rebuiltExecutable (relative to workspace)/rebuiltArguments, checks {stdout,stderr,exitCode,files,network,graphics} (default all true), normalizeApplicationPaths (default true for Electron file URLs). Empty chooses an inferred scenario if runnable.	Jusqu’à dix scénarios : name, arguments, stdin, timeout, seedFiles, assetsDirectory, observation selon behavior_capture, runtimeExecutable absolu Electron/Chromium, originalExecutable/originalArguments facultatifs, rebuiltExecutable relatif à l’espace source et rebuiltArguments. checks contrôle stdout, stderr, exitCode, files, network et graphics, tous activés par défaut. normalizeApplicationPaths vaut true par défaut pour les URL file Electron. Une liste vide choisit un scénario déduit si l’exécution est possible.
+Usable now.	Utilisable maintenant.
+Use the built-in C engine to diagnose converter failures and return a bounded evidence dossier.	Utiliser le moteur C intégré pour diagnostiquer les erreurs du convertisseur et retourner un dossier d’analyse borné.
+Verified Halo profile: reserve keyboard/mouse for player 1 and first controller for player 2.	Profil Halo vérifié : réserver clavier et souris au joueur 1, et la première manette au joueur 2.
+Verified patch plan.	Plan de remplacement vérifié.
+Verified screenshot paths.	Chemins des captures vérifiées.
+Version to remove; empty removes every private version.	Version à supprimer ; vide pour supprimer toutes les versions privées.
+View produced.	Vue produite.
+Wait after each step before recording state.	Attendre après chaque étape avant d’enregistrer son état.
+Workspace differs from latest version.	L’espace source diffère de la dernière version.
+Workspace revision returned by compare; required for restore.	Révision de l’espace source obtenue par compare, nécessaire à restore.
+completed, blocked, budget-exhausted, cancelled or failed.	État completed, blocked, budget-exhausted, cancelled ou failed.
+decompiled source or disassembly/bytecode.	Source décompilée, désassemblage ou bytecode.
+global or the unit id.	global ou identifiant de l’unité.
+idle, building, starting, running, paused, terminated, failed or cancelled.	État idle, building, starting, running, paused, terminated, failed ou cancelled.
+javascript.	Langage javascript.
+npm output.	Sortie npm.
+owner/name, or empty to clear.	Valeur owner/name ; vide pour effacer le réglage.
+passed or failed (exit code, not behavior equivalence).	État passed ou failed selon le code de sortie, sans preuve d’équivalence du comportement.
+passed, failed or no-tests.	État passed, failed ou no-tests.
+passed, failed, unavailable or skipped.	État passed, failed, unavailable ou skipped.
+prepared	État prepared.
+pyinstaller, dotnet-bundle, upx or zip-overlay; empty = first detected.	Type pyinstaller, dotnet-bundle, upx ou zip-overlay ; vide pour le premier détecté.
+scenarios-matched, compiled-unverified, compilation-failed, tests-failed, behavior-differs, blocked or cancelled.	État scenarios-matched, compiled-unverified, compilation-failed, tests-failed, behavior-differs, blocked ou cancelled.

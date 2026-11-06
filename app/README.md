@@ -13,11 +13,13 @@ CyDoc HTML reader, also shipped offline with the application.
 The **Documentation** page, command palette, contextual **F1** and Xbox guide button
 open the bundled CyDoc reader through validated `file://` links in `documentation.py`.
 `documentation_ui.py` provides the native chapter/language selector and launch errors.
-The complete `help/` export ships 22 EN/FR chapters, screenshots, SVG workflows,
-technical appendices, operation contracts and an allowlisted Python source index.
+The complete `Documentation/` export opens through `Documentation.html`. It ships
+22 EN/FR task chapters, nested navigation, screenshots, SVG workflows and public
+operation/help-link API references. `DocAI.md` is separate from the human reader.
+Authoring and tooling live in `.CyDocBuild/`, which is excluded from release packages.
 Reading needs no Node, server, internet or open project. English is the default,
 French is retained, and old chapter/heading inputs use a compatibility map.
-See [authoring and packaging](../docs/cydoc/README.md) and `tests/test_documentation.py`.
+See [authoring and packaging](.CyDocBuild/README.md) and `tests/test_documentation.py`.
 No engine/job/permission contract is added; the existing UI already opens system URLs.
 
 The window ships **CyUI 1.2's modular Python port for imgui_bundle**, pinned to

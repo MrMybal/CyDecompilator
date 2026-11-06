@@ -1,4 +1,4 @@
-"""Offline export, real contracts, safe local routing and native help integration."""
+"""Shipped bilingual reader, API-only references, offline routes and packaging."""
 import hashlib
 import importlib.util
 import json
@@ -9,143 +9,174 @@ import sys
 from types import SimpleNamespace, MethodType
 from urllib.parse import urlsplit, parse_qs
 import zipfile
-
 import pytest
 
 APP = Path(__file__).resolve().parents[1]
 ROOT = APP.parent
+DOCS = APP / '.CyDocBuild'
+SITE = APP / 'Documentation'
 sys.path.insert(0, str(APP))
 from documentation import Documentation
-
 
 def load_json(path):
     return json.loads(path.read_text(encoding='utf-8'))
 
-
 def builder():
-    spec = importlib.util.spec_from_file_location('documentation_build', APP / 'scripts/build_documentation.py')
+    spec = importlib.util.spec_from_file_location('documentation_build', DOCS / 'build.py')
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
 
-
-def test_export_hashes_are_current_and_all_resources_are_distributed():
+def test_export_hashes_layout_and_local_resources():
     builder().check_current()
-    metadata = load_json(APP / 'help/build-info.json')
-    assert len(metadata['outputs']) >= 13
-    assert (APP / 'help/CyDoc-LICENSE.txt').read_text().startswith('MIT License')
-    assert {p.name for p in (APP / 'help').glob('media-*.js')} == {'media-image.js'}
-    assert 'type="module"' not in (APP / 'help/index.html').read_text()
-    scripts = re.findall(r'<script[^>]*src="([^"]+)"', (APP / 'help/index.html').read_text())
-    assert set(scripts) == {'data.js', 'compatibility.js', 'viewer.js'}
-    assert not (ROOT / 'runtime/documentation-tools/node_modules/three').exists()
+    assert (SITE / 'DocAI.md').is_file()
+    assert (SITE / 'DocData/CyDoc-LICENSE.txt').read_text().startswith('MIT License')
+    assert {p.name for p in (SITE / 'DocData').glob('media-*.js')} == {'media-image.js'}
+    html = (SITE / 'Documentation.html').read_text()
+    assert 'type="module"' not in html and '<iframe' not in html
+    assert set(re.findall(r'<script[^>]*src="([^"]+)"', html)) == {
+        'DocData/data.js', 'DocData/compatibility.js', 'DocData/viewer.js'}
+    assert not (DOCS / 'node_modules/three').exists()
+    assert not any(p.name in {'build-info.json','migration-report.json'} for p in SITE.rglob('*'))
 
-
-def test_common_ids_anchors_media_and_tracked_chapter_translations():
+def test_complete_translations_stable_anchors_media_and_navigation_tree():
     docs = Documentation()
-    manifest = load_json(APP / 'help/manifest.json')
-    pages = {(page['locale'], page['id']): page for page in manifest['pages']}
+    data = load_json(SITE / 'DocData/manifest.json')
+    pages = {(p['locale'],p['id']):p for p in data['pages']}
+    ids = {p['id'] for p in data['pages']}
+    assert data['defaultLocale'] == 'en' and [l['code'] for l in data['locales']] == ['en','fr']
     assert len(docs.routes['chapters']) == 22
-    for chapter in docs.routes['chapters']:
-        identifier = chapter['id']
-        en, fr = pages['en', identifier], pages['fr', identifier]
-        assert [h['id'] for h in en['headings']] == [h['id'] for h in fr['headings']]
+    for identifier in ids:
+        en,fr = pages['en',identifier],pages['fr',identifier]
         assert fr['sourceRevision'] == en['revision']
+        assert en['description'] and fr['description']
+        assert [h['id'] for h in en['headings']] == [h['id'] for h in fr['headings']]
+        assert en.get('parent') == fr.get('parent')
+        if en.get('parent'): assert en['parent'] in ids
         assert docs.routes['pages'][identifier]['media']['en'] == docs.routes['pages'][identifier]['media']['fr']
-    report = load_json(APP / 'help/translation-report.json')
-    assert not report['missing'] and not report['outdated']
-    assert report['untracked']  # Original-language technical references are never falsely reviewed.
+    assert pages['en','op-reconstruction-run']['parent'] == 'api-projects'
+    assert pages['en','api-projects']['parent'] == 'operation-api'
+    assert pages['en','native']['parent'] == 'workspace'
+    report = load_json(SITE / 'DocData/translation-report.json')
+    assert not report['missing'] and not report['outdated'] and not report['untracked']
+    assert report['current'] == len(ids)
 
+def test_public_operations_retain_schemas_with_translated_descriptions():
+    data = load_json(SITE / 'DocData/manifest.json')
+    for operation in load_json(APP / 'CyTool.json')['operations']:
+        identifier='op-'+operation['id'].replace('_','-')
+        en,fr=[next(p for p in data['pages'] if p['id']==identifier and p['locale']==loc) for loc in ('en','fr')]
+        # Signature is the first code block; the contract follows it.
+        contract=json.loads(en['code'][en['code'].index('{\n  \"id\":'):])
+        translated=json.loads(fr['code'][fr['code'].index('{\n  \"id\":'):])
+        assert contract['inputSchema']==operation['inputSchema']
+        assert contract['outputSchema']==operation['outputSchema']
+        assert operation['description'] in en['text'] and operation['description'] not in fr['text']
+        def remove_descriptions(value):
+            if isinstance(value,dict): return {k:remove_descriptions(v) for k,v in value.items() if k!='description'}
+            if isinstance(value,list): return [remove_descriptions(v) for v in value]
+            return value
+        assert remove_descriptions(contract)==remove_descriptions(translated)
+        assert en['symbol']==fr['symbol']==operation['id']
 
-def test_every_declared_operation_keeps_its_complete_contract():
-    operations = load_json(APP / 'CyTool.json')['operations']
-    data = load_json(APP / 'help/manifest.json')
-    for operation in operations:
-        identifier = 'op-' + operation['id'].replace('_', '-')
-        for locale in ('en', 'fr'):
-            page = next(page for page in data['pages'] if page['id'] == identifier and page['locale'] == locale)
-            # CyDoc retains raw code text in the manifest, independently of syntax highlighting.
-            assert json.loads(page['code']) == operation
+def test_new_untranslated_contract_description_stops_generation(tmp_path):
+    manifest=load_json(APP/'CyTool.json')
+    manifest['operations'][0]['inputSchema']['properties']['newField']={'type':'string','description':'Untranslated new API meaning.'}
+    with pytest.raises(KeyError):builder().generate_api(tmp_path,manifest)
 
+def test_public_parameter_examples_match_the_installed_api():
+    import jsonschema
+    operations={operation['id']:operation for operation in load_json(APP/'CyTool.json')['operations']}
+    for name,example in load_json(DOCS/'api-examples.json').items():
+        jsonschema.Draft202012Validator(operations[name]['inputSchema']).validate(example)
 
-def test_technical_sources_preserved_with_auditable_hashes_and_no_private_indexing():
-    audit = load_json(APP / 'help/migration-report.json')
-    expected = {p.relative_to(ROOT).as_posix() for p in builder().references()}
-    assert {entry['source'] for entry in audit['references']} == expected
-    for entry in audit['references']:
-        assert builder().source_digest(ROOT / entry['source']) == entry['sha256']
-        assert entry['translation'] == 'original-language-unreviewed'
-    assert audit['sourceAllowlist'] == list(builder().SOURCE_FILES)
-    sources = [page for page in load_json(APP / 'help/manifest.json')['pages'] if page.get('kind') == 'source']
-    assert len(sources) == 2 * len(builder().SOURCE_FILES)
-    assert not any(word in page['source'].lower() for page in sources for word in ('credentials', 'runtime/', 'data/', 'vendor/'))
+def test_legacy_entry_points_preserve_the_language_and_section_fragment():
+    for entry in (SITE/'index.html',APP/'help/index.html'):
+        text=entry.read_text('utf-8')
+        assert 'location.search + location.hash' in text and 'Documentation.html' in text
+    assert list((APP/'help').iterdir())==[APP/'help/index.html']
 
+def test_agent_instructions_reports_and_implementations_are_not_human_content():
+    data=load_json(SITE/'DocData/manifest.json')
+    ids={p['id'] for p in data['pages']}
+    assert not ids.intersection({'source-policy','translation-report','technical-references'})
+    assert not any(p['id'].startswith(('source-','ref-')) or p.get('kind')=='source' for p in data['pages'])
+    for page in data['pages']:
+        assert 'def topic_for_context' not in page['text']
+        assert 'migration-report.json' not in page['text'] and 'build_documentation.py' not in page['text']
+        assert 'Server-checked completion proof.' not in page['text'] if page['locale']=='fr' else True
+        assert '\ufffd' not in page['text']+page['title']
+    assert 'Installed operation contracts' in (SITE/'DocAI.md').read_text('utf-8')
+    assert data['logo']=='assets/app-logo.png'
+    assert (SITE/'DocData/assets/app-logo.png').read_bytes()==(APP/'assets/logo-256.png').read_bytes()
 
-def test_original_screenshot_bytes_and_user_code_examples_are_preserved():
-    original = load_json(ROOT / 'docs/cydoc/migrated-manual.json')
-    assert len(original['chapters']) == 44
-    for chapter in original['chapters']:
-        text = (ROOT / chapter['target']).read_text('utf-8')
-        code = [hashlib.sha256(body.encode()).hexdigest() for lang, body in
-                re.findall(r'^```([^\n]*)\n(.*?)^```', text, re.M | re.S) if lang not in {'diagram', 'image'}]
-        assert all(block['sha256'] in code for block in chapter['codeBlocks']), chapter['source']
-    for name, expected in original['screenshots'].items():
-        assert hashlib.sha256((APP / 'help/assets' / name).read_bytes()).hexdigest() == expected
+def test_only_authored_assets_and_public_comment_documentation_are_distributed():
+    assert {p.name for p in (SITE/'DocData/assets').iterdir()} == {p.name for p in (DOCS/'assets').iterdir()}
+    assert not any(p.suffix in {'.py','.cpp','.h','.ts'} for p in SITE.rglob('*'))
+    pages=load_json(SITE/'DocData/manifest.json')['pages']
+    for locale in ('en','fr'):
+        page=next(p for p in pages if p['id']=='help-route-api' and p['locale']==locale)
+        assert page['symbol']=='Documentation.url' and '-> str' in page['code']
+        assert 'import webbrowser' not in page['code']
 
+def test_original_screenshots_and_user_code_examples_are_distributed():
+    pages={(p['locale'],p['id']):p for p in load_json(SITE/'DocData/manifest.json')['pages']}
+    for source in (ROOT/'docs/screenshots').glob('*.png'):
+        assert (SITE/'DocData/assets'/source.name).read_bytes()==source.read_bytes()
+    for locale in ('en','fr'):
+        for source in (DOCS/'manual'/locale).glob('*.md'):
+            text=source.read_text('utf-8')
+            identifier=re.search(r'^id: (.+)$',text,re.M)[1]
+            for language,code in re.findall(r'^```([^\n]*)\n(.*?)^```',text,re.M|re.S):
+                if language in {'python','json','powershell','bash','cpp','c','javascript','hlsl','glsl'}:
+                    assert code.strip() in pages[locale,identifier]['code']
 
-def test_safe_local_urls_legacy_filenames_and_french_heading_slugs():
-    docs = Documentation()
-    uri = docs.url('app/manual/fr/workspace.md', 'fr', anchor='suivre-le-code')
-    assert uri.startswith((APP / 'help/index.html').resolve().as_uri())
+def test_safe_native_legacy_and_french_links():
+    docs=Documentation()
+    uri=docs.url('app/manual/fr/workspace.md','fr',anchor='suivre-le-code')
+    assert uri.startswith((SITE/'Documentation.html').resolve().as_uri())
     assert uri.endswith('#/fr/workspace/follow-the-code')
-    assert docs.url('overview', 'de').endswith('#/en/start')
-    assert docs.url('workspace', anchor='workspace-inspect-and-navigate').endswith('#/en/workspace')
-    assert docs.url('doc:workspace#follow-the-code', 'fr-CA') == uri
-    media = docs.url('start', 'fr', media='workspace-screenshot', note='function-list', zoom=2)
-    parts = urlsplit(media)
-    assert parts.scheme == 'file' and not parts.query
-    assert parse_qs(parts.fragment.split('?')[1]) == {'media':['workspace-screenshot'], 'note':['function-list'], 'zoom':['2']}
+    assert docs.url('overview','de').endswith('#/en/start')
+    assert docs.url('workspace',anchor='workspace-inspect-and-navigate').endswith('#/en/workspace')
+    assert docs.url('doc:workspace#follow-the-code','fr-CA')==uri
+    assert docs.url('ref-app-docs-xboxporting','fr').endswith('#/fr/xbox-methods')
+    for alias in docs.routes['aliases']: assert docs.url(alias).startswith(SITE.resolve().as_uri())
+    media=docs.url('start','fr',media='workspace-screenshot',note='function-list',zoom=2)
+    parts=urlsplit(media)
+    assert parts.scheme=='file' and not parts.query
+    assert parse_qs(parts.fragment.split('?')[1])=={'media':['workspace-screenshot'],'note':['function-list'],'zoom':['2']}
 
-
-@pytest.mark.parametrize('options', [
-    {'topic':'../../private'}, {'topic':'https://example.com'}, {'topic':'javascript:alert(1)'},
-    {'anchor':'missing'}, {'media':'../../private.png'}, {'media':'missing'}, {'zoom':2},
-    {'media':'workspace-screenshot', 'note':'missing'}, {'media':'workspace-screenshot', 'zoom':'nan'},
-    {'media':'workspace-screenshot', 'zoom':100}, {'media':'workspace-screenshot', 'command':'execute'},
+@pytest.mark.parametrize('options',[
+    {'topic':'../../private'},{'topic':'https://example.com'},{'topic':'javascript:alert(1)'},
+    {'anchor':'missing'},{'media':'../../private.png'},{'media':'missing'},{'zoom':2},
+    {'media':'workspace-screenshot','note':'missing'},{'media':'workspace-screenshot','zoom':'nan'},
+    {'media':'workspace-screenshot','zoom':100},{'media':'workspace-screenshot','command':'execute'},
 ])
 def test_invalid_destinations_and_media_states_are_rejected(options):
-    with pytest.raises((ValueError, TypeError)):
-        Documentation().url(**options)
+    with pytest.raises((ValueError,TypeError)):Documentation().url(**options)
 
-
-def test_unicode_and_spaces_in_relocated_self_contained_export(tmp_path):
-    target = tmp_path / 'Mon application été 100% #1' / 'help'
-    shutil.copytree(APP / 'help', target)
-    with zipfile.ZipFile(tmp_path / 'help.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+def test_unicode_spaces_and_archive_relocation(tmp_path):
+    target=tmp_path/'Mon application été 100% #1'/'Documentation'
+    shutil.copytree(SITE,target)
+    with zipfile.ZipFile(tmp_path/'manual.zip','w',zipfile.ZIP_DEFLATED) as archive:
         for file in target.rglob('*'):
-            if file.is_file(): archive.write(file, file.relative_to(target))
-    relocated = tmp_path / 'Another install'
-    with zipfile.ZipFile(tmp_path / 'help.zip') as archive:
-        archive.extractall(relocated)
-    docs = Documentation(target)
-    assert '%C3%A9t%C3%A9%20100%25%20%231/help/index.html#/en/start' in docs.url()
+            if file.is_file():archive.write(file,file.relative_to(target))
+    relocated=tmp_path/'Another install'
+    with zipfile.ZipFile(tmp_path/'manual.zip') as archive:archive.extractall(relocated)
+    assert '%C3%A9t%C3%A9%20100%25%20%231/Documentation/Documentation.html#/en/start' in Documentation(target).url()
     assert Documentation(relocated).url('projects').startswith(relocated.as_uri())
-    assert (relocated / 'assets/workspace.png').is_file()
+    assert (relocated/'DocData/assets/workspace.png').is_file()
 
-
-def test_only_explicit_open_calls_browser_and_reports_failure(tmp_path):
-    opened = []
-    docs = Documentation(opener=lambda url, **kwargs: opened.append((url, kwargs)) or True)
-    docs.url(); assert not opened
-    assert docs.open('projects') == opened[0][0]
-    assert opened[0][1] == {'new':0}
-    with pytest.raises(ValueError): docs.open('missing')
-    assert len(opened) == 1
-    docs.opener = lambda *args, **kwargs: False
-    with pytest.raises(OSError): docs.open()
-    shutil.copy(APP / 'help/routes.json', tmp_path / 'routes.json')
-    with pytest.raises(FileNotFoundError): Documentation(tmp_path).open()
-
+def test_only_explicit_open_launches_browser_and_reports_failure(tmp_path):
+    opened=[]
+    docs=Documentation(opener=lambda url,**kw:opened.append((url,kw)) or True)
+    docs.url();assert not opened
+    assert docs.open('projects')==opened[0][0] and opened[0][1]=={'new':0}
+    with pytest.raises(ValueError):docs.open('missing')
+    docs.opener=lambda *a,**kw:False
+    with pytest.raises(OSError):docs.open()
+    (tmp_path/'DocData').mkdir();shutil.copy(SITE/'DocData/routes.json',tmp_path/'DocData/routes.json')
+    with pytest.raises(FileNotFoundError):Documentation(tmp_path).open()
 
 @pytest.fixture
 def native_frame(monkeypatch, tmp_path):
@@ -221,79 +252,54 @@ def test_unavailable_help_is_visible_without_crashing_the_window(native_frame, m
     native_frame(lambda: panel.draw(SimpleNamespace()))
 
 
-def test_build_cleanup_refuses_paths_outside_its_root(tmp_path):
-    parent = tmp_path / 'build';parent.mkdir()
-    outside = tmp_path / 'valuable';outside.mkdir();(outside/'keep').write_text('keep')
-    with pytest.raises(ValueError): builder().reset_child(outside, parent)
-    with pytest.raises(ValueError): builder().reset_child(parent, parent)
-    assert (outside/'keep').read_text() == 'keep'
 
+def test_cleanup_refuses_paths_outside_the_build_root(tmp_path):
+    parent=tmp_path/'build';parent.mkdir()
+    outside=tmp_path/'valuable';outside.mkdir();(outside/'keep').write_text('keep')
+    with pytest.raises(ValueError):builder().reset_child(outside,parent)
+    with pytest.raises(ValueError):builder().reset_child(parent,parent)
+    assert (outside/'keep').read_text()=='keep'
 
-def test_private_work_media_is_preserved_locally_and_omitted_from_export(tmp_path, monkeypatch):
-    module = builder()
-    monkeypatch.setattr(module, 'ROOT', tmp_path)
-    source = tmp_path / 'modules/example/README.md'
-    private = source.parent / 'work/session.png'
-    private.parent.mkdir(parents=True)
-    private.write_bytes(b'private local capture')
-    assets = tmp_path / 'assets'; assets.mkdir()
-    body, audit = module.rewrite_reference('![Local result](work/session.png)', source, {}, assets)
-    assert body == 'Local result' and private.read_bytes() == b'private local capture'
-    assert not list(assets.iterdir())
-    assert audit and 'outside the distributable' in audit[0]['reason']
-
-
-@pytest.mark.parametrize('name', ['guide.md', 'module.py', 'config.json', '.gitignore', 'icon.svg'])
-def test_input_text_hashes_survive_git_line_ending_conversion(tmp_path, name):
-    source = tmp_path / name
-    source.write_bytes(b'# Guide\n\nUseful content.\n')
-    expected = builder().source_digest(source)
+@pytest.mark.parametrize('name',['guide.md','module.py','config.json','.gitignore','icon.svg','api-fr.tsv'])
+def test_hashes_survive_windows_checkout_conversion(tmp_path,name):
+    source=tmp_path/name;source.write_bytes(b'# Guide\n\nUseful content.\n')
+    expected=builder().source_digest(source)
     source.write_bytes(b'# Guide\r\n\r\nUseful content.\r\n')
-    assert builder().source_digest(source) == expected
+    assert builder().source_digest(source)==expected
 
-
-def test_pages_deployment_uploads_only_the_verified_reader_export():
+def test_pages_uploads_only_the_fresh_distributable_directory():
     import yaml
-    workflow = yaml.load((ROOT / '.github/workflows/documentation-pages.yml').read_text('utf-8'), Loader=yaml.BaseLoader)
-    assert workflow['on']['push']['branches'] == ['main']
-    build = workflow['jobs']['build']
-    steps = build['steps']
-    uploads = [step for step in steps if step.get('uses', '').startswith('actions/upload-pages-artifact@')]
-    assert len(uploads) == 1 and uploads[0]['with']['path'] == 'app/help'
-    checks = [index for index, step in enumerate(steps) if step.get('run') == 'python app/scripts/build_documentation.py --check']
-    assert checks and checks[0] < steps.index(uploads[0])
-    deploy = workflow['jobs']['deploy']
-    assert deploy['needs'] == 'build' and deploy['environment']['name'] == 'github-pages'
-    assert deploy['permissions'] == {'pages':'write', 'id-token':'write'}
+    workflow=yaml.load((ROOT/'.github/workflows/documentation-pages.yml').read_text('utf-8'),Loader=yaml.BaseLoader)
+    steps=workflow['jobs']['build']['steps']
+    upload=next(s for s in steps if s.get('uses','').startswith('actions/upload-pages-artifact@'))
+    assert upload['with']['path']=='app/Documentation'
+    assert next(i for i,s in enumerate(steps) if s.get('run')=='python app/scripts/build_documentation.py --check')<steps.index(upload)
+    assert workflow['jobs']['deploy']['needs']=='build'
 
+@pytest.mark.parametrize(('filename','language'),[('README.md','en'),('LISEZ-MOI.md','fr'),('app/README.md','en'),('app/.CyDocBuild/README.md','en')])
+def test_readme_language_destinations(filename,language):
+    href=re.search(r'\[Documentation\]\(([^)]+)\)',(ROOT/filename).read_text('utf-8'))[1]
+    route=urlsplit(href)
+    assert (route.scheme,route.netloc,route.path)==('https','mrmybal.github.io','/CyDecompilator/')
+    assert route.fragment=='/'+language+'/start'
 
-@pytest.mark.parametrize(('filename', 'language'), [('README.md','en'), ('LISEZ-MOI.md','fr'), ('app/README.md','en'), ('docs/cydoc/README.md','en')])
-def test_readme_documentation_links_open_the_html_reader_in_the_expected_language(filename, language):
-    text = (ROOT / filename).read_text('utf-8')
-    href = re.search(r'\[Documentation\]\(([^)]+)\)', text)[1]
-    route = urlsplit(href)
-    assert (route.scheme, route.netloc, route.path) == ('https', 'mrmybal.github.io', '/CyDecompilator/')
-    assert route.fragment == '/' + language + '/start'
-
-
-def test_release_overlays_the_complete_fresh_export_without_old_help(tmp_path, monkeypatch):
-    """Exercise release ZIP assembly without publishing, compiling a launcher or committing unrelated work."""
+def test_release_excludes_workspace_and_overlays_the_complete_export(tmp_path,monkeypatch):
     import io
-    from scripts import make_release, build_documentation
-    buffer = io.BytesIO()
-    with zipfile.ZipFile(buffer, 'w') as source:
-        source.writestr('CyDecompilator/app/help/obsolete.js', 'stale')
-        source.writestr('CyDecompilator/README.md', 'source checkout')
-    monkeypatch.setattr(make_release, 'git', lambda *args: '' if args[0] == 'status' else
-                        '\n'.join(build_documentation.input_hashes()) if args[0] == 'ls-files' else 'a'*40)
-    monkeypatch.setattr(build_documentation, 'build', lambda: APP / 'help')
-    monkeypatch.setattr(make_release.subprocess, 'run', lambda *args, **kwargs: SimpleNamespace(stdout=buffer.getvalue()))
-    monkeypatch.setattr(make_release, 'sys', SimpleNamespace(platform='linux'))
-    monkeypatch.setattr(make_release, 'DIST', tmp_path)
-    archive, version, commit, sha = make_release.build()
-    assert hashlib.sha256(archive.read_bytes()).hexdigest() == sha
+    from scripts import make_release,build_documentation
+    buffer=io.BytesIO()
+    with zipfile.ZipFile(buffer,'w') as source:
+        source.writestr('CyDecompilator/app/help/obsolete.js','stale')
+        source.writestr('CyDecompilator/app/Documentation/DocData/obsolete.js','stale')
+        source.writestr('CyDecompilator/app/.CyDocBuild/internal/private.md','not shipped')
+        source.writestr('CyDecompilator/README.md','source checkout')
+    monkeypatch.setattr(make_release,'git',lambda *a:'' if a[0]=='status' else '\n'.join(build_documentation.input_hashes()) if a[0]=='ls-files' else 'a'*40)
+    monkeypatch.setattr(build_documentation,'build',lambda:SITE)
+    monkeypatch.setattr(make_release.subprocess,'run',lambda *a,**kw:SimpleNamespace(stdout=buffer.getvalue()))
+    monkeypatch.setattr(make_release,'sys',SimpleNamespace(platform='linux'))
+    monkeypatch.setattr(make_release,'DIST',tmp_path)
+    archive,version,commit,sha=make_release.build()
+    assert hashlib.sha256(archive.read_bytes()).hexdigest()==sha
     with zipfile.ZipFile(archive) as exported:
-        assert 'CyDecompilator/app/help/obsolete.js' not in exported.namelist()
-        for source in (APP / 'help').rglob('*'):
-            if source.is_file():
-                assert exported.read('CyDecompilator/app/help/' + source.relative_to(APP / 'help').as_posix()) == source.read_bytes()
+        assert not any('/.CyDocBuild/' in n or n.endswith('/obsolete.js') for n in exported.namelist())
+        for source in SITE.rglob('*'):
+            if source.is_file():assert exported.read('CyDecompilator/app/Documentation/'+source.relative_to(SITE).as_posix())==source.read_bytes()

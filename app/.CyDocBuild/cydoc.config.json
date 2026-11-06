@@ -1,0 +1,12 @@
+{
+  "name": "CyDecompilator",
+  "version": "1.5.1",
+  "defaultLocale": "en",
+  "locales": [{"code":"en","label":"English"},{"code":"fr","label":"Français"}],
+  "homePage": "start",
+  "logo": "assets/app-logo.png",
+  "content": ".work/content",
+  "assets": "assets",
+  "out": "../Documentation",
+  "modules": ["image"]
+}
