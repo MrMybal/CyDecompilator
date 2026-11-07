@@ -11,13 +11,15 @@ Décompilateur multi-moteurs assisté par IA — Windows, Linux · x86, x64, ARM
 
 [English](README.md) · **Français**
 
+**[Présentation](https://mrmybal.github.io/CyDecompilator/?lang=fr)** · **[Documentation](https://mrmybal.github.io/CyDecompilator/manual/Documentation.html#/fr/start)** · [Téléchargements](https://github.com/MrMybal/CyDecompilator/releases)
+
 CyDecompilator ouvre presque n'importe quel binaire, montre son code reconstruit, et une IA aide à
 le comprendre, à le renommer et à le réécrire en vrai code source. Il fonctionne aussi comme
 serveur MCP, pour qu'une IA (Claude Code, Codex…) l'utilise directement.
 
 ## Documentation intégrée
 
-**[Documentation](https://mrmybal.github.io/CyDecompilator/#/fr/start)** — ouvrez en
+**[Documentation](https://mrmybal.github.io/CyDecompilator/manual/Documentation.html#/fr/start)** — ouvrez en
 ligne le même lecteur CyDoc, avec navigation, recherche, images, schémas et choix de langue.
 
 Ouvrez **Documentation** dans la barre latérale, ou appuyez sur **F1** pour l’aide

@@ -281,7 +281,7 @@ def test_pages_uploads_only_the_fresh_distributable_directory():
 def test_readme_language_destinations(filename,language):
     href=re.search(r'\[Documentation\]\(([^)]+)\)',(ROOT/filename).read_text('utf-8'))[1]
     route=urlsplit(href)
-    assert (route.scheme,route.netloc,route.path)==('https','mrmybal.github.io','/CyDecompilator/')
+    assert (route.scheme,route.netloc,route.path)==('https','mrmybal.github.io','/CyDecompilator/manual/Documentation.html')
     assert route.fragment=='/'+language+'/start'
 
 def test_release_excludes_workspace_and_overlays_the_complete_export(tmp_path,monkeypatch):

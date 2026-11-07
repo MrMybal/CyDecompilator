@@ -1,13 +1,26 @@
 """Check the actual publication boundary, bilingual routes and generated assets."""
 import json
+import re
 from pathlib import Path
 import sys
+from urllib.parse import parse_qs, urlsplit
 
 import pytest
 
 APP = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(APP))
 from scripts import build_website as site
+
+
+@pytest.mark.parametrize(('filename', 'label', 'language'), [('README.md', 'Website', 'en'), ('LISEZ-MOI.md', 'Présentation', 'fr')])
+def test_public_readmes_link_to_both_the_website_and_html_reader(filename, label, language):
+    readme = (APP.parent / filename).read_text('utf-8')
+    website = urlsplit(re.search(r'\[' + label + r'\]\(([^)]+)\)', readme)[1])
+    manual = urlsplit(re.search(r'\[Documentation\]\(([^)]+)\)', readme)[1])
+    assert (website.scheme, website.netloc, website.path) == ('https', 'mrmybal.github.io', '/CyDecompilator/')
+    assert parse_qs(website.query) == {'lang': [language]}
+    assert (manual.scheme, manual.netloc, manual.path) == ('https', 'mrmybal.github.io', '/CyDecompilator/manual/Documentation.html')
+    assert manual.fragment == '/' + language + '/start'
 
 
 @pytest.fixture

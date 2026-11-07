@@ -1,5 +1,7 @@
 # CyDecompilator showcase
 
+[Website](https://mrmybal.github.io/CyDecompilator/?lang=en) · [Présentation en français](https://mrmybal.github.io/CyDecompilator/?lang=fr) · [Documentation](https://mrmybal.github.io/CyDecompilator/manual/Documentation.html#/en/start) · [Documentation française](https://mrmybal.github.io/CyDecompilator/manual/Documentation.html#/fr/start)
+
 A buildless, bilingual static presentation, prepared for GitHub Pages. The visual
 reference is the CyDaw showcase; the blue identity and all product descriptions
 belong to CyDecompilator. There are no fonts, scripts, images or analytics loaded
@@ -66,6 +68,6 @@ or game compatibility. Their interface is English; the page's captions are EN/FR
 
 The existing Pages workflow generates and checks both the documentation and the
 showcase, and uploads only `dist/site`. Preparing or committing these changes does
-not deploy anything. Deployment occurs on a later authorized push to `main` or a
+not deploy anything. Deployment occurs on a push to `main` or a
 manual workflow dispatch. The application's offline documentation and release
 packaging continue to use `app/Documentation` directly.

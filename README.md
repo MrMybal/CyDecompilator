@@ -11,13 +11,15 @@ AI-assisted multi-engine decompiler — Windows, Linux · x86, x64, ARM64 · .NE
 
 **English** · [Français](LISEZ-MOI.md)
 
+**[Website](https://mrmybal.github.io/CyDecompilator/?lang=en)** · **[Documentation](https://mrmybal.github.io/CyDecompilator/manual/Documentation.html#/en/start)** · [Downloads](https://github.com/MrMybal/CyDecompilator/releases)
+
 CyDecompilator opens a wide range of binaries and displays their reconstructed code. An AI
 assistant helps explain, rename and rewrite that code into editable source. It also works
 as an MCP server, so AI clients such as Claude Code and Codex can use it directly.
 
 ## Built-in documentation
 
-**[Documentation](https://mrmybal.github.io/CyDecompilator/#/en/start)** — open the
+**[Documentation](https://mrmybal.github.io/CyDecompilator/manual/Documentation.html#/en/start)** — open the
 same CyDoc reader online, with navigation, search, images, diagrams and language selection.
 
 Open **Documentation** in the sidebar, or press **F1** for help about the current page.

@@ -1,7 +1,9 @@
 # CyDecompilator documentation tooling
 
-Human documentation is **[Documentation](https://mrmybal.github.io/CyDecompilator/#/en/start)**
-([Français](https://mrmybal.github.io/CyDecompilator/#/fr/start)). This workspace is for
+Human documentation is **[Documentation](https://mrmybal.github.io/CyDecompilator/manual/Documentation.html#/en/start)**
+([Français](https://mrmybal.github.io/CyDecompilator/manual/Documentation.html#/fr/start)).
+The public [website](https://mrmybal.github.io/CyDecompilator/?lang=en) presents the application.
+This workspace is for
 maintainers and is excluded from application releases and the human reader.
 
 ## Build
