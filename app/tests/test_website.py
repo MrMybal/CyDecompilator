@@ -12,7 +12,7 @@ sys.path.insert(0, str(APP))
 from scripts import build_website as site
 
 
-@pytest.mark.parametrize(('filename', 'label', 'language'), [('README.md', 'Website', 'en'), ('LISEZ-MOI.md', 'Présentation', 'fr')])
+@pytest.mark.parametrize(('filename', 'label', 'language'), [('README.md', 'Website', 'en'), ('README.fr.md', 'Présentation', 'fr'), ('LISEZ-MOI.md', 'Présentation', 'fr')])
 def test_public_readmes_link_to_both_the_website_and_html_reader(filename, label, language):
     readme = (APP.parent / filename).read_text('utf-8')
     website = urlsplit(re.search(r'\[' + label + r'\]\(([^)]+)\)', readme)[1])

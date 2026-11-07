@@ -1,5 +1,11 @@
 # Changements
 
+[English](CHANGELOG.en.md) · [README de l’application](README.fr.md) · [Publications](https://github.com/MrMybal/CyDecompilator/releases)
+
+CyDecompilator est **en développement**. Windows x64 est pris en charge ; Linux x64 est expérimental.
+La mise à jour publiée demande un runtime Python privé compatible déjà installé ; le numéro de version
+ne garantit ni une reconstruction complète ni la compatibilité des jeux console.
+
 ## 1.5.1 — 6 novembre 2026
 
 - Documentation CyDoc mise à jour : manuel humain complet en anglais et français,
@@ -10,6 +16,36 @@
   aides contextuelles et anciens liens conservés.
 - Génération et distribution du lecteur complet dans l’application et sur GitHub Pages.
   Sources et outils documentaires séparés dans `.CyDocBuild/`.
+
+### Disponibilité et problèmes connus
+
+La [publication 1.5.1](https://github.com/MrMybal/CyDecompilator/releases/tag/v1.5.1) contient le lanceur
+Windows, l’application et le manuel hors ligne. Conserver les dossiers `runtime/` compatible et `data/`
+existants. Les changements des sources ou de la documentation postérieurs au tag ne modifient pas cette archive.
+
+La publication ne fournit pas de liste des bogues un par un. Consulter le véritable
+[suivi des problèmes](https://github.com/MrMybal/CyDecompilator/issues) et
+[la couverture des fonctions](app/Docs/CapabilityCoverage.md) ; l’absence de ticket mentionné ne prouve
+pas qu’un parcours est exempt de bogues.
+
+### Limites documentées
+
+- Linux x64 est expérimental ; aucune publication Linux ou macOS prête à l’emploi n’est proposée ici.
+- Python 3.9+ : pas de décompilation complète en sources ; bytecode et reconstruction IA disponibles.
+- Les bibliothèques DXIL (`lib_6_x`, ray tracing) n’exposent actuellement que leur première fonction.
+- Les archives PyInstaller chiffrées (`--key`) et les installateurs NSIS/Inno sont détectés mais pas extraits.
+- La reconstruction des types C natifs reste limitée : les structures peuvent apparaître sous forme
+  d’expressions pointeur/décalage. Les prototypes ARM64 placent les paramètres entiers avant les flottants.
+- Les services C# demandent les références adaptées du SDK .NET. Le débogage natif et .NET Framework
+  n’est pas disponible ; la console d’exécution/débogage ne permet ni saisie interactive ni modification des variables.
+- La reconstruction et le remplacement de fonctions ont des contraintes de format, dépendances, ABI
+  et signature. Une compilation réussie ne prouve pas l’équivalence du comportement.
+- Les conversions PS5/Xbox restent expérimentales et dépendent de backends séparés et du jeu.
+  La Xbox d’origine permet seulement l’inspection/préparation. Une conversion ne garantit ni jouabilité ni 60 FPS.
+- L’analyse des gros binaires par Ghidra peut être longue ; la limite de fonctions est réglable dans Moteurs.
+
+Il s’agit de limites du périmètre, pas de tickets de bogue confirmés inventés. Consulter
+[le manuel](https://mrmybal.github.io/CyDecompilator/manual/Documentation.html#/fr/start) pour chaque parcours.
 
 ## 1.5.0 — 2 novembre 2026
 

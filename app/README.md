@@ -3,7 +3,7 @@
 # CyDecompilator — developer guide
 
 AI-assisted multi-engine decompiler built on CyToolsCore 0.10 (Python 3.11, Dear ImGui).
-User guides: [English](../README.md) (default on GitHub) · [Français](../LISEZ-MOI.md).
+User guides: [English](../README.md) (default on GitHub) · [Français](../README.fr.md).
 
 **[Website](https://mrmybal.github.io/CyDecompilator/?lang=en)** · [Downloads](https://github.com/MrMybal/CyDecompilator/releases)
 
@@ -151,8 +151,8 @@ CyDecompilator/
 ```powershell
 py -3.11 -m venv runtime\python
 runtime\python\Scripts\python.exe -m pip install -r app\requirements.txt -r app\requirements-dev.txt
-# or, against a local SDK checkout:
-runtime\python\Scripts\python.exe -m pip install "cytools-core[mcp] @ file:///D:/_Project/CyToolsCore"
+# or, against an adjacent local SDK checkout:
+runtime\python\Scripts\python.exe -m pip install -e "../CyToolsCore[mcp]"
 powershell -ExecutionPolicy Bypass -File app\build_launcher.ps1   # needs Visual Studio C++ tools
 ```
 

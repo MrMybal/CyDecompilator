@@ -277,7 +277,7 @@ def test_pages_uploads_only_the_fresh_distributable_directory():
     assert next(i for i,s in enumerate(steps) if s.get('run')=='python app/scripts/build_website.py --check')<steps.index(upload)
     assert workflow['jobs']['deploy']['needs']=='build'
 
-@pytest.mark.parametrize(('filename','language'),[('README.md','en'),('LISEZ-MOI.md','fr'),('app/README.md','en'),('app/.CyDocBuild/README.md','en')])
+@pytest.mark.parametrize(('filename','language'),[('README.md','en'),('README.fr.md','fr'),('LISEZ-MOI.md','fr'),('app/README.md','en'),('app/.CyDocBuild/README.md','en')])
 def test_readme_language_destinations(filename,language):
     href=re.search(r'\[Documentation\]\(([^)]+)\)',(ROOT/filename).read_text('utf-8'))[1]
     route=urlsplit(href)
