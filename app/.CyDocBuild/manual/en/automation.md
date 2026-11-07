@@ -5,21 +5,21 @@ description: Connect an MCP client or CLI and follow the operation/job protocol.
 section: AI and automation
 parent: ai
 order: 14
-revision: 2
+revision: 3
 ---
 
 The GUI, CLI and MCP expose the same Runtime business operations. Open [Advanced operations](doc:automation) to browse the installed operation contracts, parameter forms, declared permissions and outputs. This live catalogue is the reference for the exact installed version; do not rely on a fixed operation count in a guide or an AI prompt.
 
 ## Connect an MCP client {#connect-an-mcp-client}
 
-Use the installation's private Python and **app/tool.py mcp** as a stdio server. Replace these example installation paths with your actual location:
+Full Windows packages provide **CyDecompilatorCLI.exe mcp** as a stdio server. Development venvs can still run their private Python with **app/tool.py mcp**. Replace these example installation paths with your actual location:
 
 ```json
 {
   "mcpServers": {
     "cydecompilator": {
-      "command": "C:/Tools/CyDecompilator/runtime/python/Scripts/python.exe",
-      "args": ["C:/Tools/CyDecompilator/app/tool.py", "mcp"]
+      "command": "C:/Tools/CyDecompilator/CyDecompilatorCLI.exe",
+      "args": ["mcp"]
     }
   }
 }

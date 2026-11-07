@@ -1,6 +1,7 @@
 """Build (and optionally publish) the application release that cydec/updates.py installs.
 
-    runtime/python/Scripts/python.exe app/scripts/make_release.py            # build dist/*.zip
+    runtime/python/Scripts/python.exe app/scripts/make_release.py            # small application-update ZIP
+    runtime/python/Scripts/python.exe app/scripts/build_windows.py           # complete Windows packages
     runtime/python/Scripts/python.exe app/scripts/make_release.py --publish  # + GitHub release
 
 The archive is `git archive HEAD` (only committed files: never runtime/ or data/) with an added

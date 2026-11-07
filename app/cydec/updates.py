@@ -137,11 +137,11 @@ def check():
     else:
         release = github('repos/%s/releases/latest' % current['applicationRepository'], current['applicationRepository'])
         row['available'] = release.get('tag_name', '')
-        assets = [a for a in release.get('assets', []) if str(a.get('name', '')).endswith('.zip')]
-        if not assets:
-            row['notes'] = 'The latest release publishes no .zip asset (expected: a zip holding app/ with CyTool.json).'
+        try:
+            asset = update_asset(release.get('assets', []))
+        except CyToolError as exc:
+            row['notes'] = str(exc)
         else:
-            asset = assets[0]
             row.update(asset=asset['name'], sizeBytes=int(asset.get('size', 0)), digest=str(asset.get('digest', '')),
                        updateAvailable=parse_version(row['available']) > parse_version(installed))
             if row['sizeBytes'] > MAX_ASSET_BYTES:
@@ -178,6 +178,18 @@ def verify_application_tree(root):
             'runtimeAbi': abi or 'not declared', 'operations': len(document['operations'])}
 
 
+def update_asset(assets):
+    """Prefer the small application update, independently of GitHub's asset ordering.
+
+    Full portable packages contain a runtime; silently selecting one would stage
+    unnecessary files and hide new dependencies from the application-only updater.
+    """
+    matches = [a for a in assets if re.fullmatch(r'CyDecompilator-\d+(?:\.\d+){1,3}\.zip', str(a.get('name','')))]
+    if not matches:
+        raise CyToolError('NotFound', 'That release publishes no compatible application-update ZIP. Use its full installer or portable package.')
+    return matches[0]
+
+
 def download(context, version=''):
     from .components import extract
     current = settings()
@@ -188,10 +200,7 @@ def download(context, version=''):
             else 'repos/%s/releases/latest' % current['applicationRepository'])
     release = github(path, current['applicationRepository'])
     tag = release.get('tag_name', version)
-    assets = [a for a in release.get('assets', []) if str(a.get('name', '')).endswith('.zip')]
-    if not assets:
-        raise CyToolError('NotFound', 'That release publishes no .zip asset.')
-    asset = assets[0]
+    asset = update_asset(release.get('assets', []))
     size = int(asset.get('size', 0))
     if size > MAX_ASSET_BYTES:
         raise CyToolError('InvalidArchive', 'The published asset is larger than this Tool will download.')

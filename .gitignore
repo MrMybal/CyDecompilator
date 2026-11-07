@@ -8,6 +8,8 @@ __pycache__/
 *.tmp
 # Keep the launcher out of the source tree; it is a build product.
 CyDecompilator.exe
+CyDecompilatorCLI.exe
+python-proxy.exe
 # Release archives built by app/scripts/make_release.py.
 dist/
 app/managed/bin/

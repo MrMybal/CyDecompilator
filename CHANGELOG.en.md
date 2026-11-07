@@ -3,8 +3,19 @@
 [Français](CHANGELOG.md) · [Application README](README.md) · [Releases](https://github.com/MrMybal/CyDecompilator/releases)
 
 CyDecompilator is **in development**. Windows x64 is supported; Linux x64 is experimental.
-The published application update requires an existing compatible private Python runtime;
-the version number does not imply complete reconstruction or console compatibility.
+Full Windows packages include their runtime; the smaller application-only update requires a compatible existing runtime. The version number does not establish reconstruction or console compatibility.
+
+## 1.5.2 — 7 November 2026
+
+- Complete Windows x64 installer and portable ZIP with a relocatable Python 3.11.18 runtime, 37 hash-locked dependencies and the source-identified CyToolsCore 0.10.1 SDK.
+- English/French installer, current-user destination, Start menu and optional desktop shortcuts. Uninstall preserves user-created data and downloaded engines.
+- Native GUI/CLI launchers, legacy Python-path compatibility proxy, and support for existing development venvs.
+- Application updater selects the small application-only ZIP even when full packages appear first.
+- Updated README and built-in English/French installation/MCP guides, runtime provenance and component notices.
+
+### Availability and limits
+
+[Release 1.5.2](https://github.com/MrMybal/CyDecompilator/releases/tag/v1.5.2) provides an installer, a complete portable ZIP, an application-only update and their SHA-256 files. Optional engines and target build toolchains remain separate. Windows artifacts are unsigned; no code-signing certificate is configured. Linux remains experimental. Known workflow limitations from 1.5.1 below still apply; consult the [issue tracker](https://github.com/MrMybal/CyDecompilator/issues).
 
 ## 1.5.1 — 6 November 2026
 

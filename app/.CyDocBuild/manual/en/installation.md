@@ -5,12 +5,18 @@ description: Keep a complete installation and check the runtime and task prerequ
 section: Get started
 parent: start
 order: 1
-revision: 2
+revision: 3
 ---
 
 ## Keep the complete installation together {#keep-the-complete-installation-together}
 
-On Windows, start **CyDecompilator.exe**. On Linux, use **CyDecompilator.sh** with a Python runtime created for Linux. The desktop uses one private Python environment and optional, separately installed engines. A source ZIP or application update is not a complete runtime bundle. Keep the existing **runtime/** and **data/** directories when applying an application update.
+Windows x64 provides two complete packages, both including Python and required libraries. No system Python installation is needed.
+
+- **Installer:** run the setup EXE, choose its language and destination, then launch from the Start menu. The default location is writable by your current user and needs no administrator rights. The desktop shortcut is optional.
+- **Portable ZIP:** extract the whole archive to a writable directory, then start **CyDecompilator.exe**. Keep **app/** and **runtime/** beside the executable.
+- **Application-update ZIP:** this smaller archive is for an existing compatible installation; keep its **runtime/** and **data/** directories. The built-in updater selects this archive rather than the complete portable package.
+
+Linux x64 remains experimental and uses **CyDecompilator.sh** with a Linux-created runtime. Windows bundles cannot run on Linux. Optional analysis engines and build toolchains are installed separately from the Engines page.
 
 | Folder | Role |
 |---|---|
@@ -19,7 +25,7 @@ On Windows, start **CyDecompilator.exe**. On Linux, use **CyDecompilator.sh** wi
 | runtime/engines/ | Optional analysis engines and toolchains |
 | data/ | Projects, settings, history, jobs and reports |
 
-Do not move an existing Python virtual environment and assume it will still work: its launcher paths can be absolute. For a new development installation, create it in its final directory, then install the application requirements and the owner's CyToolsCore SDK. The developer setup is recorded in **app/README.md**. Linux execution and individual engines have platform-specific validation limits; Windows results do not establish Linux compatibility.
+Do not move an existing Python virtual environment and assume it will still work: its launcher paths can be absolute. For a new development installation, create it in its final directory, then install the application requirements and the pinned CyToolsCore SDK. The developer setup is recorded in **app/README.md**. Linux execution and individual engines have platform-specific validation limits; Windows results do not establish Linux compatibility.
 
 ## Check prerequisites by task {#check-prerequisites-by-task}
 
@@ -35,4 +41,7 @@ Open **Options**, select a language and theme, then press F1. The manual must op
 
 ## When launch fails {#when-launch-fails}
 
-An error about **runtime/python/Scripts/pythonw.exe** means the Windows launcher cannot find its private interpreter. Restore or recreate that environment at the installation location. If a native library or Python import fails, check **Application log** and the matching runtime requirements rather than installing packages into an unrelated system Python. See [troubleshooting](doc:troubleshooting) and [storage](doc:storage) before removing anything.
+A missing-runtime error means the Windows launcher cannot find its private interpreter. Re-extract the full portable archive or reinstall. Full packages use **runtime/python/pythonw.exe**; existing development venvs use **runtime/python/Scripts/pythonw.exe**. If a native library or Python import fails, check **Application log** and the matching runtime requirements rather than installing packages into an unrelated system Python. See [troubleshooting](doc:troubleshooting) and [storage](doc:storage) before removing anything.
+
+
+The portable application keeps user data in **data/** beside it. Uninstalling an installed copy preserves user-created projects, settings and downloaded engines. Back them up before removing the remaining application directory manually.

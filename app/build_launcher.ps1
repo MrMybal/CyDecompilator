@@ -1,3 +1,4 @@
+param([string]$OutputDirectory = '', [string]$BuildDirectory = '')
 $ErrorActionPreference = 'Stop'
 # Builds the Windows launcher. The executable only starts the private interpreter on
 # app/desktop.py: it embeds no Python and no model, so rebuilding it never touches data/.
@@ -5,7 +6,7 @@ $ErrorActionPreference = 'Stop'
 # shell that has `cl` is not the shell this script is usually run from.
 $appRoot = $PSScriptRoot
 $toolRoot = Split-Path -Parent $appRoot
-$build = Join-Path $toolRoot 'runtime/build'
+$build = if ($BuildDirectory) { $BuildDirectory } else { Join-Path $toolRoot 'runtime/build/launchers' }
 New-Item -ItemType Directory -Force -Path $build | Out-Null
 
 function Get-VcVars {
@@ -22,17 +23,26 @@ function Get-VcVars {
     return $vcvars
 }
 
-$output = Join-Path $toolRoot 'CyDecompilator.exe'
+$destination = if ($OutputDirectory) { $OutputDirectory } else { $toolRoot }
+New-Item -ItemType Directory -Force -Path $destination | Out-Null
 $source = Join-Path $appRoot 'launcher.cpp'
 $resources = Join-Path $appRoot 'launcher.rc'
 $compiled = Join-Path $build 'launcher.res'
 
+foreach ($variant in @(
+    @{ Name='CyDecompilator.exe'; Define=''; Subsystem='WINDOWS' },
+    @{ Name='CyDecompilatorCLI.exe'; Define='/DCYDEC_CLI'; Subsystem='CONSOLE' },
+    @{ Name='python-proxy.exe'; Define='/DCYDEC_PYTHON_PROXY'; Subsystem='CONSOLE' }
+)) {
+$output = Join-Path $destination $variant.Name
 if (Get-Command cl -ErrorAction SilentlyContinue) {
     Push-Location $build
     try {
         & rc /nologo /i $appRoot /fo $compiled $resources
         if ($LASTEXITCODE -ne 0) { throw 'Resource compilation failed' }
-        & cl /nologo /std:c++17 /MT /EHsc /O2 $source $compiled "/Fe:$output" /link /SUBSYSTEM:WINDOWS user32.lib
+        $compilerOptions = @('/nologo','/std:c++17','/MT','/EHsc','/O2','/Brepro','/experimental:deterministic','/pathmap:' + $toolRoot + '=src')
+        if ($variant.Define) { $compilerOptions += $variant.Define }
+        & cl @compilerOptions $source $compiled "/Fe:$output" /link ("/SUBSYSTEM:" + $variant.Subsystem) user32.lib
         if ($LASTEXITCODE -ne 0) { throw 'Launcher compilation failed' }
     } finally { Pop-Location }
 } else {
@@ -41,11 +51,13 @@ if (Get-Command cl -ErrorAction SilentlyContinue) {
     $line = 'call ' + $quote + $vcvars + $quote + ' >nul && cd /d ' + $quote + $build + $quote +
             ' && rc /nologo /i ' + $quote + $appRoot + $quote + ' /fo ' + $quote + $compiled + $quote + ' ' +
             $quote + $resources + $quote +
-            ' && cl /nologo /std:c++17 /MT /EHsc /O2 ' + $quote + $source + $quote + ' ' + $quote + $compiled + $quote +
-            ' /Fe:' + $quote + $output + $quote + ' /link /SUBSYSTEM:WINDOWS user32.lib'
+            ' && cl /nologo /std:c++17 /MT /EHsc /O2 /Brepro /experimental:deterministic ' + $variant.Define +
+            ' /pathmap:' + $quote + $toolRoot + '=src' + $quote + ' ' + $quote + $source + $quote + ' ' + $quote + $compiled + $quote +
+            ' /Fe:' + $quote + $output + $quote + ' /link /SUBSYSTEM:' + $variant.Subsystem + ' user32.lib'
     & cmd.exe /c $line
     if ($LASTEXITCODE -ne 0) { throw 'Launcher compilation failed' }
 }
 
 if (-not (Test-Path $output)) { throw "The launcher was not produced at $output" }
 Write-Host ("Built {0} ({1} bytes)" -f $output, (Get-Item $output).Length)
+}

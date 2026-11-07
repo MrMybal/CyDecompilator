@@ -1,4 +1,4 @@
-cytools-core[mcp] @ git+https://github.com/MrMybal/CyToolsCore.git@442f53740fc65f092e4abd6b4d8ccf70d391116a
+cytools-core[mcp] @ git+https://github.com/MrMybal/CyToolsCore.git@05352e1d2f58f423fa2ad57b8eec48d2609f2626
 imgui-bundle==1.92.900
 numpy>=2.0
 capstone==5.0.9

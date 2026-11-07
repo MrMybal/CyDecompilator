@@ -73,7 +73,7 @@
     "kind": "Engine",
     "name": "ILSpy / ilspycmd and ICSharpCode.Decompiler (downloaded on demand)",
     "license": "MIT",
-    "url": "https://github.com/icsharpcode/ILSpy/blob/master/doc/license.txt",
+    "url": "https://github.com/icsharpcode/ILSpy/blob/master/LICENSE",
     "notes": "Downloaded from nuget.org."
   },
   {
@@ -150,7 +150,14 @@
     "kind": "Component",
     "name": "CyDoc",
     "license": "MIT",
-    "url": "https://github.com/MrMybal/CyDoc/blob/774f2a7eabf7dd181a98ffc5add115b580b67f42/LICENSE",
-    "notes": "Offline file:// documentation reader, core and image module, pinned to 774f2a7eabf7dd181a98ffc5add115b580b67f42. MIT notice ships in app/help/CyDoc-LICENSE.txt. Source package provenance and SHA256: app/vendor/cydoc-source.json. Node/npm are build-only; no Three.js or web server is shipped. CyDecompilator retains GPL-3.0-only."
+    "url": "https://github.com/MrMybal/CyDoc/blob/6ddf9a582defb2f11fbb3f992afef6f98dcadc93/LICENSE",
+    "notes": "Bundled offline reader and image module. MIT notice: app/Documentation/DocData/CyDoc-LICENSE.txt. Pinned source package: app/.CyDocBuild/vendor/cydoc-source.json. Build tools are not reader runtime dependencies."
+  },
+  {
+    "kind": "Component",
+    "name": "CyToolsCore 0.10.1",
+    "license": "MIT",
+    "url": "https://github.com/MrMybal/CyToolsCore/blob/05352e1d2f58f423fa2ad57b8eec48d2609f2626/LICENSE",
+    "notes": "Required SDK bundled in full Windows distributions from the pinned source wheel. Python sources and MIT notice are included; wheel provenance is in app/packaging/vendor/cytools-core-source.json."
   }
 ]

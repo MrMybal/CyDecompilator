@@ -8,7 +8,7 @@ from pathlib import Path
 from operations import OPERATIONS
 
 APP = Path(__file__).resolve().parent
-VERSION = '1.5.1'
+VERSION = '1.5.2'
 
 
 def operation(spec):
@@ -49,7 +49,7 @@ def manifest():
         'concurrency': {'policy': 'Concurrent', 'maxWorkers': 6},
         'operations': [operation(spec) for spec in OPERATIONS],
         'standaloneExecutable': 'CyDecompilator.exe',
-        'distributionStatus': 'Portable on the machine where runtime/ was created; see README.',
+        'distributionStatus': 'Windows x64 installer and portable ZIP include their private Python runtime; optional engines are installed separately.',
     }
 
 

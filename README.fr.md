@@ -12,8 +12,8 @@
     </td>
     <td width="300" align="right" valign="top">
       <p><sub>Licence de l’application</sub><br><a href="LICENSE"><strong>GPL-3.0-only</strong></a></p>
-      <p><sub>Version</sub><br><a href="CHANGELOG.md"><strong>1.5.1</strong></a><br><strong>EN DÉVELOPPEMENT</strong></p>
-      <p><a href="https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.1/CyDecompilator-1.5.1.zip"><strong>Télécharger</strong></a><br><sub>Windows x64 · mise à jour<br>Runtime compatible existant requis</sub></p>
+      <p><sub>Version</sub><br><a href="CHANGELOG.md"><strong>1.5.2</strong></a><br><strong>EN DÉVELOPPEMENT</strong></p>
+      <p><a href="https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.2/CyDecompilator-1.5.2-windows-x64-setup.exe"><strong>Télécharger l’installateur</strong></a><br><sub>Windows x64 · Python inclus</sub><br><a href="https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.2/CyDecompilator-1.5.2-windows-x64-portable.zip">ZIP portable</a></p>
     </td>
   </tr>
 </table>
@@ -22,9 +22,9 @@
 
 Un espace de travail pour les développeurs et spécialistes de la rétro-ingénierie : comprendre une application compilée, modifier ses sources récupérées et tester les changements. Analyser les binaires natifs, .NET, Java, Android, le bytecode Python, JavaScript/Electron et les shaders, avec assistance IA et automatisation MCP optionnelles.
 
-> **EN DÉVELOPPEMENT · 1.5.1**
+> **EN DÉVELOPPEMENT · 1.5.2**
 >
-> Windows x64 est pris en charge ; Linux x64 est expérimental. Le ZIP publié met à jour une installation existante et nécessite son runtime Python compatible. Consulter les [notes de version et limites documentées](CHANGELOG.md).
+> Windows x64 est pris en charge ; Linux x64 est expérimental. L’installateur et le ZIP portable incluent Python et les bibliothèques nécessaires. Consulter les [notes de version et limites documentées](CHANGELOG.md).
 
 [![Espace de travail avec un shader DXBC reconstruit en HLSL, la navigation des fonctions et les commandes IA](website/assets/workspace.png)](website/assets/workspace.png)
 
@@ -378,29 +378,28 @@ Les sources et instructions de génération sont dans [.CyDocBuild](app/.CyDocBu
 
 ## Installation
 
-**Windows x64** est la plateforme prise en charge. **Linux x64** est expérimental et demande un runtime créé sous Linux. Aucun paquet Linux ou macOS prêt à l’emploi n’est proposé ici. L’architecture des fichiers analysés est indépendante de celle du système hôte.
+**Windows 10/11 x64 :** choisissez un paquet complet. Aucun ne nécessite un Python déjà installé.
+Linux x64 reste expérimental et demande son propre runtime créé sous Linux ; les paquets Windows n’y fonctionnent pas.
 
-### Mettre à jour une installation existante
+### Installateur
 
-1. [Télécharger CyDecompilator 1.5.1](https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.1/CyDecompilator-1.5.1.zip) et consulter ses [notes de publication et son empreinte](https://github.com/MrMybal/CyDecompilator/releases/tag/v1.5.1).
-2. Fermer l’application. Mettre à jour les fichiers applicatifs en conservant les dossiers `runtime/` compatible et `data/`. L’archive ne contient ni le runtime Python privé ni les moteurs optionnels.
-3. Démarrer `CyDecompilator.exe`. Pour une **première installation**, préparer le runtime depuis les sources avec la section suivante.
+1. [Télécharger l’installateur Windows](https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.2/CyDecompilator-1.5.2-windows-x64-setup.exe).
+2. Lancer la configuration, choisir anglais ou français et le dossier d’installation. Le mode par défaut pour le compte courant ne demande pas de droits administrateur ; le raccourci sur le bureau est optionnel.
+3. Démarrer **CyDecompilator** depuis le menu Démarrer. La désinstallation conserve les projets, réglages et moteurs créés après installation.
 
-Onglet *Engines*, section *Application updates* : *Check for updates* interroge les
-[releases](https://github.com/MrMybal/CyDecompilator/releases) de ce dépôt, *Download and verify*
-prépare la nouvelle version (empreinte SHA-256, identité, compilation), *Apply update* l'active en
-gardant l'ancienne (*Restore previous version*). `data/` n'est jamais remplacé. Si le dépôt de
-mises à jour configuré est privé, il faut un jeton GitHub en lecture (champ *GitHub token* ou variable
-d'environnement `GITHUB_TOKEN`).
+### Portable
 
-### Fichiers locaux
+1. [Télécharger le ZIP portable complet](https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.2/CyDecompilator-1.5.2-windows-x64-portable.zip).
+2. Extraire toute l’archive dans un dossier accessible en écriture. Conserver `app/` et `runtime/` à côté de `CyDecompilator.exe`.
+3. Lancer `CyDecompilator.exe`. Les données restent dans `data/` au sein du dossier portable. Fermer le logiciel avant de déplacer ce dossier.
 
-- `data/projects/` : un dossier par fichier ouvert (analyse, code en cache, renommages,
-  commentaires, résultats IA).
-- `data/settings/` : préférences, réglages IA, clés et jetons chiffrés.
-- `data/logs/` : journal (aussi visible dans l'onglet *Application log*).
-- `runtime/` : Python privé, moteurs téléchargés, mises à jour préparées.
-- [`app/README.md`](app/README.md) : guide développeur (architecture, tests, releases).
+Les moteurs et outils de compilation C/C++/.NET/Java/Node optionnels s’installent séparément depuis **Moteurs** ou leurs installateurs officiels. Consulter les [notes et fichiers SHA-256](https://github.com/MrMybal/CyDecompilator/releases/tag/v1.5.2).
+
+### Mises à jour et fichiers locaux
+
+La petite archive `CyDecompilator-1.5.2.zip` est une **mise à jour applicative seule**, pour un runtime compatible existant. Dans **Moteurs → Mises à jour de l’application**, télécharger, vérifier, appliquer ou restaurer une version. L’outil choisit cette archive indépendamment de l’ordre des paquets complets et préserve `data/` ainsi que le runtime existant.
+
+`data/projects/` contient analyses, commentaires et code en cache ; `data/settings/`, les préférences et identifiants ; `data/logs/`, les journaux. `runtime/` conserve Python, moteurs téléchargés et mises à jour préparées.
 
 ## Sources, compilation et bibliothèques nécessaires
 
@@ -454,7 +453,7 @@ La lecture du manuel exporté ne demande aucun de ces outils. Voir le [guide dé
 
 | Bibliothèque · sources | Licence · texte | Utilisation / périmètre |
 | --- | --- | --- |
-| [CyToolsCore](https://github.com/MrMybal/CyToolsCore) | [GPL-3.0-only](https://github.com/MrMybal/CyToolsCore/blob/442f53740fc65f092e4abd6b4d8ccf70d391116a/LICENSE) | SDK requis pour le runtime, la CLI et MCP, révision Git épinglée ; accès aux sources éventuellement soumis à autorisation. |
+| [CyToolsCore 0.10.1](https://github.com/MrMybal/CyToolsCore) | [MIT](app/packaging/vendor/CyToolsCore-LICENSE.txt) | SDK requis pour le runtime, la CLI et MCP, révision Git épinglée ; accès aux sources éventuellement soumis à autorisation. |
 | [CyUI 1.2.0](https://github.com/MrMybal/CyUI) | [MIT](app/vendor/CYUI_LICENSE.txt) | Modules Python sélectionnés et inclus ; dépôt privé, [provenance épinglée](app/vendor/cyui-source.json). |
 | [Dear ImGui / imgui-bundle 1.92.900](https://github.com/pthom/imgui_bundle) | [MIT + notices des composants](https://github.com/pthom/imgui_bundle/blob/main/LICENSE) | Runtime de l’interface et de l’éditeur natifs ; conserver les notices des composants et polices, dont Inconsolata SIL OFL 1.1. |
 | [Capstone 5.0.9](https://github.com/capstone-engine/capstone) | [BSD-3-Clause](https://www.capstone-engine.org/License.html) | Désassemblage et représentation intermédiaire pour le moteur C à l’exécution. |
@@ -463,7 +462,7 @@ La lecture du manuel exporté ne demande aucun de ces outils. Voir le [guide dé
 | [NumPy](https://github.com/numpy/numpy) | [BSD-3-Clause + notices des composants](https://github.com/numpy/numpy/blob/main/LICENSE.txt) | Runtime numérique requis ; les roues incluent des composants sous d’autres licences. |
 | [HTTPX 0.28.1](https://github.com/encode/httpx) | [BSD-3-Clause](https://github.com/encode/httpx/blob/0.28.1/LICENSE.md) | Clients HTTP à l’exécution. |
 | [pywin32 312](https://github.com/mhammond/pywin32) | [PSF + notices des composants](https://github.com/mhammond/pywin32#license) | Intégration à l’exécution, uniquement sous Windows. |
-| [CPython](https://github.com/python/cpython) | [PSF + notices des composants](https://github.com/python/cpython/blob/3.11/LICENSE) | Runtime Python privé préparé séparément. |
+| [CPython](https://github.com/python/cpython) | [PSF + notices des composants](https://github.com/python/cpython/blob/3.11/LICENSE) | Runtime autonome inclus dans les paquets Windows complets. |
 | [CyDoc 0.1.0](https://github.com/MrMybal/CyDoc) | [MIT](app/Documentation/DocData/CyDoc-LICENSE.txt) | Lecteur et module image inclus ; sources privées, [provenance épinglée](app/.CyDocBuild/vendor/cydoc-source.json). Aucune dépendance mesh/Three.js. |
 | [cyai_connectors](app/cydec/ai/vendor/cyai_connectors) | [Registre des composants](app/licenses.json) | Adaptateur CLI inclus, issu de CyTools_AIChat ; aucune licence distincte déclarée. Les programmes fournisseurs gardent leurs conditions. |
 

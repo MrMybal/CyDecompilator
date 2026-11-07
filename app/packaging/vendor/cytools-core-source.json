@@ -1,0 +1,9 @@
+{
+  "name": "CyToolsCore",
+  "version": "0.10.1",
+  "repository": "https://github.com/MrMybal/CyToolsCore",
+  "revision": "05352e1d2f58f423fa2ad57b8eec48d2609f2626",
+  "license": "MIT",
+  "wheel": "cytools_core-0.10.1-py3-none-any.whl",
+  "sha256": "2cbf92f8cade40308c26364e4a1d531077a2af9e282c3ce9ba75f0c9a56260ae"
+}

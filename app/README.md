@@ -2,7 +2,7 @@
 
 # CyDecompilator — developer guide
 
-AI-assisted multi-engine decompiler built on CyToolsCore 0.10 (Python 3.11, Dear ImGui).
+AI-assisted multi-engine decompiler built on CyToolsCore 0.10.1 (Python 3.11, Dear ImGui).
 User guides: [English](../README.md) (default on GitHub) · [Français](../README.fr.md).
 
 **[Website](https://mrmybal.github.io/CyDecompilator/?lang=en)** · [Downloads](https://github.com/MrMybal/CyDecompilator/releases)
@@ -482,3 +482,8 @@ module always compiles.
 ## Unreal reconstruction knowledge
 
 The **Unreal reconstruction** page and `unreal_rules` / `unreal_guide` operations expose the prototype’s 26 reconstruction rules and ten campaign profiles. The integrated agent can consult the same catalog. This read-only knowledge integration works without game files; import/build/execution remain separate. See [methods and scope](Docs/UnrealReconstruction.md).
+
+
+## Full Windows packages
+
+The installer and portable ZIP include a fresh relocatable Python 3.11.18 runtime with hash-locked dependencies. The GUI launcher supports this layout and existing development venvs. `CyDecompilatorCLI.exe mcp` exposes the same CLI/MCP server, and the legacy Scripts/python.exe proxy preserves existing client configurations. See [packaging](packaging/README.md) for the reproducible build, notices and storage limits. Application-only update ZIPs remain separate.

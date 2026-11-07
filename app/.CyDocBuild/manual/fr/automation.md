@@ -5,21 +5,21 @@ description: Connecter un client MCP ou CLI et suivre le protocole des opératio
 section: IA et automatisation
 parent: ai
 order: 14
-sourceRevision: 2
+sourceRevision: 3
 ---
 
 Interface, CLI et MCP exposent les mêmes opérations métier Runtime. Ouvrez les [opérations avancées](doc:automation) pour consulter contrats installés, formulaires de paramètres, permissions et sorties. Ce catalogue actif fait référence pour votre version ; ne figez pas un nombre d’opérations dans un guide ou un prompt IA.
 
 ## Connecter un client MCP {#connect-an-mcp-client}
 
-Utilisez le Python privé de l’installation et **app/tool.py mcp** comme serveur stdio. Remplacez les chemins d’exemple par votre emplacement réel :
+Les paquets Windows complets fournissent **CyDecompilatorCLI.exe mcp** comme serveur stdio. Les venv de développement peuvent toujours utiliser leur Python privé avec **app/tool.py mcp**. Remplacez les chemins d’exemple par votre emplacement réel :
 
 ```json
 {
   "mcpServers": {
     "cydecompilator": {
-      "command": "C:/Tools/CyDecompilator/runtime/python/Scripts/python.exe",
-      "args": ["C:/Tools/CyDecompilator/app/tool.py", "mcp"]
+      "command": "C:/Tools/CyDecompilator/CyDecompilatorCLI.exe",
+      "args": ["mcp"]
     }
   }
 }

@@ -5,12 +5,18 @@ description: Conserver une installation complète et vérifier les prérequis de
 section: Bien démarrer
 parent: start
 order: 1
-sourceRevision: 2
+sourceRevision: 3
 ---
 
 ## Conserver l’installation complète {#keep-the-complete-installation-together}
 
-Sous Windows, lancez **CyDecompilator.exe**. Sous Linux, utilisez **CyDecompilator.sh** avec un environnement Python créé pour Linux. Le logiciel utilise un Python privé et des moteurs optionnels installés séparément. Une archive de sources ou de mise à jour ne contient pas nécessairement le runtime complet. Conservez les dossiers **runtime/** et **data/** lors d’une mise à jour de l’application.
+Windows x64 propose deux paquets complets, comprenant Python et les bibliothèques nécessaires. Aucun Python système n’est requis.
+
+- **Installateur :** exécutez le fichier EXE de configuration, choisissez sa langue et sa destination, puis lancez depuis le menu Démarrer. L’emplacement par défaut est accessible au compte courant sans droits administrateur. Le raccourci sur le bureau est optionnel.
+- **ZIP portable :** extrayez toute l’archive dans un dossier accessible en écriture, puis lancez **CyDecompilator.exe**. Conservez **app/** et **runtime/** à côté de l’exécutable.
+- **ZIP de mise à jour applicative :** cette petite archive s’adresse à une installation compatible existante ; conservez ses dossiers **runtime/** et **data/**. L’outil de mise à jour sélectionne cette archive plutôt que le paquet portable complet.
+
+Linux x64 reste expérimental et utilise **CyDecompilator.sh** avec un runtime créé sous Linux. Les paquets Windows ne fonctionnent pas sous Linux. Les moteurs d’analyse et chaînes de compilation optionnels s’installent séparément depuis la page Moteurs.
 
 | Dossier | Rôle |
 |---|---|
@@ -35,4 +41,7 @@ Ouvrez **Options**, choisissez une langue et un thème, puis appuyez sur F1. Le 
 
 ## En cas d’échec au lancement {#when-launch-fails}
 
-Une erreur concernant **runtime/python/Scripts/pythonw.exe** signifie que le lanceur Windows ne trouve pas son interpréteur privé. Restaurez ou recréez cet environnement à l’emplacement de l’installation. Si une bibliothèque native ou un import Python échoue, consultez le **journal de l’application** et les dépendances du runtime correspondant, plutôt que d’installer des paquets dans un autre Python système. Consultez le [dépannage](doc:troubleshooting) et le [stockage](doc:storage) avant toute suppression.
+Une erreur de runtime manquant signifie que le lanceur ne trouve pas son interpréteur privé. Réextrayez le paquet portable complet ou réinstallez. Les paquets complets utilisent **runtime/python/pythonw.exe** ; les venv de développement existants utilisent **runtime/python/Scripts/pythonw.exe**. Si une bibliothèque native ou un import Python échoue, consultez le **journal de l’application** et les dépendances du runtime correspondant, plutôt que d’installer des paquets dans un autre Python système. Consultez le [dépannage](doc:troubleshooting) et le [stockage](doc:storage) avant toute suppression.
+
+
+L’application portable conserve ses données dans **data/** à côté d’elle. La désinstallation d’une copie installée préserve les projets, réglages et moteurs créés après installation. Sauvegardez-les avant toute suppression manuelle du dossier restant.

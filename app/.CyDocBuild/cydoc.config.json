@@ -1,6 +1,6 @@
 {
   "name": "CyDecompilator",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "defaultLocale": "en",
   "locales": [{"code":"en","label":"English"},{"code":"fr","label":"Français"}],
   "homePage": "start",

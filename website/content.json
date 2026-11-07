@@ -134,15 +134,15 @@
     "faq.source.q": "Does decompilation restore the original source?",
     "faq.source.a": "It recovers a representation from the compiled application. Names, types, build settings or resources may be missing. Source reconstruction and behavior comparisons help you continue the work, but do not prove universal equivalence.",
     "faq.install.q": "What is included in the download?",
-    "faq.install.a": "The Windows archive contains the application, launcher and offline manual. It is an application update: a matching private Python runtime is required. For a first installation, follow the setup guide. Optional engines and SDKs are installed separately.",
+    "faq.install.a": "Windows x64 has a complete installer and portable ZIP, both including Python and required libraries. Choose setup for Start menu shortcuts, or extract the portable ZIP to a writable folder. Optional engines and target build tools are installed separately.",
     "faq.license.q": "What about licensing and the original application?",
     "faq.license.a": "CyDecompilator is GPL-3.0-only. CyUI and CyDoc include their MIT notices; external engines keep their own licenses. Analyze and modify software you have the right to work on. Direct replacement writes a separate application copy.",
     "download.eyebrow": "CONTINUE WITH YOUR OWN CODE",
     "download.title": "Open a sample. Follow a function.",
     "download.body": "Start with a supported input and a question you can test. The documentation walks you through the next steps.",
-    "download.windows": "Windows x64 · v{{version}}",
+    "download.windows": "Windows installer",
     "download.source": "View the source",
-    "download.note": "Application update · Existing compatible runtime required",
+    "download.note": "Windows x64 · Python included · Optional engines installed separately",
     "download.setup": "First installation & prerequisites",
     "footer.credit": "Created by Cyberalien. Built for understanding code.",
     "footer.license": "License",
@@ -165,7 +165,8 @@
     "shots.code": "Detail of the recovered HLSL code and its original resource names.",
     "shots.diff": "Detail of the actual saved-versus-modified source comparison.",
     "shots.documentation": "The actual CyDoc documentation reader, with chapter navigation, search and English/French language selection.",
-    "nav.footer": "Footer navigation"
+    "nav.footer": "Footer navigation",
+    "download.portable": "Portable ZIP"
   },
   "fr": {
     "meta.title": "CyDecompilator — Analyser, modifier et reconstruire le code",
@@ -302,15 +303,15 @@
     "faq.source.q": "La décompilation retrouve-t-elle les sources originales ?",
     "faq.source.a": "Elle retrouve une représentation du programme compilé. Noms, types, réglages de compilation ou ressources peuvent manquer. La reconstruction et les comparaisons permettent de poursuivre le travail, sans prouver une équivalence universelle.",
     "faq.install.q": "Que contient le téléchargement ?",
-    "faq.install.a": "L’archive Windows contient l’application, son lanceur et le manuel hors ligne. C’est une mise à jour d’application : un environnement Python privé compatible est nécessaire. Pour une première installation, suivez le guide de préparation. Les moteurs et SDK facultatifs s’installent séparément.",
+    "faq.install.a": "Windows x64 dispose d’un installateur et d’un ZIP portable complets, incluant Python et les bibliothèques nécessaires. Choisissez l’installateur pour les raccourcis du menu Démarrer, ou extrayez le ZIP dans un dossier accessible en écriture. Les moteurs et outils de compilation s’installent séparément.",
     "faq.license.q": "Qu’en est-il des licences et de l’application originale ?",
     "faq.license.a": "CyDecompilator est sous GPL-3.0-only. CyUI et CyDoc fournissent leurs notices MIT ; les moteurs externes gardent leurs licences. Analysez et modifiez les logiciels sur lesquels vous avez ces droits. Le remplacement direct écrit une copie séparée de l’application.",
     "download.eyebrow": "POURSUIVEZ AVEC VOTRE PROPRE CODE",
     "download.title": "Ouvrez un exemple. Suivez une fonction.",
     "download.body": "Commencez par une entrée compatible et une question que vous pouvez tester. La documentation vous accompagne pour la suite.",
-    "download.windows": "Windows x64 · v{{version}}",
+    "download.windows": "Installateur Windows",
     "download.source": "Voir le code source",
-    "download.note": "Mise à jour d’application · Environnement compatible existant requis",
+    "download.note": "Windows x64 · Python inclus · Moteurs optionnels séparés",
     "download.setup": "Première installation et prérequis",
     "footer.credit": "Créé par Cyberalien. Pour comprendre le code.",
     "footer.license": "Licence",
@@ -333,6 +334,7 @@
     "shots.code": "Détail du code HLSL retrouvé et de ses noms de ressources d’origine.",
     "shots.diff": "Détail de la comparaison réelle entre les sources sauvegardées et modifiées.",
     "shots.documentation": "Le véritable lecteur CyDoc, avec navigation par chapitres, recherche et sélection anglais/français.",
-    "nav.footer": "Navigation de pied de page"
+    "nav.footer": "Navigation de pied de page",
+    "download.portable": "ZIP portable"
   }
 }
