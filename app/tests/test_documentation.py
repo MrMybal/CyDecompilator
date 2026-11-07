@@ -272,8 +272,9 @@ def test_pages_uploads_only_the_fresh_distributable_directory():
     workflow=yaml.load((ROOT/'.github/workflows/documentation-pages.yml').read_text('utf-8'),Loader=yaml.BaseLoader)
     steps=workflow['jobs']['build']['steps']
     upload=next(s for s in steps if s.get('uses','').startswith('actions/upload-pages-artifact@'))
-    assert upload['with']['path']=='app/Documentation'
+    assert upload['with']['path']=='dist/site'
     assert next(i for i,s in enumerate(steps) if s.get('run')=='python app/scripts/build_documentation.py --check')<steps.index(upload)
+    assert next(i for i,s in enumerate(steps) if s.get('run')=='python app/scripts/build_website.py --check')<steps.index(upload)
     assert workflow['jobs']['deploy']['needs']=='build'
 
 @pytest.mark.parametrize(('filename','language'),[('README.md','en'),('LISEZ-MOI.md','fr'),('app/README.md','en'),('app/.CyDocBuild/README.md','en')])

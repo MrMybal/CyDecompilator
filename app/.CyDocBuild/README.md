@@ -48,8 +48,10 @@ Ship all of `app/Documentation/`: `Documentation.html`, `DocAI.md`, `DocData/`, 
 assets and notices. `app/scripts/make_release.py` regenerates it, overlays the fresh
 tree and excludes `.CyDocBuild/` and the former documentation sources from release
 archives. Application updates replace `app/` and therefore carry this directory.
-The GitHub Pages workflow uploads only `app/Documentation/`; the root index redirect
-preserves existing public README addresses. No deployment happens until a push.
+The GitHub Pages workflow builds the [showcase](../../website/README.md), bundles
+this unchanged reader under `manual/` and uploads only the generated `dist/site/`.
+The showcase redirects previous root documentation bookmarks to the reader,
+preserving existing public README addresses. No deployment happens until a push.
 
 `build-info.json` is maintainer metadata, never a human page or shipped resource.
 Working records and test output belong in `internal/`, which is ignored by Git.

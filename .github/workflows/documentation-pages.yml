@@ -1,4 +1,4 @@
-name: Publish CyDoc documentation
+name: Publish website and CyDoc documentation
 
 on:
   push:
@@ -37,10 +37,14 @@ jobs:
         run: python app/scripts/build_documentation.py --setup
       - name: Verify exported documentation and resource hashes
         run: python app/scripts/build_documentation.py --check
-      - name: Upload the documentation export only
+      - name: Generate the static showcase and bundle the CyDoc reader
+        run: python app/scripts/build_website.py
+      - name: Verify website links, translations and distribution
+        run: python app/scripts/build_website.py --check
+      - name: Upload the static website and documentation only
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
-          path: app/Documentation
+          path: dist/site
 
   deploy:
     if: github.ref == 'refs/heads/main'
@@ -53,6 +57,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy the CyDoc reader to GitHub Pages
+      - name: Deploy the showcase and CyDoc reader to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
