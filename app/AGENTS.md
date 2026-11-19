@@ -1,7 +1,8 @@
 # Working on CyDecompilator
 
 Read `README.md` (architecture, commands) and `Docs/CapabilityCoverage.md` first. The
-CyToolsCore contracts copied in `Docs/` (StandaloneDelivery, Localization, TaskFiles...) apply.
+Application delivery, localization and task-file contracts in `Docs/` apply. The
+runtime now uses the compiled CyMCPSDK; see `Docs/CyMCPSDK.md` before changing it.
 
 - Operation contracts live in `operations.py`; regenerate `CyTool.json` with
   `build_manifest.py`, then register the handler in `tool.py`. A declared operation without a

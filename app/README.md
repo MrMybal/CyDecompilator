@@ -2,7 +2,15 @@
 
 # CyDecompilator — developer guide
 
-AI-assisted multi-engine decompiler built on CyToolsCore 0.10.1 (Python 3.11, Dear ImGui).
+AI-assisted multi-engine decompiler using native CyMCPSDK 0.7.0 with durable Python jobs (Python 3.11, Dear ImGui).
+Native SDK integration: [CyMCPSDK](Docs/CyMCPSDK.md).
+
+An external AI can operate the application through the SDK CLI, without an embedded
+model or MCP client: `CyDecompilatorCLI.exe --auto invoke <operation> --params-file input.json`.
+`--auto` joins the running application or runs headless. Native SDK `jsonl`/`sdk stdio`
+supports persistent command sessions; `jobs`, `job`, `wait`, `result` and `cancel`
+retain job ownership across CLI processes. See the [CLI agent contract](skills/cydecompilator/references/cli.md).
+
 User guides: [English](../README.md) (default on GitHub) · [Français](../README.fr.md).
 
 **[Website](https://mrmybal.github.io/CyDecompilator/?lang=en)** · [Downloads](https://github.com/MrMybal/CyDecompilator/releases)
@@ -151,8 +159,8 @@ CyDecompilator/
 ```powershell
 py -3.11 -m venv runtime\python
 runtime\python\Scripts\python.exe -m pip install -r app\requirements.txt -r app\requirements-dev.txt
-# or, against an adjacent local SDK checkout:
-runtime\python\Scripts\python.exe -m pip install -e "../CyToolsCore[mcp]"
+# Compile the native SDK from the local or verified bundled sources:
+runtime\python\Scripts\python.exe app\scripts\build_mcp_sdk.py --bundled
 powershell -ExecutionPolicy Bypass -File app\build_launcher.ps1   # needs Visual Studio C++ tools
 ```
 
@@ -163,7 +171,7 @@ the same way with python3.11 and use `CyDecompilator.sh`.
 
 ```powershell
 runtime\python\Scripts\python.exe app\build_manifest.py            # after editing operations.py
-runtime\python\Scripts\cytools.exe validate app\CyTool.json
+runtime\python\Scripts\python.exe app\tool.py sdk-info
 runtime\python\Scripts\python.exe -m pytest app\tests -q
 runtime\python\Scripts\python.exe app\tests\acceptance_mcp.py      # real MCP stdio session
 runtime\python\Scripts\python.exe app\tool.py list-operations
@@ -180,10 +188,13 @@ The CLI `invoke` timeout defaults to 300 s: pass `--timeout` for Ghidra on large
 ## Identity and permissions
 
 Operations declare `network`, `processSpawn` and `filesystemExternal` where they really have
-those effects. When `CYTOOLS_TOKEN` is not set, `tool.py` mints a local client holding exactly
+those effects. When neither `CYMCP_TOKEN` nor its legacy alias `CYTOOLS_TOKEN` is set,
+`tool.py` mints a local client holding exactly
 the declared permissions and exports its token for the transport. To restrict an MCP client,
 create one with `tool.py create-client --name ai --permission processSpawn` and set
-`CYTOOLS_TOKEN` to its token: it can then analyse and decompile but not download or call AI.
+`CYMCP_TOKEN` to its token: it can then analyse and decompile but not download or call AI.
+For a shared live instance, select the same explicit `--data-dir` when creating the
+client and starting the GUI. See [CyMCPSDK.md](Docs/CyMCPSDK.md).
 
 ## MCP usage pattern
 
@@ -390,7 +401,7 @@ Format references: [Microsoft PE/COFF](https://learn.microsoft.com/en-us/windows
 
 `components.py` resolves the current release from the official source at install time
 (GitHub API with asset `digest`, Adoptium API checksum, Microsoft release metadata SHA512,
-NuGet, PyPI), downloads with `cytools_core.downloads.DownloadManager` (resume, size, hash),
+NuGet, PyPI), downloads with `cydec.mcp.downloads.DownloadManager` (resume, size, hash),
 extracts with traversal/link refusal into `runtime/engines/<id>/<version>` and records
 `installed.json`. Previous versions stay until removed. A system install or a user-chosen
 folder (`set_component_path`) is preferred when valid; Ghidra additionally requires `javac`.
@@ -410,7 +421,7 @@ folder (`set_component_path`) is preferred when valid; Ghidra additionally requi
 
 - `dxbc.py`: container, RDEF (cbuffer variables, bindings), ISGN/OSGN/ISG1/OSG1/PCSG, SM4/5
   token decoding. The disassembly is checked instruction by instruction against fxc listings.
-- `hlsl.py`: structured control flow from the tokens, signature/RDEF naming, typed literals. <!-- gitleaks:allow (prose, not a secret) -->
+- `hlsl.py`: reconstructs control flow, recovers RDEF names and writes typed HLSL literals.
   The output of every fixture is recompiled with D3DCompile in the tests.
 - `spirv.py` / `glsl.py`: SPIR-V parsing, structured CFG rebuilt from merge instructions,
   single-use inlining with a store barrier for mutable memory, Phi variables, swizzle merging,

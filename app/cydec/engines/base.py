@@ -18,7 +18,7 @@ Engines never print to stdout (the CLI and MCP transports own it); they log thro
 context, check cancellation regularly and isolate external programs in subprocesses that
 `process.run` stops when the job is cancelled.
 """
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 
 class EngineContext:

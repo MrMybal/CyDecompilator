@@ -1,3 +1,4 @@
 pytest
+mcp==1.30.0
 PyYAML>=6.0,<7
 unicorn==2.1.4

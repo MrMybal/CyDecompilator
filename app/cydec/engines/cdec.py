@@ -5,7 +5,7 @@ decompile() lifts the function to an IR, runs data flow, structures the control 
 Ghidra stays first in the engine order when it is installed; this engine is the dependency-free
 alternative and the source of module_c (recompilable C for a set of functions).
 """
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from .native import NativeEngine
 

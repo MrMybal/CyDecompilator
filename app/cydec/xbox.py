@@ -13,7 +13,7 @@ import time
 import tomllib
 import uuid
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from xbox_support.xbox_native import formats
 from . import process
 from .paths import APP, ROOT, ENGINES, SETTINGS, read_json, write_json

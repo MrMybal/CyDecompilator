@@ -1,5 +1,7 @@
 # Prompt prêt à fournir à une IA
 
+> Référence historique des contrats applicatifs. Pour cette application, suivre [CyMCPSDK.md](CyMCPSDK.md) et `app/AGENTS.md`. Les exemples de génération `cytools` ne sont pas des commandes livrées avec CyDecompilator ; aucun ancien SDK Python n’est requis.
+
 ## Prompt court pour un nouveau Tool
 
 ```text

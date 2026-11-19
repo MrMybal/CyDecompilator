@@ -5,8 +5,8 @@ import time
 import uuid
 from pathlib import Path
 
-from cytools_core import CyToolError
-from cytools_core.runtime import Principal, TERMINAL
+from cydec.mcp import CyToolError
+from cydec.mcp.runtime import Principal, TERMINAL
 
 from .. import service
 from ..paths import read_json, write_json

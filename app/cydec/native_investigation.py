@@ -1,7 +1,7 @@
 """Ghidra instruction/type/value dossiers joined to the existing native call graph."""
 import hashlib
 from pathlib import Path
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from . import investigation as inv, process
 from .engines import get
 from .engines.ghidra import SCRIPTS

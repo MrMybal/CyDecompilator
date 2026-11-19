@@ -19,7 +19,7 @@ import zipfile
 from collections import Counter
 from pathlib import Path, PurePosixPath
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from . import components, process
 from .paths import SETTINGS, ENGINES, DOWNLOADS, read_json, write_json
@@ -745,7 +745,7 @@ def install_anyps5(target,context):
         if inventory(reference_lib,context)!=inventory(final/relative,context):
             fail('Installed compatibility libraries differ from the verified release.', 'IntegrityFailure')
     else:
-        from cytools_core.downloads import DownloadManager
+        from cydec.mcp.downloads import DownloadManager
         manager=DownloadManager(DOWNLOADS/'anyps5',timeout=120,use_shared_cache=False)
         stage=Path(context.workdir)/('anyps5-install-'+uuid.uuid4().hex)
         stage.mkdir(parents=True)
@@ -774,7 +774,7 @@ def install_ultrapack(context, build_pkg_helper=True):
     """Official source checkout in a private engine, never in the Tool's Python."""
     if os.name!='nt' and not sys.platform.startswith('linux'):
         fail('Automatic UltraPack installation supports Windows and Linux. Configure another backend explicitly.', 'Unsupported')
-    from cytools_core.downloads import DownloadManager
+    from cydec.mcp.downloads import DownloadManager
     revision=components._http_json('https://api.github.com/repos/knutwurst/ps5-ultrapack/commits/main')['sha']
     if not re.fullmatch('[a-f0-9]{40}',revision): fail('Unexpected UltraPack source revision.', 'IntegrityFailure')
     final=ENGINES/'ultrapack'/revision

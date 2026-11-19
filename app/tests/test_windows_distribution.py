@@ -52,6 +52,6 @@ def test_packaging_cleanup_preserves_an_external_directory(tmp_path):
 
 def test_bundled_sdk_and_build_inputs_are_hash_locked():
     build=builder(); config=json.loads(build.CONFIG.read_text('utf-8'))
-    sdk=APP/'packaging/vendor'/config['sdk']['wheel']
+    sdk=APP/'native/vendor'/config['sdk']['sourceArchive']
     assert build.digest(sdk)==config['sdk']['sha256']
     assert all('--hash=sha256:' in line for line in build.LOCK.read_text().splitlines() if line and not line.startswith('#'))

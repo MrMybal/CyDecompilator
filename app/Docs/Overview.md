@@ -1,7 +1,7 @@
 # Vue d'ensemble
 
 Un CyTool est une application autonome. Il décrit ses opérations avec `CyTool.json`
-et les exécute au moyen de CyToolsCore. Les clients découvrent le Tool, valident les
+et les exécute au moyen de l’hôte CyDecompilator/CyMCPSDK. Les clients découvrent le Tool, valident les
 paramètres, créent une session et soumettent des jobs. Le même runtime sert toutes
 les façades d'un processus.
 

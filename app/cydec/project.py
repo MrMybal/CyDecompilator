@@ -16,7 +16,7 @@ import threading
 import time
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from . import detect as detection
 from .paths import PROJECTS, read_json, write_json

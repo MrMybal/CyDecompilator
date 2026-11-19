@@ -26,7 +26,7 @@ SHADERS = FIXTURES / 'shaders'
 if str(APP) not in sys.path:
     sys.path.insert(0, str(APP))
 
-from cytools_core import CyToolError  # noqa: E402
+from cydec.mcp import CyToolError  # noqa: E402
 
 from cydec import components, detect, service  # noqa: E402
 from cydec.engines.base import EngineContext  # noqa: E402

@@ -4,7 +4,7 @@ title: Assistance IA et parcours autonomes
 description: Configurer un assistant et donner un objectif précis et vérifiable à un parcours autonome.
 section: IA et automatisation
 order: 13
-sourceRevision: 2
+sourceRevision: 3
 ---
 
 Ouvrez les [réglages de l’assistant IA](doc:ai) pour configurer un CLI connecté ou un fournisseur HTTP pris en charge, le modèle et les limites. Un CLI utilise son compte existant ; un fournisseur HTTP peut nécessiter sa clé et sa facturation. Les clés appartiennent au mécanisme d’identifiants du logiciel, jamais aux sources, scénarios JSON, captures ou paramètres métier. Un fournisseur local nécessite aussi son service et son modèle actifs.
@@ -13,6 +13,7 @@ Ouvrez les [réglages de l’assistant IA](doc:ai) pour configurer un CLI connec
 
 | Mode | Usage |
 |---|---|
+| Assistant de l’application | Conversation générale avec le SDK natif, même sans projet sélectionné |
 | Parcours autonome | Investigation, reconstruction, modification ou portage/test via les opérations |
 | Conversation | Questions sur le programme ; examiner appels d’outils et réponse |
 | Fonction | Expliquer, proposer des noms ou convertir la fonction choisie |
@@ -42,3 +43,17 @@ L’agent découvre les opérations Runtime, conserve des points de reprise, sau
 Lisez modifications, sorties de compilation, commits, reçus des copies et scénarios enregistrés. La fin d’un parcours exige ses preuves de validation, pas seulement une réponse affirmative. Une requête au modèle réussie ne signifie ni compilation réussie, ni tests passés, ni équivalence. Aucun fournisseur ne récupère des octets chiffrés absents ou ne garantit la reconstruction de toute application ou de tout jeu.
 
 Pour un client externe, consultez [MCP / CLI](doc:automation). Les réparations sont détaillées dans la [reconstruction](doc:reconstruction), et les changements ciblés dans le [remplacement](doc:patching).
+
+## Sessions et pièces jointes {#sessions-and-attachments}
+
+L’**assistant de l’application** utilise CyMCPSDK Conversation et le même registre métier que CLI/MCP. Le texte arrive progressivement ; Annuler interrompt un tour actif. **Actualiser les conversations** et **Restaurer la conversation** rouvrent une session précise appartenant à votre identité applicative. Les historiques conservent les échanges d’outils et survivent au redémarrage. Les anciennes conversations de projet restent accessibles ; une continuation explicite crée un checkpoint SDK sans supprimer l’ancien fichier.
+
+**Joindre des fichiers** sélectionne des fichiers locaux de 8 Mio maximum chacun. Les types image/audio/fichier acceptés dépendent du fournisseur et du transport réel ; un contenu non pris en charge produit une erreur. Pour les API, la fenêtre de contexte configurable réduit la requête tout en conservant l’historique local complet, les instructions système, le tour actif et les échanges d’outils entiers. Les agents CLI gardent leur propre gestion du contexte. Le résumé reste facultatif, sans requête cachée.
+
+Codex reçoit les outils dynamiques natifs. Les transports HTTP/Ollama compatibles utilisent les échanges d’outils du SDK. Claude Code reçoit une délégation MCP locale authentifiée limitée à cette conversation ; ses propres actions shell/fichiers restent désactivées. Les autres profils CLI/ACP permettent l’assistance de fonction mais demandent un chemin MCP explicite pour agir dans le chat métier. La détection d’un CLI ne prouve ni la connexion du compte ni la réussite d’une génération.
+
+## Permissions et outils externes {#permissions-and-external-tools}
+
+**Autoriser les modifications de l’application** permet les modifications métier dans les droits du client. Identifiants, mises à jour applicatives et actions destructives restent exclus du chat ; les révisions source, la préservation des binaires originaux et les sauvegardes Git existantes s’appliquent. Une conversation limitée à un projet ne peut pas utiliser un autre identifiant de projet.
+
+Dans **Réglages de l’assistant IA → Options CyMCPSDK et outils externes**, choisir les optimisations indépendantes et les serveurs MCP externes. Seuls les outils explicitement nommés dans `allowedTools` sont accessibles. Les secrets restent dans le coffre. `remote_tools`, `remote_call` et `remote_resources` découvrent/appellent les outils autorisés, lisent leurs ressources référencées et exposent les métadonnées des notifications compatibles. Une erreur métier distante reste une erreur. L’expiration d’une référence ne rejoue jamais une modification. Les transports et exemples sont détaillés dans [MCP et CLI](doc:automation).

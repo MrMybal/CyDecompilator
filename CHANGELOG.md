@@ -5,6 +5,19 @@
 CyDecompilator est **en développement**. Windows x64 est pris en charge ; Linux x64 est expérimental.
 Les paquets Windows complets incluent leur runtime ; la petite mise à jour applicative demande un runtime compatible existant. Le numéro de version ne garantit ni reconstruction complète ni compatibilité console.
 
+## 1.5.3 — 19 novembre 2026
+
+- Remplacement de l’intégration de l’ancien SDK Python par CyMCPSDK 0.7.0 compilé, en conservant tâches durables, opérations métier et permissions.
+- Pilotage par une IA externe via le CLI natif du SDK : choix automatique de l’instance ouverte ou du mode sans fenêtre, describe/invoke, JSONL persistant, consultation des tâches, résultats par morceaux, attente et annulation.
+- Assistant intégré avec réponses progressives, conversations enregistrées, restauration, pièces jointes et outils MCP externes explicitement autorisés.
+- Réglages indépendants de découverte compacte, cache, notifications, recherche native, quotas/dossier temporaire, mesures et projection du contexte API.
+- Manuel CyDoc hors ligne anglais/français, guide CLI pour l’IA, README et notices actualisés.
+- Installateur Windows x64, portable et archive applicative reconstruits.
+
+### Mise à niveau et limites
+
+Depuis la 1.5.2, utiliser l’installateur ou le portable complet : l’ABI du runtime natif a changé. Sauvegarder séparément `data/` avant de remplacer les fichiers applicatifs/runtime d’un portable existant. La petite archive exige le nouveau runtime compatible. Moteurs et chaînes de compilation optionnels restent séparés. Windows x64 est vérifié ; Linux reste expérimental. Claude Code a renvoyé AuthenticationRequired lors du contrôle du fournisseur natif ; le pilotage CLI externe n’exige pas de fournisseur intégré. L’écart d’empreinte préexistant des références Unreal reste non résolu.
+
 ## 1.5.2 — 7 novembre 2026
 
 - Installateur Windows x64 et ZIP portable complets, avec Python 3.11.18 déplaçable, 37 dépendances figées par empreinte et le SDK CyToolsCore 0.10.1 identifié par ses sources.

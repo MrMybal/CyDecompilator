@@ -9,7 +9,7 @@ import uuid
 
 import pytest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from cydec import porting,porting_analysis,service
 from cydec.engines import native
 from cydec.paths import write_json

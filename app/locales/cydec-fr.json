@@ -856,5 +856,21 @@
   "Diagram unavailable: %s": "Schéma indisponible : %s",
   "Read the bundled CyDoc documentation in your browser. No internet or server is required.": "Consultez la documentation CyDoc fournie dans votre navigateur. Aucune connexion ni aucun serveur ne sont nécessaires.",
   "Open documentation": "Ouvrir la documentation",
-  "Copy local documentation link": "Copier le lien local de la documentation"
+  "Copy local documentation link": "Copier le lien local de la documentation",
+  "Application assistant": "Assistant de l’application",
+  "Project assistant": "Assistant du projet",
+  "The assistant uses the same operations and permissions as the CLI and MCP.": "L’assistant utilise les mêmes opérations et permissions que le CLI et MCP.",
+  "Refresh conversations": "Actualiser les conversations",
+  "Restore conversation": "Restaurer la conversation",
+  "Allow application changes": "Autoriser les modifications de l’application",
+  "Attach files": "Joindre des fichiers",
+  "Clear attachments": "Retirer les pièces jointes",
+  "CyMCPSDK options and external tools": "Options CyMCPSDK et outils externes",
+  "Options are independent. Save and restart to apply. External tools require an explicit allowedTools list.": "Les options sont indépendantes. Enregistrez et redémarrez pour les appliquer. Les outils externes nécessitent une liste allowedTools explicite.",
+  "Save SDK options": "Enregistrer les options du SDK",
+  "Confirm destructive action": "Confirmer l’action destructive",
+  "Not running": "Arrêté",
+  "Not configured": "Non configuré",
+  "Executable missing": "Exécutable absent",
+  "Authentication required": "Authentification requise"
 }

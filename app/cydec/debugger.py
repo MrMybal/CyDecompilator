@@ -11,7 +11,7 @@ import time
 import uuid
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from . import components, process, workspace
 from .execution import output_events

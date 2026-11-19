@@ -9,7 +9,7 @@ import uuid
 from pathlib import Path
 
 import pefile
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from . import process, workspace
 from .paths import APP, ENGINES, read_json, write_json

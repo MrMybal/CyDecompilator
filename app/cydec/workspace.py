@@ -7,7 +7,7 @@ import shutil
 import uuid
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from . import components, process
 from .paths import read_json, write_json

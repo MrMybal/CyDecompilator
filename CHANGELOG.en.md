@@ -5,6 +5,19 @@
 CyDecompilator is **in development**. Windows x64 is supported; Linux x64 is experimental.
 Full Windows packages include their runtime; the smaller application-only update requires a compatible existing runtime. The version number does not establish reconstruction or console compatibility.
 
+## 1.5.3 — 19 November 2026
+
+- Replaced the former Python SDK integration with compiled CyMCPSDK 0.7.0, while retaining durable jobs, existing application operations and permissions.
+- External AI control through the native SDK CLI: automatic live-instance/headless selection, describe/invoke, persistent JSONL and job inspection, chunked results, waiting and cancellation.
+- Integrated application assistant with streamed responses, saved sessions, restoration, attachments and explicitly approved external MCP tools.
+- Independent settings for compact discovery, cache, notifications, native search, temporary storage quotas/directory, measurements and API context projection.
+- Updated English/French offline CyDoc manual, CLI agent guide, README and component notices.
+- Rebuilt Windows x64 installer, portable package and application-only archive.
+
+### Upgrade and limits
+
+Use the complete installer or portable package when upgrading from 1.5.2: the native runtime ABI changed. Preserve existing portable `data/` separately before replacing application/runtime files. The smaller update archive requires the new compatible runtime. Optional engines/toolchains remain separate. Windows x64 is validated; Linux remains experimental. Claude Code returned AuthenticationRequired during the current native-provider check; external SDK CLI control does not require an embedded provider. The existing Unreal reference snapshot mismatch remains unresolved.
+
 ## 1.5.2 — 7 November 2026
 
 - Complete Windows x64 installer and portable ZIP with a relocatable Python 3.11.18 runtime, 37 hash-locked dependencies and the source-identified CyToolsCore 0.10.1 SDK.

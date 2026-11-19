@@ -29,7 +29,7 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from .paths import DOWNLOADS, ENGINES, SETTINGS, read_json, write_json
 
@@ -609,7 +609,7 @@ def _install_one(component_id, context):
     release = resolve(component_id)
     if component_id == 'pydecompile':
         return _install_pip(context)
-    from cytools_core.downloads import DownloadManager
+    from cydec.mcp.downloads import DownloadManager
     DOWNLOADS.mkdir(parents=True, exist_ok=True)
     manager = DownloadManager(DOWNLOADS, timeout=60, use_shared_cache=False)
     file_name = re.sub(r'[^A-Za-z0-9_.-]', '_', release['fileName'])

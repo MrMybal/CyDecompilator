@@ -25,7 +25,7 @@ Linux x64 reste expérimental et utilise **CyDecompilator.sh** avec un runtime c
 | runtime/engines/ | Moteurs d’analyse et chaînes d’outils optionnels |
 | data/ | Projets, réglages, historique, tâches et rapports |
 
-Ne déplacez pas un environnement virtuel Python en supposant qu’il fonctionnera encore : ses lanceurs peuvent contenir des chemins absolus. Pour une installation de développement neuve, créez-le à son emplacement définitif, puis installez les dépendances de l’application et le SDK CyToolsCore du propriétaire. La procédure développeur figure dans **app/README.md**. L’exécution Linux et chaque moteur ont leurs propres limites de validation ; les résultats Windows ne prouvent pas la compatibilité Linux.
+Ne déplacez pas un environnement virtuel Python en supposant qu’il fonctionnera encore : ses lanceurs peuvent contenir des chemins absolus. Pour une installation de développement neuve, créez-le à son emplacement définitif, puis installez les dépendances de l’application et compilez le SDK natif CyMCPSDK depuis ses sources locales ou fournies. La procédure développeur figure dans **app/README.md**. L’exécution Linux et chaque moteur ont leurs propres limites de validation ; les résultats Windows ne prouvent pas la compatibilité Linux.
 
 ## Vérifier les prérequis selon l’objectif {#check-prerequisites-by-task}
 

@@ -15,3 +15,12 @@ The human manual is `Documentation.html`; the native help adapter is
 Installation-specific paths, user projects and credentials do not belong in this
 sidecar. The operation contracts below are declarative API data, not permission
 to execute an operation or install a component.
+
+## Native SDK discovery
+
+The runtime uses CyMCPSDK 0.7.0. Full discovery retains op_<operation> asynchronous jobs and adds direct business tools. Compact discovery exposes cy_tools_search, cy_tools_describe and cy_tools_call; complete schemas remain accessible. Native resources and chunk reads preserve private large results. Expiration must never cause an action to be repeated; use durable job results through cy_read_result. For an open GUI use its authenticated loopback /mcp endpoint rather than starting another scheduler on the same database. The CLI preserves its commands and supports --connect for /v1. SDK business chat, external allowlists and independent options are documented in the human automation/AI chapters.
+
+
+## External CLI agents
+
+An external AI can use CyDecompilatorCLI.exe --auto directly, without MCP or a model configured inside the app. SDK describe/invoke and jsonl call the native dispatch_app registry. Preserve existing authorization and complete the requested business workflow autonomously. Read app/skills/cydecompilator/references/cli.md for native JSONL, stable ownership, job controls and process lifetime. Never replace a wait timeout with a mutation replay.

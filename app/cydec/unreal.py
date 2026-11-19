@@ -2,7 +2,7 @@
 import hashlib
 import json
 from pathlib import Path
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 APP = Path(__file__).resolve().parents[1]
 CATALOG = APP / 'unreal_support/reconstruction-rules.json'

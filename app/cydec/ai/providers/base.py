@@ -8,7 +8,7 @@ with the native identifier it recorded, so trimming the local transcript changes
 display but not what the provider remembers. `kind` carries that difference to the
 interface, to MCP and to the saved conversation instead of leaving it implicit.
 """
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 STATELESS = 'stateless'
 SESSION = 'session'

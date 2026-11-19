@@ -1,5 +1,7 @@
 # Livraison obligatoire d'un CyTool autonome
 
+> Référence historique des contrats applicatifs. Pour cette application, suivre [CyMCPSDK.md](CyMCPSDK.md) et `app/AGENTS.md`. Les exemples de génération `cytools` ne sont pas des commandes livrées avec CyDecompilator ; aucun ancien SDK Python n’est requis.
+
 Pour les maillages, appliquer [MeshViewer.md](MeshViewer.md) : vue 3D interactive
 obligatoire après génération/remesh/PBR/UV/rig, commandes souris/clavier, inspection
 rapprochée, scènes et éclairages. Les aperçus fixes seuls ne suffisent pas.
@@ -132,7 +134,7 @@ dans une release publique par défaut.
 - Guide utilisateur court à la racine, documentation développeur dans app/, preuves dans data/reports.
 
 Adapter les chemins, licences, opérations et mises à jour au Tool cible.
-Ne pas copier le runtime CyToolsCore, les modèles ou un environnement existant.
+Ne pas copier un environnement de développement, les modèles, les modèles ou un environnement existant.
 
 # Journaux et modèles
 

@@ -12,8 +12,8 @@
     </td>
     <td width="300" align="right" valign="top">
       <p><sub>Application license</sub><br><a href="LICENSE"><strong>GPL-3.0-only</strong></a></p>
-      <p><sub>Version</sub><br><a href="CHANGELOG.en.md"><strong>1.5.2</strong></a><br><strong>IN DEVELOPMENT</strong></p>
-      <p><a href="https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.2/CyDecompilator-1.5.2-windows-x64-setup.exe"><strong>Download installer</strong></a><br><sub>Windows x64 · Python included</sub><br><a href="https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.2/CyDecompilator-1.5.2-windows-x64-portable.zip">Portable ZIP</a></p>
+      <p><sub>Version</sub><br><a href="CHANGELOG.en.md"><strong>1.5.3</strong></a><br><strong>IN DEVELOPMENT</strong></p>
+      <p><a href="https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.3/CyDecompilator-1.5.3-windows-x64-setup.exe"><strong>Download installer</strong></a><br><sub>Windows x64 · Python included</sub><br><a href="https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.3/CyDecompilator-1.5.3-windows-x64-portable.zip">Portable ZIP</a></p>
     </td>
   </tr>
 </table>
@@ -22,7 +22,9 @@
 
 A desktop workspace for reverse engineers and developers: understand compiled applications, edit recovered sources and test changes. Inspect native binaries, .NET, Java, Android, Python bytecode, JavaScript/Electron and shaders, with optional AI assistance and MCP automation.
 
-> **IN DEVELOPMENT · 1.5.2**
+> **IN DEVELOPMENT · 1.5.3**
+>
+> Version 1.5.3 integrates CyMCPSDK and native SDK CLI/JSONL control. Upgrading from 1.5.2 requires the complete installer or portable package because the runtime ABI changed. See the [SDK guide](app/Docs/CyMCPSDK.md).
 >
 > Windows x64 is supported; Linux x64 is experimental. The installer and portable ZIP include Python and the required runtime libraries. Read the [version notes and documented limitations](CHANGELOG.en.md).
 
@@ -280,6 +282,26 @@ Open **AI assistant settings**:
 The AI receives the selected function's code and information requested through its tools.
 With an online provider, that code leaves your machine.
 
+### Use an external AI through the SDK CLI
+
+An external AI with terminal access can drive the application without an integrated
+conversation or a model account inside CyDecompilator. `--auto` uses the open instance
+or runs without a window; the local identity and job results survive between commands.
+
+```powershell
+.\CyDecompilatorCLI.exe --auto list-operations
+.\CyDecompilatorCLI.exe --auto describe-operation open_file
+.\CyDecompilatorCLI.exe --auto sdk invoke open_file --params-file input.json
+.\CyDecompilatorCLI.exe --auto jsonl
+```
+
+`input.json` contains the requested operation arguments. Native JSONL calls the
+compiled SDK's `dispatch_app`; keep stdin open for multi-step tasks and debugging.
+Use `jobs`, `job`, `wait`, `result` and `cancel` to follow durable work. The same
+business handlers perform source edits, reconstruction, Git, builds and tests.
+The external AI client's execution/approval policy still applies.
+[CLI agent guide](app/skills/cydecompilator/references/cli.md) · [SDK integration](app/Docs/CyMCPSDK.md).
+
 ### Use from an AI client (MCP)
 
 ```text
@@ -376,21 +398,21 @@ Linux x64 remains experimental and needs its own Linux-created runtime; these Wi
 
 ### Installer
 
-1. [Download the Windows installer](https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.2/CyDecompilator-1.5.2-windows-x64-setup.exe).
+1. [Download the Windows installer](https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.3/CyDecompilator-1.5.3-windows-x64-setup.exe).
 2. Run setup, choose English or French and the installation folder. The default current-user installation needs no administrator rights; a desktop shortcut is optional.
 3. Start **CyDecompilator** from the Start menu. Uninstall preserves projects, settings and downloaded engines created after installation.
 
 ### Portable
 
-1. [Download the complete portable ZIP](https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.2/CyDecompilator-1.5.2-windows-x64-portable.zip).
+1. [Download the complete portable ZIP](https://github.com/MrMybal/CyDecompilator/releases/download/v1.5.3/CyDecompilator-1.5.3-windows-x64-portable.zip).
 2. Extract the whole archive to a writable folder. Keep `app/` and `runtime/` beside `CyDecompilator.exe`.
 3. Start `CyDecompilator.exe`. User data stays in `data/` within the portable folder. Close the application before moving the folder.
 
-Optional engines and C/C++/.NET/Java/Node build tools are installed separately from **Engines** or through their official installers. Consult the [release notes and SHA-256 files](https://github.com/MrMybal/CyDecompilator/releases/tag/v1.5.2).
+Optional engines and C/C++/.NET/Java/Node build tools are installed separately from **Engines** or through their official installers. Consult the [release notes and SHA-256 files](https://github.com/MrMybal/CyDecompilator/releases/tag/v1.5.3).
 
 ### Updates and local files
 
-The smaller `CyDecompilator-1.5.2.zip` is an **application-only update**, for an existing compatible runtime. In **Engines → Application updates**, download, verify, apply or roll back an update. The updater chooses this archive independently of the order of full packages in the release and preserves `data/` and the existing runtime.
+The smaller `CyDecompilator-1.5.3.zip` is an **application-only update**, for an existing compatible runtime. In **Engines → Application updates**, download, verify, apply or roll back an update. The updater chooses this archive independently of the order of full packages in the release and preserves `data/` and the existing runtime.
 
 `data/projects/` stores analyses, comments and cached code; `data/settings/` stores preferences and credentials; `data/logs/` stores logs. `runtime/` holds Python, downloaded engines and staged updates.
 
@@ -399,15 +421,14 @@ The smaller `CyDecompilator-1.5.2.zip` is an **application-only update**, for an
 <details>
 <summary>Set up and run from source</summary>
 
-Use Python 3.11, Git and [the runtime requirements](app/requirements.txt). The pinned CyToolsCore
-SDK is fetched through Git; source access may require your GitHub account. Create the virtual
-environment in its final directory: Python virtual environments are not relocatable.
+Use Python 3.11, Git, a C++20 compiler/CMake and [the runtime requirements](app/requirements.txt). Build the pinned native CyMCPSDK with `python app/scripts/build_mcp_sdk.py --bundled`; a clean sibling SDK checkout can also be selected explicitly. Create the Python environment in its final directory: virtual environments are not relocatable.
 
 ```powershell
 git clone https://github.com/MrMybal/CyDecompilator.git
 cd CyDecompilator
 py -3.11 -m venv runtime\python
 runtime\python\Scripts\python.exe -m pip install -r app\requirements.txt
+runtime\python\Scripts\python.exe app\scripts\build_mcp_sdk.py --bundled
 runtime\python\Scripts\python.exe app\desktop.py
 ```
 
@@ -446,7 +467,7 @@ Reading the exported manual needs none of those build tools. See the [developer 
 
 | Library · source | License · terms | Use / scope |
 | --- | --- | --- |
-| [CyToolsCore 0.10.1](https://github.com/MrMybal/CyToolsCore) | [MIT](app/packaging/vendor/CyToolsCore-LICENSE.txt) | Required runtime, CLI and MCP SDK, pinned Git revision; source access may require permission. |
+| [CyMCPSDK 0.7.0](https://github.com/MrMybal/CyMCPSDK) | [MIT](app/native/vendor/CyMCPSDK-MIT.txt) | Compiled native operation registry, MCP client/server and Conversation service; [integration and revision](app/Docs/CyMCPSDK.md). |
 | [CyUI 1.2.0](https://github.com/MrMybal/CyUI) | [MIT](app/vendor/CYUI_LICENSE.txt) | Selected bundled Python UI modules; private source repository, [pinned provenance](app/vendor/cyui-source.json). |
 | [Dear ImGui / imgui-bundle 1.92.900](https://github.com/pthom/imgui_bundle) | [MIT + component notices](https://github.com/pthom/imgui_bundle/blob/main/LICENSE) | Native UI/editor runtime; retain component/font notices, including Inconsolata SIL OFL 1.1. |
 | [Capstone 5.0.9](https://github.com/capstone-engine/capstone) | [BSD-3-Clause](https://www.capstone-engine.org/License.html) | Runtime disassembly and C lifting. |
@@ -457,7 +478,6 @@ Reading the exported manual needs none of those build tools. See the [developer 
 | [pywin32 312](https://github.com/mhammond/pywin32) | [PSF + component notices](https://github.com/mhammond/pywin32#license) | Windows-only runtime integration. |
 | [CPython](https://github.com/python/cpython) | [PSF + component notices](https://github.com/python/cpython/blob/3.11/LICENSE) | Self-contained runtime bundled in complete Windows packages. |
 | [CyDoc 0.1.0](https://github.com/MrMybal/CyDoc) | [MIT](app/Documentation/DocData/CyDoc-LICENSE.txt) | Bundled reader + image module; private source, [pinned provenance](app/.CyDocBuild/vendor/cydoc-source.json). No mesh/Three.js dependency. |
-| [cyai_connectors](app/cydec/ai/vendor/cyai_connectors) | [Component registry](app/licenses.json) | Bundled CLI adapter from CyTools_AIChat; no separate license declaration. Provider programs use their own terms. |
 
 <details>
 <summary>Optional engines, helpers and build dependencies</summary>

@@ -15,7 +15,7 @@ import os
 import stat
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from ..paths import SETTINGS, read_json, write_json
 
@@ -72,16 +72,17 @@ def _restrict(path):
         pass
 
 
-def store(provider_id, value):
+def store(provider_id, value, *, file=None):
     """Store a key. The caller must have read it from stdin or a masked field, never argv."""
     value = str(value or '').strip()
     if not value:
         raise CyToolError('InvalidParameters', 'An empty key cannot be stored.')
-    records = read_json(STORE, {})
+    target=Path(file) if file is not None else STORE
+    records = read_json(target, {})
     records[str(provider_id)] = _seal(value)
-    write_json(STORE, records)
-    _restrict(STORE)
-    return status(provider_id)
+    write_json(target, records)
+    _restrict(target)
+    return status(provider_id,file=target)
 
 
 def clear(provider_id):
@@ -92,22 +93,22 @@ def clear(provider_id):
     return {'providerId': provider_id, 'removed': removed}
 
 
-def resolve(provider_id):
+def resolve(provider_id, *, file=None):
     """Return the key or an empty string. Never log, echo or return this value to a client."""
     variable = ENVIRONMENT.get(provider_id)
     if variable and os.environ.get(variable, '').strip():
         return os.environ[variable].strip()
-    record = read_json(STORE, {}).get(str(provider_id))
+    record = read_json(Path(file) if file is not None else STORE, {}).get(str(provider_id))
     if not isinstance(record, dict) or not record.get('value'):
         return ''
     return _open(record)
 
 
-def status(provider_id):
+def status(provider_id, *, file=None):
     """Everything a caller may know about a key: that it exists, and how it is protected."""
     variable = ENVIRONMENT.get(provider_id)
     from_environment = bool(variable and os.environ.get(variable, '').strip())
-    record = read_json(STORE, {}).get(str(provider_id))
+    record = read_json(Path(file) if file is not None else STORE, {}).get(str(provider_id))
     stored = isinstance(record, dict) and bool(record.get('value'))
     return {'providerId': provider_id, 'configured': from_environment or stored,
             'source': 'environment' if from_environment else ('stored' if stored else 'none'),

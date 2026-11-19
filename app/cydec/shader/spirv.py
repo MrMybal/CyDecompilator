@@ -6,7 +6,7 @@ types, constants, global variables, entry points and functions split into blocks
 """
 import struct
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 # opcode: (name, has result type, has result id)
 OPS = {

@@ -134,13 +134,6 @@
   },
   {
     "kind": "Component",
-    "name": "AI providers and cyai_connectors (from CyTools_AIChat)",
-    "license": "Same author; cyai_connectors declares no licence",
-    "url": "",
-    "notes": "Agent command lines (Claude Code, Codex, Antigravity, OpenCode) are not redistributed: the programs already installed and signed in on this machine are started, under their publishers' terms. HTTP providers are reached with the user's own API key."
-  },
-  {
-    "kind": "Component",
     "name": "Dear ImGui / imgui_bundle (interface)",
     "license": "MIT",
     "url": "https://github.com/pthom/imgui_bundle/blob/main/LICENSE",
@@ -155,9 +148,16 @@
   },
   {
     "kind": "Component",
-    "name": "CyToolsCore 0.10.1",
+    "name": "CyMCPSDK 0.7.0",
     "license": "MIT",
-    "url": "https://github.com/MrMybal/CyToolsCore/blob/05352e1d2f58f423fa2ad57b8eec48d2609f2626/LICENSE",
-    "notes": "Required SDK bundled in full Windows distributions from the pinned source wheel. Python sources and MIT notice are included; wheel provenance is in app/packaging/vendor/cytools-core-source.json."
+    "url": "https://github.com/MrMybal/CyMCPSDK/blob/791d4d7d7680213b282ec8529d248a10f8494d77/LICENSE",
+    "notes": "Compiled native Core, Platform, Http, MCP and AI modules. Source archive, exact hashes and MIT/transitive notices are in app/native/. The Python host owns durable jobs and adapts the existing CyUI interface to the SDK Conversation service."
+  },
+  {
+    "kind": "Component",
+    "name": "Legacy installation storage and HTTPS behavior",
+    "license": "MIT",
+    "url": "app/native/vendor/Legacy-storage-MIT.txt",
+    "notes": "Application-owned compatibility helpers, with exact source provenance in app/native/legacy-storage-source.json. No former Python SDK package is distributed or imported."
   }
 ]

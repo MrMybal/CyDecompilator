@@ -1,16 +1,18 @@
 ---
 name: cydecompilator
-description: Use CyDecompilator through MCP to investigate binaries or JavaScript/Electron applications, reconstruct and build editable projects, replace native or .NET methods, debug .NET sources, compare observed behavior, or prepare and test PS5 desktop ports with separate AnyPS5 and UltraPack backends. Drive requested work to a tested result. Use when the user requests these operations in CyDecompilator.
+description: Use CyDecompilator through its native SDK CLI/JSONL or MCP to investigate binaries or JavaScript/Electron applications, reconstruct and build editable projects, replace native or .NET methods, debug .NET sources, compare observed behavior, or prepare and test PS5 desktop ports. Drive requested work autonomously to a tested result. Use when the user requests these operations in CyDecompilator.
 ---
 
 # CyDecompilator
 
-Drive the connected CyDecompilator MCP server. Discover its current tools and use
+Use the interface requested by the user. An external AI can operate the application
+through its SDK CLI without MCP or an embedded model: read [the CLI contract](references/cli.md).
+For MCP, drive the connected CyDecompilator server. Discover its current tools and use
 `cy_describe_operation` for the input/output contract of each unfamiliar operation.
-Do not assume the server version matches a remembered schema. Operation tool names
-are `op_<operationId>`; runtime controls begin with `cy_`.
+Do not assume the installed version matches a remembered schema. Native names match
+operation IDs; compatibility asynchronous tools are `op_<operationId>` and controls begin with `cy_`.
 
-Read [the MCP contract](references/mcp.md) first. Then read the relevant workflow:
+Read [the MCP contract](references/mcp.md) when using MCP. Then read the relevant workflow:
 
 - [Autonomous completion](references/autonomy.md): carrying the task through
   validation, recovery, engine preparation, checkpoints and the integrated agent.

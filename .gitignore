@@ -2,6 +2,9 @@
 runtime/
 # User data: projects, settings, credentials, logs, reports.
 data/
+/.cytools/
+**/mcp-instance.json
+**/mcp-automation-credentials.json
 __pycache__/
 *.pyc
 .pytest_cache/

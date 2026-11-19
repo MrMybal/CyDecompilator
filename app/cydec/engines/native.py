@@ -15,7 +15,7 @@ import re
 import struct
 import time
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from .base import Engine
 

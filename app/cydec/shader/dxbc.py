@@ -7,7 +7,7 @@ input/output signatures. `disassemble(shader)` prints an fxc-like listing;
 """
 import struct
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 PROGRAM_TYPES = {0: ('ps', 'Pixel'), 1: ('vs', 'Vertex'), 2: ('gs', 'Geometry'), 3: ('hs', 'Hull'),
                  4: ('ds', 'Domain'), 5: ('cs', 'Compute')}

@@ -9,7 +9,7 @@ import psutil
 import pytest
 
 from test_managed_patching import sample, edit, value_method  # fixture shared with managed patch tests
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from cydec import execution, process, service
 from cydec.engines.base import EngineContext
 

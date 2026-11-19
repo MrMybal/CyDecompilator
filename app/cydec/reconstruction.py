@@ -12,7 +12,7 @@ import time
 import uuid
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from . import behavior, history, process, workspace
 from .paths import read_json, write_json
 

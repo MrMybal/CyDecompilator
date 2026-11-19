@@ -11,7 +11,7 @@ import time
 import zipfile
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from .. import components, process
 from .base import Engine

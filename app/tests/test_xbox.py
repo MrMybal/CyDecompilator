@@ -11,7 +11,7 @@ import pytest
 
 APP=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(APP))
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from cydec import xbox
 from cydec.engines.base import EngineContext
 from cydec.paths import write_json

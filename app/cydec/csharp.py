@@ -10,7 +10,7 @@ import uuid
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from . import process, workspace
 from .paths import APP, ENGINES, read_json
 

@@ -5,7 +5,7 @@ several entry points, each decompiled with the module's declarations and helpers
 """
 import time
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from ..shader import dxbc, dxil, dxil_hlsl, glsl, hlsl, spirv
 from .base import Engine

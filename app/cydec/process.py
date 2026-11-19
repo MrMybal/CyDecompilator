@@ -9,7 +9,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 CREATE_NO_WINDOW = 0x08000000 if os.name == 'nt' else 0
 

@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import re
 import uuid
-from cytools_core import validate_parameters
+from cydec.mcp import validate_parameters
 
 def secret_key(key):
     key=re.sub(r'[^a-z]','',str(key).lower())

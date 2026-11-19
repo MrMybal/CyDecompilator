@@ -11,7 +11,7 @@ import re
 import time
 import uuid
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from . import porting,service
 from .engines import native

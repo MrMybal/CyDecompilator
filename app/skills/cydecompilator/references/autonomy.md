@@ -6,6 +6,9 @@ source repairs, executable output and representative comparisons. Choose default
 from the actual format, architecture, available engines and supplied scenarios.
 Use the existing authorization without asking again at each intermediate operation.
 
+For command-line control use [the SDK CLI](cli.md), including `--auto`, native
+JSONL and durable job controls. MCP is another interface, not a prerequisite.
+
 ## Drive the operations yourself
 
 1. Open the original. For a missing binary engine, `open_file analyze=false`

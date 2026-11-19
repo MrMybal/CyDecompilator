@@ -14,12 +14,19 @@
     "size": 14336568
   },
   "sdk": {
-    "name": "CyToolsCore",
-    "version": "0.10.1",
-    "repository": "https://github.com/MrMybal/CyToolsCore",
-    "revision": "05352e1d2f58f423fa2ad57b8eec48d2609f2626",
+    "version": "0.7.0",
+    "repository": "https://github.com/MrMybal/CyMCPSDK",
+    "revision": "791d4d7d7680213b282ec8529d248a10f8494d77",
+    "name": "CyMCPSDK",
     "license": "MIT",
-    "wheel": "cytools_core-0.10.1-py3-none-any.whl",
-    "sha256": "2cbf92f8cade40308c26364e4a1d531077a2af9e282c3ce9ba75f0c9a56260ae"
+    "sourceArchive": "CyMCPSDK-source.zip",
+    "sha256": "858aa2d6b1240a611a10b793140625dbd61dc45a2d1ae75a9e14f6c5b7141ad8",
+    "modules": [
+      "Core",
+      "Platform",
+      "Http",
+      "MCP",
+      "AI"
+    ]
   }
 }

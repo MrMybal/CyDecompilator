@@ -4,7 +4,7 @@ Settings (data/settings/symbols.json): enabled, server (HTTPS symbol server, Mic
 default, empty = local only) and localFolders searched first. The symbols found for a
 project are cached in its folder (symbols.json) so later analyses and engines reuse them.
 """
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from . import pdb
 from .paths import SETTINGS, read_json, write_json

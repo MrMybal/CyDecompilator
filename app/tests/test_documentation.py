@@ -297,10 +297,16 @@ def test_release_excludes_workspace_and_overlays_the_complete_export(tmp_path,mo
     monkeypatch.setattr(build_documentation,'build',lambda:SITE)
     monkeypatch.setattr(make_release.subprocess,'run',lambda *a,**kw:SimpleNamespace(stdout=buffer.getvalue()))
     monkeypatch.setattr(make_release,'sys',SimpleNamespace(platform='linux'))
+    native=tmp_path/'native';native.mkdir()
+    (native/'libcydec_mcp.so').write_bytes(b'native-library-fixture')
+    (native/'build.json').write_text('{"version":"0.7.0"}','utf-8')
+    monkeypatch.setattr(make_release,'build_native',lambda:native)
     monkeypatch.setattr(make_release,'DIST',tmp_path)
     archive,version,commit,sha=make_release.build()
     assert hashlib.sha256(archive.read_bytes()).hexdigest()==sha
     with zipfile.ZipFile(archive) as exported:
         assert not any('/.CyDocBuild/' in n or n.endswith('/obsolete.js') for n in exported.namelist())
+        assert exported.read('CyDecompilator/app/native/bin/libcydec_mcp.so')==b'native-library-fixture'
+        assert json.loads(exported.read('CyDecompilator/app/native/bin/build.json'))['version']=='0.7.0'
         for source in SITE.rglob('*'):
             if source.is_file():assert exported.read('CyDecompilator/app/Documentation/'+source.relative_to(SITE).as_posix())==source.read_bytes()

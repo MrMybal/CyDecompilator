@@ -11,8 +11,8 @@ from installation_ui import configure as configure_storage
 
 configure_storage()
 
-from cytools_core import CyToolError, Runtime, load_manifest  # noqa: E402
-from cytools_core.transports.cli import run_cli  # noqa: E402
+from cydec.mcp import CyToolError, Runtime, load_manifest  # noqa: E402
+from cydec.mcp.cli import run_cli  # noqa: E402
 
 APP = Path(__file__).resolve().parent
 ROOT = APP.parent
@@ -39,10 +39,9 @@ def ai_options(parameters):
 
 
 # Operations declare their real effects (network, spawning engines, writing outside data/).
-# The Core gates them on the caller's identity, so the implicit client the CLI and MCP
-# transports would create could not call them. When no identity is configured the Tool
+# The host gates them on the caller's identity. When no identity is configured it
 # mints a local client holding exactly the permissions its manifest declares and passes
-# its token through CYTOOLS_TOKEN, the variable the Core already reads. Set CYTOOLS_TOKEN
+# its token through CYMCP_TOKEN (CYTOOLS_TOKEN remains a compatibility alias). Set CYMCP_TOKEN
 # to a client created with `create-client --permission ...` to use a restricted identity.
 EVENT_LIMIT = 20000
 
@@ -56,10 +55,10 @@ def declared_permissions(runtime):
 
 def ensure_standalone_identity(runtime):
     import os
-    if os.environ.get('CYTOOLS_TOKEN'):
+    if os.environ.get('CYMCP_TOKEN') or os.environ.get('CYTOOLS_TOKEN'):
         return ''
     token = runtime.create_client('standalone', declared_permissions(runtime))['token']
-    os.environ['CYTOOLS_TOKEN'] = token
+    os.environ['CYMCP_TOKEN'] = token
     return token
 
 
@@ -276,16 +275,23 @@ def create_runtime(data_dir, **options):
                                          p.get('verify', True), p.get('instructions', ''), p.get('language', 'en'),
                                          ctx, ai_options(p))
             if name == 'ai_ask':
-                return assistant.ask(p['projectId'], p['question'], p.get('function', ''), p.get('engine', ''),
-                                     p.get('conversationId', ''), p.get('allowEdits'), p.get('language', 'en'),
-                                     ctx, ai_options(p))
+                return runtime.assistant.send(context,p['question'],p.get('conversationId',''),
+                    p.get('provider',''),p.get('model',''),p['projectId'],
+                    p.get('allowEdits',assistant.settings()['allowEdits']))
             if name == 'ai_batch_rename':
                 return assistant.batch_rename(p['projectId'], p.get('engine', ''), p.get('limit', 20),
                                               p.get('onlyUnnamed', True), ctx, ai_options(p))
             if name == 'ai_conversations':
-                return {'conversations': assistant.conversations(p['projectId'])}
+                saved=[s for s in runtime.assistant.list(runtime.assistant._actor(context))['conversations'] if s.get('projectId')==p['projectId']]
+                return {'conversations':saved+assistant.conversations(p['projectId'])}
             if name == 'ai_conversation':
-                return assistant.conversation(p['projectId'], p['conversationId'])
+                try:
+                    out=runtime.assistant.history(runtime.assistant._actor(context),p['conversationId'])
+                    if out['projectId']!=p['projectId']:raise CyToolError('AccessDenied','Conversation belongs to another project.')
+                    out['turns']=out['history'];return out
+                except CyToolError as exc:
+                    if exc.code!='NotFound':raise
+                    return assistant.conversation(p['projectId'], p['conversationId'])
             raise CyToolError('NotFound', name)
         return run
 
@@ -297,6 +303,16 @@ def create_runtime(data_dir, **options):
     from cydec.ai import agent
     registrations['ai_agent'] = agent.run
     registrations['ai_agent_status'] = lambda c, p: agent.status(p['projectId'], p.get('runId', ''))
+    registrations.update({
+        'assistant_send':lambda c,p:runtime.assistant.send(c,p['text'],p.get('conversationId',''),p.get('provider',''),p.get('model',''),p.get('projectId',''),p.get('allowEdits',True),p.get('attachments',[])),
+        'assistant_history':lambda c,p:runtime.assistant.history(runtime.assistant._actor(c),p['conversationId']) if p.get('conversationId') else runtime.assistant.list(runtime.assistant._actor(c)),
+        'assistant_connections':lambda c,p:runtime.assistant.providers(c,p.get('refresh',False)),
+        'remote_tools':lambda c,p:runtime.assistant.remote_tools(c,p['server'],p.get('refresh',False)),
+        'remote_call':lambda c,p:runtime.assistant.remote_call(c,p['server'],p['tool'],p['arguments']),
+        'remote_resources':lambda c,p:runtime.assistant.resources(c,p['server'],p.get('action','list'),p.get('uri','')),
+        'workspace_grep_native':lambda c,p:runtime.native.call('fileGrep',arguments=p,principal=runtime.assistant._actor(c).client_id,requestId=c.job_id),
+        'workspace_read_native':lambda c,p:runtime.native.call('fileRead',arguments=p,principal=runtime.assistant._actor(c).client_id,requestId=c.job_id),
+    })
     registrations.update({
         'update_state': lambda c, p: updates.state(),
         'update_configure': lambda c, p: updates.configure(p.get('repository'), p.get('automaticCheck')),
@@ -313,7 +329,7 @@ def create_runtime(data_dir, **options):
     missing = declared - set(registrations)
     if missing:
         raise RuntimeError('Operations without handler: %s' % ', '.join(sorted(missing)))
-    from cytools_core.shared_installation import register_operations
+    from cydec.mcp.shared_installation import register_operations
     register_operations(runtime, ROOT)
     ensure_standalone_identity(runtime)
     return runtime
@@ -321,6 +337,6 @@ def create_runtime(data_dir, **options):
 
 if __name__ == '__main__':
     argv = sys.argv[1:]
-    if '--data-dir' not in argv:
+    if not any(a=='--data-dir' or a.startswith('--data-dir=') for a in argv):
         argv = ['--data-dir', str(ROOT / 'data/jobs'), *argv]
     raise SystemExit(run_cli(create_runtime, argv))

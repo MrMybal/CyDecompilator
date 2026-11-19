@@ -10,7 +10,7 @@ class Panel:
         self.test='--ui-test-advanced' in sys.argv;self.future=None;self.executor=ThreadPoolExecutor(max_workers=1)
         self.editors={};self.contracts={};self.results={}
         if runtime is not None:
-            from cytools_core.transports.api import LocalClient
+            from cydec.mcp.api import LocalClient
 
             self.submit=runtime.submit
             self.principal=principal or runtime.authenticate(runtime.create_client('Standalone advanced')['token'])
@@ -21,11 +21,11 @@ class Panel:
         operation=self.runtime.descriptor['operations'][self.index]
         if operation['id'] not in self.drafts:
             defaults={k:v['default'] for k,v in operation['inputSchema'].get('properties',{}).items() if 'default' in v}
-            self.drafts[operation['id']]={'text':json.dumps(defaults,indent=2),'backend':'','model':'','priority':3,'queue':'','execution':'','path':''}
+            self.drafts[operation['id']]={'text':json.dumps(defaults,indent=2),'backend':'','model':'','priority':3,'queue':'','execution':'','path':'','confirmed':False}
         return operation,self.drafts[operation['id']]
     def payload(self):
         operation,state=self.state()
-        from cytools_core import validate_parameters
+        from cydec.mcp import validate_parameters
         return validate_parameters(json.loads(state['text']),operation['inputSchema'])
     def restore(self,value):
         self.index=next(i for i,o in enumerate(self.runtime.descriptor['operations']) if o['id']==value['operationId'])
@@ -73,11 +73,13 @@ class Panel:
                 self.future=self.executor.submit(self.client.call,'CanRun',operationId=operation['id'],parameters=self.payload(),backendId=state['backend'],modelId=state['model'])
             ui.same_line()
             active=self.job and self.job['state'] not in ('Completed','Cancelled','Failed')
+            from cydec.mcp.runtime import CONFIRM
+            if operation['id'] in CONFIRM:_,state['confirmed']=ui.checkbox(label('Confirm destructive action'),state.get('confirmed',False))
             ui.begin_disabled(bool(active))
             try:
                 if ui.button(label('Run exact parameters')):
                     options={key:float(state[field]) for key,field in (('queue_timeout','queue'),('execution_timeout','execution')) if state[field].strip()}
-                    self.job=self.submit(self.principal,self.session,operation['id'],self.payload(),backend_id=state['backend'],model_id=state['model'],priority=priorities[state['priority']],**options)
+                    self.job=self.submit(self.principal,self.session,operation['id'],self.payload(),backend_id=state['backend'],model_id=state['model'],priority=priorities[state['priority']],confirmed=state.get('confirmed',False),**options)
                     self.message=json.dumps(self.job,indent=2,ensure_ascii=False)
             finally:ui.end_disabled()
             if active:

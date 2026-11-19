@@ -1,63 +1,48 @@
-# Créer son premier CyTool
+# Ajouter une opération à CyDecompilator
 
-Installer le SDK comme indiqué dans le README. Les commandes suivantes supposent
-que l'environnement virtuel contenant le SDK est activé (`.venv/Scripts/Activate.ps1`
-sous PowerShell ou `source .venv/bin/activate` sous Linux/macOS).
+L’hôte Python conserve les contrats applicatifs de jobs, sessions et configurations.
+Le registre natif, le chat et MCP sont fournis par [CyMCPSDK](CyMCPSDK.md).
+Aucun générateur ou paquet Python de l’ancien SDK n’est nécessaire.
+
+## Préparer le runtime
+
+Depuis la racine, avec Python 3.11 et les outils C++20/CMake :
 
 ```powershell
-cytools new ./CyToolExample --name CyToolExample --id cy.tool.example
-cd CyToolExample
-cytools validate CyTool.json
-python -m unittest -v
-python tool.py describe
-python tool.py list-operations
-python tool.py invoke echo --params-file params.json
+runtime/python/Scripts/python.exe -m pip install -r app/requirements.txt
+runtime/python/Scripts/python.exe app/scripts/build_mcp_sdk.py
+runtime/python/Scripts/python.exe app/tool.py describe
+runtime/python/Scripts/python.exe app/tool.py list-operations
+runtime/python/Scripts/python.exe app/tool.py describe-operation list_projects
+runtime/python/Scripts/python.exe app/tool.py invoke list_projects --params-file params.json
 ```
 
-Le générateur crée un Tool fonctionnel. `params.json` contient `{"text":"Hello CyTools"}`.
-L'invocation retourne un objet job avec `state: Completed` et `outputs.text`.
-Les paramètres passés dans un fichier évitent les différences d'échappement entre shells.
+`params.json` contient `{}`. La dernière commande retourne un job terminé et ses
+résultats JSON. Les diagnostics restent sur stderr. Utiliser des fichiers JSON
+évite les différences d’échappement entre shells.
 
 ## Ajouter une opération
 
-Dans `CyTool.json`, ajouter un objet dans operations avec id/name/description,
-inputSchema/outputSchema. Employer `additionalProperties: false` pour détecter les
-fautes de frappe dans les paramètres. Le manifest lui-même accepte des métadonnées
-inconnues pour permettre l'évolution du standard.
+Déclarer son identifiant stable, sa description, ses schémas et ses permissions
+dans `app/operations.py`, puis générer `app/CyTool.json` avec `app/build_manifest.py`.
+Employer `additionalProperties: false` pour détecter les fautes de frappe.
+Enregistrer le vrai handler métier dans `app/tool.py`; tout handler manquant
+empêche le démarrage. Consulter `app/AGENTS.md` pour les effets, la progression,
+l’annulation, les confirmations et les traductions.
 
-Dans `create_runtime`, écrire `def operation(context, parameters)` puis appeler
-`runtime.register('operation_id', operation)`. Toute opération déclarée doit avoir un
-handler : le runtime refuse de démarrer sinon. La CLI et le catalogue MCP se mettent à
-jour automatiquement, sans écrire un outil MCP supplémentaire.
+Le chat, le CLI et le serveur MCP utilisent ce même registre. Le contrat durable
+`op_<operation>` retourne un job consultable avec `cy_get_job`; les noms directs
+exécutent les mêmes handlers. `debug_start` démarre un job contrôlable en parallèle.
 
-Consulter le handler `write_report` du guide IA pour produire un fichier, et les sept
-opérations de `cytool_test/__init__.py` pour l'annulation, la progression et les erreurs.
+## Lancer et distribuer
 
-## Lancer en MCP
-
-Installer `cytools-core[mcp]` depuis le checkout ou le wheel. Configurer un client MCP
-stdio pour lancer l'interpréteur Python du Tool avec les arguments absolus :
-
-```json
-{
-  "mcpServers": {
-    "cytool-example": {
-      "command": "C:/path/to/venv/Scripts/python.exe",
-      "args": ["C:/path/to/CyToolExample/tool.py", "--data-dir", "C:/path/to/data/mcp", "mcp"]
-    }
-  }
-}
+```powershell
+runtime/python/Scripts/python.exe app/tool.py mcp --compact
+runtime/python/Scripts/python.exe app/tool.py mcp --full
 ```
 
-Ce bloc illustre le format courant `mcpServers` ; l'emplacement et la syntaxe de la
-configuration dépendent du client. Ne pas écraser sa configuration existante.
-Le client découvre `op_echo`, appelle `{"parameters":{"text":"Hello"}}`, puis
-consulte `cy_get_job` avec le jobId retourné. Voir [MCP.md](MCP.md).
-
-## Livrer
-
-Installer le wheel de CyToolsCore avec le Tool, ou référencer une version précise.
-Ne pas dépendre d'un chemin de développement privé dans la distribution finale.
-Le SDK livre des scripts console Python ; produire un `.exe` autonome avec son outil
-de packaging est une étape propre au Tool, à tester avec ses dépendances.
-La génération ne choisit pas de licence à la place du propriétaire du projet.
+Voir [CyMCPSDK.md](CyMCPSDK.md) pour la configuration absolue du client MCP,
+l’authentification, les appels sur une instance ouverte et les options indépendantes.
+Les scripts de packaging compilent le SDK et livrent la DLL, sa provenance et les
+sources nécessaires à sa reconstruction. Aucun chemin privé de développement ni
+ancien wheel ne doit être requis sur la machine destinataire.

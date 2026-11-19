@@ -20,7 +20,8 @@ ENGINE_IDS = ['', 'ghidra', 'cdec', 'native', 'ilspy', 'vineflower', 'jadx', 'py
 COMPONENT_IDS = ['jdk', 'ghidra', 'dotnet', 'ilspycmd', 'vineflower', 'jadx', 'pydecompile', 'upx', 'netcoredbg', 'typescript','electron']
 TARGETS = ['same', 'c', 'cpp', 'csharp', 'java', 'python', 'rust', 'go', 'hlsl', 'glsl', 'javascript']
 PROVIDERS = ['', 'claude-code', 'codex', 'antigravity', 'opencode', 'anthropic', 'openai', 'openrouter',
-             'openai-compatible', 'ollama']
+             'openai-compatible', 'ollama','codex-exec','opencode-cli','acp','gemini','qwen-code',
+             'devin','goose','kimi','codebuddy','codebuddy-acp','command-code','command-code-acp','lmstudio','llama.cpp']
 
 PROJECT = S('Project id returned by open_file or list_projects.')
 ENGINE = S('Engine id. Empty selects the analysed (or best available) engine for the file.', enum=ENGINE_IDS, default='')
@@ -663,3 +664,28 @@ OPERATIONS = [
     dict(id='update_rollback', name='Restore previous version', description='Restore the app/ kept by the last update.',
          inputs={}, groups=['install'], outputs={'restored': B('Restored.')}),
 ]
+
+# The same contracts are registered in the native SDK for UI jobs, CLI and MCP.
+OPERATIONS.extend([
+    dict(id='remote_resources',name='Approved remote resources',description='Read resources explicitly approved by the host or referenced by an approved remote tool. Optional watch uses SDK notifications only on a compatible transport; events returns their metadata. Expired references never repeat an operation.',
+         inputs={'server':S('Configured server.'),'action':S('Resource action.',enum=['list','read','watch','events'],default='list'),'uri':S('Approved URI or a reference returned by an approved tool.',default='')},required=['server'],permissions=['network','processSpawn'],outputs={}),
+    dict(id='workspace_grep_native',name='Native workspace grep',description='Search saved text using SDK ripgrep with bounded pages. Requires the host to enable ripgrep and explicitly choose workspaceRoot; no directory is inferred from a prompt.',
+         inputs={'pattern':S('Literal or regular expression.'),'regex':B('Use the bounded Rust regular-expression engine.',False),'ignore_case':B('Ignore case.',False),'glob':S('Optional relative file glob.'),'cursor':S('Continue the same search with this cursor only.')},permissions=['filesystemExternal','processSpawn'],outputs={}),
+    dict(id='workspace_read_native',name='Native workspace range read',description='Read a bounded UTF-8 byte range inside the host-selected native search workspace. Retain the returned revision to detect changes.',
+         inputs={'path':S('Path relative to the explicit host workspace.'),'offset':I('Byte offset.',0,0),'length':I('Maximum bytes.',32768,1,65536),'revision':S('Previous revision, if available.')},required=['path'],permissions=['filesystemExternal'],outputs={}),
+    dict(id='assistant_send',name='Integrated assistant',
+         description='Send a streamed turn through CyMCPSDK Conversation. The assistant can call the real application tools allowed by this client. Reuse conversationId to restore exactly that session; never retries a mutation automatically.',
+         inputs={'text':S('User request.',minLength=1,maxLength=1000000),'conversationId':S('Existing session ID, or empty for a new conversation.',default=''),
+                 'projectId':S('Optional selected project scope.',default=''),'provider':AI_PROVIDER,'model':AI_MODEL,
+                 'allowEdits':B('Permit business mutations already authorized to this client. Destructive actions and credentials remain excluded.',True),
+                 'attachments':{'type':'array','description':'Explicit local files, maximum 8 MiB each; supported media depend on the provider.','items':{'type':'string'},'maxItems':8}},
+         required=['text'],permissions=['network','processSpawn'],outputs={'conversationId':S('Persistent conversation ID.'),'answer':S('Final answer.')}),
+    dict(id='assistant_history',name='Assistant history',description='List this client’s SDK conversations or read the full retained history of one exact conversation.',
+         inputs={'conversationId':S('Empty lists conversations.',default='')},outputs={}),
+    dict(id='assistant_connections',name='Assistant providers',description='Inspect the compiled SDK provider catalogue; optionally detect installed CLIs and running local models without generating a reply.',
+         inputs={'refresh':B('Probe configured providers and loopback model services.',False)},permissions=['network','processSpawn'],outputs={}),
+    dict(id='remote_tools',name='Approved external tools',description='Discover tools from a user-configured MCP server. Returns only the explicitly approved tools and their schemas; does not grant additional rights.',
+         inputs={'server':S('User-configured server identifier.'),'refresh':B('Invalidate discovery/read cache and refresh explicitly.',False)},required=['server'],permissions=['network','processSpawn'],outputs={}),
+    dict(id='remote_call',name='Call approved external tool',description='Call one explicitly approved tool of a user-configured MCP server through CyMCPSDK McpClient. Business errors remain errors; mutations are never replayed.',
+         inputs={'server':S('Configured server.'),'tool':S('Exact approved tool name.'),'arguments':OBJ('Arguments matching the discovered remote schema.')},required=['server','tool','arguments'],permissions=['network','processSpawn'],outputs={}),
+])

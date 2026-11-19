@@ -18,5 +18,5 @@ ListModels retourne les modèles déclarés avec backendId. Une sélection model
 inconnue ou un modèle local non installé donne MissingModel. Les modèles distants
 ne requièrent pas un fichier local ; le backend doit vérifier son authentification.
 
-CyToolsCore ne télécharge pas un modèle sur la seule base d'une requête de génération
+l’hôte CyDecompilator/CyMCPSDK ne télécharge pas un modèle sur la seule base d'une requête de génération
 et n'embarque pas de chargeur PyTorch. La notion de modèle reste facultative.

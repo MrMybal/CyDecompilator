@@ -1,4 +1,6 @@
-cytools-core[mcp] @ git+https://github.com/MrMybal/CyToolsCore.git@05352e1d2f58f423fa2ad57b8eec48d2609f2626
+# CyMCPSDK is compiled from source: python app/scripts/build_mcp_sdk.py
+jsonschema==4.26.0
+psutil==7.2.2
 imgui-bundle==1.92.900
 numpy>=2.0
 capstone==5.0.9

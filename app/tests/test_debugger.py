@@ -8,7 +8,7 @@ import psutil
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from cydec import components, debugger, process, service, workspace
 from cydec.engines.base import EngineContext
 from cydec.project import ProjectStore

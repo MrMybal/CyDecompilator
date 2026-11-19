@@ -1,8 +1,9 @@
 # Manifest du Tool
 
-Source normative : `cytools_core/schemas/tool.schema.json`.
-Chargement : `load_manifest(path)` ; validation CLI : `cytools validate CyTool.json`.
-Exemple complet exécutable : `cytool_test/CyTool.json`.
+Le manifeste applicatif est généré par `app/build_manifest.py` depuis
+`app/operations.py`. Chargement : `cydec.mcp.load_manifest(path)`.
+Référence exécutable : `app/CyTool.json` et `app/tool.py` ; validation des entrées
+par le registre natif CyMCPSDK. Voir [CyMCPSDK.md](CyMCPSDK.md).
 
 Champs obligatoires : schemaVersion, protocolVersion, id, name, version, description,
 operations, platforms, concurrency. Un id commence par une lettre puis contient des

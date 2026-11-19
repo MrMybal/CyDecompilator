@@ -1,7 +1,7 @@
 """Entry point: decompile one function (or a set of functions) of a loaded native image to C."""
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from .cgen import HEADER, Generator
 from .dataflow import Program

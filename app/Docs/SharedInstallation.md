@@ -19,7 +19,7 @@ choix dans `data/settings/installation-storage.json`. Aucun registre Windows req
 
 ## Ce que le SDK implémente
 
-- `InstallationStorage` dans `cytools_core.shared_installation`, import sans effet
+- `InstallationStorage` dans `cydec.mcp.shared_installation`, import sans effet
   sur l'environnement. `apply_environment()` est appelé explicitement par le Tool.
 - Cache pip, Hugging Face Hub et Torch Hub local/partagé via variables de processus.
   `HF_HOME` et les magasins de jetons ne sont pas déplacés. Les installateurs utilisant
@@ -78,4 +78,4 @@ Tester chemins configurables, modes indépendants par Tool, verrou concurrent, h
 CUDA absent/modifié, états d'accès et absence de déplacement des modèles. Tester le
 panneau EN/FR. Distinguer les tests avec faux compilateur d'un vrai moteur CUDA exécuté.
 
-Contrat des préférences : cytools_core/schemas/installation-storage.schema.json.
+Contrat des préférences : `cydec.mcp.shared_installation`, format historique conservé.

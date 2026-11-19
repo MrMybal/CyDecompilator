@@ -1,3 +1,5 @@
+Current runtime: [CyMCPSDK integration](CyMCPSDK.md). The native registry adds direct and compact discovery; the compatibility job calls below remain supported.
+
 # CyDecompilator : intégration MCP et skill IA
 
 Le serveur MCP expose les opérations métier de l'application : analyse, sources,
@@ -5,6 +7,26 @@ reconstruction, compilation, Git, réinjection, débogage et observations de pro
 réseau et interface. Le skill `cydecompilator` explique à l'agent comment enchaîner
 ces opérations et interpréter leurs preuves et limites. Les outils disponibles et
 leurs schémas se découvrent sur le serveur ; ne pas figer leur nombre côté client.
+
+## Piloter directement par le CLI du SDK
+
+Une IA externe peut utiliser le CLI/JSONL natif sans serveur MCP configuré dans son
+client, sans chat intégré et sans compte de modèle dans CyDecompilator :
+
+```powershell
+CyDecompilatorCLI.exe --auto list-operations
+CyDecompilatorCLI.exe --auto describe-operation open_file
+CyDecompilatorCLI.exe --auto sdk invoke open_file --params-file input.json
+CyDecompilatorCLI.exe --auto jsonl
+```
+
+`--auto` rejoint l’instance propriétaire ou démarre le moteur sans fenêtre. L’identité
+locale conserve l’accès aux résultats entre commandes. `jsonl` utilise réellement
+`dispatch_app` du SDK compilé ; garder son stdin ouvert pour les tâches asynchrones
+et le débogage. `jobs`, `job`, `wait`, `result` et `cancel` suivent le travail durable.
+Voir le [contrat CLI pour l’IA](../skills/cydecompilator/references/cli.md) et le
+[guide du SDK](CyMCPSDK.md). L’IA externe réalise le raisonnement et enchaîne les
+opérations autorisées ; la politique d’exécution de son client reste applicable.
 
 ## Installer le skill
 
@@ -173,7 +195,7 @@ graphiques dépendent du pilote Windows/Chromium/Electron et des contrôles expo
 ```powershell
 runtime/python/Scripts/python.exe -m pytest app/tests/test_autonomous_agent.py app/tests/test_mcp_workflows.py app/tests/test_skill_delivery.py -q
 runtime/python/Scripts/python.exe app/tests/acceptance_mcp.py
-runtime/python/Scripts/cytools.exe validate app/CyTool.json
+runtime/python/Scripts/python.exe app/tool.py sdk-info
 ```
 
 Les tests MCP lancent le vrai serveur stdio, avec des magasins isolés : catalogue
@@ -195,5 +217,5 @@ Code** configuré : diagnostic, récupération de la source, sauvegardes Git,
 correction et comparaison réussie de trois scénarios Node. Ce résultat ne
 certifie pas tous les modèles ni toutes les applications.
 
-[MCP.md](MCP.md) décrit le contrat générique CyToolsCore ; les noms de Tool de ses
-exemples de scaffold ne sont pas ceux de CyDecompilator.
+[CyMCPSDK.md](CyMCPSDK.md) décrit le transport natif et les commandes actuelles.
+[MCP.md](MCP.md) conserve le contrat de compatibilité des anciens clients.

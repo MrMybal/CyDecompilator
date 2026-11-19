@@ -4,7 +4,7 @@ title: AI assistance and autonomous workflows
 description: Configure an assistant and give an autonomous workflow a precise, testable objective.
 section: AI and automation
 order: 13
-revision: 2
+revision: 3
 ---
 
 Open [AI assistant settings](doc:ai) to configure a supported signed-in CLI or HTTP provider, model and limits. A CLI connection uses its existing account; an HTTP provider may require its own key and billing. Keys belong in the application's credential mechanism, never source files, scenario JSON, screenshots or job parameters. Local providers still need their own running service/model.
@@ -13,6 +13,7 @@ Open [AI assistant settings](doc:ai) to configure a supported signed-in CLI or H
 
 | Mode | Use |
 |---|---|
+| Application assistant | General conversation using the native SDK, even without a selected project |
 | Autonomous workflow | Investigate, reconstruct, patch or port/test through tool operations |
 | Conversation | Ask about a program; review tool use and the answer |
 | Function | Explain, suggest names or convert the selected function |
@@ -42,3 +43,17 @@ The agent discovers Runtime operations, records checkpoints, creates source-hist
 Read changes, compilation output, source commits, modified-copy receipts and recorded scenarios. Completion of a workflow requires its validation evidence, not just a confident response. A successful model request is distinct from a successful build, test or equivalent application. No AI provider can recover missing encrypted bytes or guarantee every game/application will rebuild.
 
 For external clients, see [MCP / CLI](doc:automation). For automatic repair behavior, see [reconstruction](doc:reconstruction); for function changes, see [replacement](doc:patching).
+
+## Sessions and attachments {#sessions-and-attachments}
+
+The **Application assistant** uses CyMCPSDK Conversation and the same business registry as CLI/MCP. Text arrives progressively; Cancel interrupts an active turn. **Refresh conversations** and **Restore conversation** reopen an exact saved session owned by your application identity. Histories retain tool exchanges and survive a restart. Existing project conversations remain available; explicit continuation creates an SDK checkpoint without deleting the old file.
+
+**Attach files** chooses local files up to 8 MiB each. Supported image/audio/file types depend on the provider and actual transport; unsupported content produces an error. For API providers, the configurable context window projects a smaller request while keeping the full local history, system instructions, active turn and complete tool exchanges. CLI agents keep their native context management. Summarization is optional and no hidden summary request is sent.
+
+Codex receives native dynamic tools. Supported HTTP/Ollama transports use the SDK tool exchange. Claude Code receives an authenticated local MCP delegation limited to this conversation; its own shell/file actions remain disabled. Other CLI/ACP profiles support function assistance but need an explicit MCP path before business chat can use them. Detecting a CLI is distinct from a working account and a successful model response.
+
+## Permissions and external tools {#permissions-and-external-tools}
+
+**Allow application changes** permits business mutations within your client rights. Credentials, application updates and destructive actions are excluded from chat; source revisions, original-binary preservation and existing Git backups still apply. A selected-project chat cannot name another project ID.
+
+In **AI assistant settings → CyMCPSDK options and external tools**, choose independent optimizations and user-configured external MCP servers. Only tools explicitly named in `allowedTools` are available. Secrets stay in the vault. `remote_tools`, `remote_call` and `remote_resources` discover/call approved tools, read their referenced resources and expose compatible notification metadata. A remote business error remains an error. Expired result references never cause a mutation to be repeated. See [MCP and CLI](doc:automation) for transports and examples.

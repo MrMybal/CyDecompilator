@@ -1,4 +1,8 @@
-# Documentation CyToolsCore
+# Documentation développeur CyDecompilator
+
+Commencer par [l’intégration CyMCPSDK](CyMCPSDK.md), référence actuelle pour le
+build natif, le chat, le CLI et MCP. Les contrats historiques ci-dessous décrivent
+le format applicatif conservé ; ils ne nécessitent aucun ancien SDK Python.
 
 ## Pour créer un Tool
 

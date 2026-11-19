@@ -22,15 +22,15 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from cytools_core import CyToolError, load_manifest
-from cytools_core.downloads import DownloadManager
+from cydec.mcp import CyToolError, load_manifest
+from cydec.mcp.downloads import DownloadManager
 
 from . import paths
 from .paths import TOOL_ID, read_json, write_json
 
 MAX_ASSET_BYTES = 512 * 1024 ** 2
 # Bumped whenever the application stops being loadable by the runtime already installed here.
-RUNTIME_ABI = 'python311-cytools010-imgui192-cydec01'
+RUNTIME_ABI = 'python311-cymcp070-imgui192-cydec02'
 USER_AGENT = 'CyDecompilator'
 DEFAULT_REPOSITORY = 'MrMybal/CyDecompilator'
 

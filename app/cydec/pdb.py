@@ -15,7 +15,7 @@ import urllib.request
 import uuid
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from .paths import DATA
 

@@ -100,7 +100,7 @@ def operation_group(identifier):
         return 'patching'
     if identifier.startswith(('application_', 'investigation_', 'behavior_')):
         return 'investigation'
-    if identifier.startswith('ai_'):
+    if identifier.startswith(('ai_', 'assistant_', 'remote_')):
         return 'ai'
     if identifier.startswith('update_') or identifier in {'list_engines','list_components','install_component','remove_component','set_component_path','symbols_configure'}:
         return 'settings'

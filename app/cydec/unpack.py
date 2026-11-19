@@ -20,7 +20,7 @@ import zipfile
 import zlib
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from . import detect as detection
 from .pe_info import DOTNET_BUNDLE_SIGNATURE, PYINSTALLER_MAGIC

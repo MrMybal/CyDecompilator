@@ -32,6 +32,11 @@ def git(*args):
                           cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
 
 
+def build_native():
+    subprocess.run([sys.executable, str(APP / 'scripts/build_mcp_sdk.py'), '--bundled'], cwd=ROOT, check=True)
+    return ROOT / 'runtime/native/CyMCPSDK'
+
+
 def build():
     from cydec.updates import DEFAULT_REPOSITORY, RUNTIME_ABI
     manifest = json.loads((APP / 'CyTool.json').read_text(encoding='utf-8'))
@@ -46,6 +51,7 @@ def build():
     if uncommitted_inputs:
         raise SystemExit('Commit documentation inputs before release: ' + ', '.join(sorted(uncommitted_inputs)))
     documentation = build_documentation.build()
+    native = build_native()
     launcher = None
     if sys.platform == 'win32':
         subprocess.run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
@@ -61,7 +67,7 @@ def build():
             if (item.filename not in ('CyDecompilator/app/release.json', 'CyDecompilator/CyDecompilator.exe')
                     and not item.filename.startswith(('CyDecompilator/app/help/',
                         'CyDecompilator/app/Documentation/', 'CyDecompilator/app/.CyDocBuild/',
-                        'CyDecompilator/docs/cydoc/'))):
+                        'CyDecompilator/docs/cydoc/', 'CyDecompilator/app/native/bin/'))):
                 out.writestr(item, source.read(item))
         for path in sorted(documentation.rglob('*')):
             if path.is_file():
@@ -71,6 +77,8 @@ def build():
             out.write(legacy, 'CyDecompilator/app/help/index.html')
         if launcher:
             out.write(launcher, 'CyDecompilator/CyDecompilator.exe')
+        for name in (('cydec_mcp.dll' if sys.platform == 'win32' else 'libcydec_mcp.so'), 'build.json'):
+            out.write(native / name, 'CyDecompilator/app/native/bin/' + name)
         out.writestr('CyDecompilator/app/release.json', json.dumps(
             {'version': version, 'runtimeAbi': RUNTIME_ABI, 'commit': commit, 'repository': DEFAULT_REPOSITORY},
             indent=2) + '\n')

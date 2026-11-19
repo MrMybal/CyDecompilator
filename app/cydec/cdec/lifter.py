@@ -13,7 +13,7 @@ jump tables), splits it into basic blocks and lifts every instruction into IR st
 """
 import struct
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from .ir import (Addr, Assign, Bin, Branch, Call, Cast, Clobber, Comment, Cond, Const, ExprStmt, FConst, Flags,
                  IndirectJump, Intrinsic, Jump, Load, Ret, Store, Switch, Sym, Tern, Un, Var, mask, negate)

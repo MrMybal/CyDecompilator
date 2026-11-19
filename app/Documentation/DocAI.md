@@ -5,7 +5,7 @@ This file is for assistants working on the application's documentation. The huma
 ```json
 {
   "application": "CyDecompilator",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "entry": "Documentation.html",
   "manifest": "DocData/manifest.json",
   "defaultLocale": "en",
@@ -61,6 +61,15 @@ The human manual is `Documentation.html`; the native help adapter is
 Installation-specific paths, user projects and credentials do not belong in this
 sidecar. The operation contracts below are declarative API data, not permission
 to execute an operation or install a component.
+
+## Native SDK discovery
+
+The runtime uses CyMCPSDK 0.7.0. Full discovery retains op_<operation> asynchronous jobs and adds direct business tools. Compact discovery exposes cy_tools_search, cy_tools_describe and cy_tools_call; complete schemas remain accessible. Native resources and chunk reads preserve private large results. Expiration must never cause an action to be repeated; use durable job results through cy_read_result. For an open GUI use its authenticated loopback /mcp endpoint rather than starting another scheduler on the same database. The CLI preserves its commands and supports --connect for /v1. SDK business chat, external allowlists and independent options are documented in the human automation/AI chapters.
+
+
+## External CLI agents
+
+An external AI can use CyDecompilatorCLI.exe --auto directly, without MCP or a model configured inside the app. SDK describe/invoke and jsonl call the native dispatch_app registry. Preserve existing authorization and complete the requested business workflow autonomously. Read app/skills/cydecompilator/references/cli.md for native JSONL, stable ownership, job controls and process lifetime. Never replace a wait timeout with a mutation replay.
 
 
 ## Installed operation contracts
@@ -4986,7 +4995,21 @@ to execute an operation or install a component.
             "openai",
             "openrouter",
             "openai-compatible",
-            "ollama"
+            "ollama",
+            "codex-exec",
+            "opencode-cli",
+            "acp",
+            "gemini",
+            "qwen-code",
+            "devin",
+            "goose",
+            "kimi",
+            "codebuddy",
+            "codebuddy-acp",
+            "command-code",
+            "command-code-acp",
+            "lmstudio",
+            "llama.cpp"
           ]
         },
         "model": {
@@ -5116,7 +5139,21 @@ to execute an operation or install a component.
             "openai",
             "openrouter",
             "openai-compatible",
-            "ollama"
+            "ollama",
+            "codex-exec",
+            "opencode-cli",
+            "acp",
+            "gemini",
+            "qwen-code",
+            "devin",
+            "goose",
+            "kimi",
+            "codebuddy",
+            "codebuddy-acp",
+            "command-code",
+            "command-code-acp",
+            "lmstudio",
+            "llama.cpp"
           ],
           "default": ""
         },
@@ -5208,7 +5245,21 @@ to execute an operation or install a component.
             "openai",
             "openrouter",
             "openai-compatible",
-            "ollama"
+            "ollama",
+            "codex-exec",
+            "opencode-cli",
+            "acp",
+            "gemini",
+            "qwen-code",
+            "devin",
+            "goose",
+            "kimi",
+            "codebuddy",
+            "codebuddy-acp",
+            "command-code",
+            "command-code-acp",
+            "lmstudio",
+            "llama.cpp"
           ],
           "default": ""
         },
@@ -5344,7 +5395,21 @@ to execute an operation or install a component.
             "openai",
             "openrouter",
             "openai-compatible",
-            "ollama"
+            "ollama",
+            "codex-exec",
+            "opencode-cli",
+            "acp",
+            "gemini",
+            "qwen-code",
+            "devin",
+            "goose",
+            "kimi",
+            "codebuddy",
+            "codebuddy-acp",
+            "command-code",
+            "command-code-acp",
+            "lmstudio",
+            "llama.cpp"
           ],
           "default": ""
         },
@@ -5474,7 +5539,21 @@ to execute an operation or install a component.
             "openai",
             "openrouter",
             "openai-compatible",
-            "ollama"
+            "ollama",
+            "codex-exec",
+            "opencode-cli",
+            "acp",
+            "gemini",
+            "qwen-code",
+            "devin",
+            "goose",
+            "kimi",
+            "codebuddy",
+            "codebuddy-acp",
+            "command-code",
+            "command-code-acp",
+            "lmstudio",
+            "llama.cpp"
           ],
           "default": ""
         },
@@ -5659,7 +5738,21 @@ to execute an operation or install a component.
             "openai",
             "openrouter",
             "openai-compatible",
-            "ollama"
+            "ollama",
+            "codex-exec",
+            "opencode-cli",
+            "acp",
+            "gemini",
+            "qwen-code",
+            "devin",
+            "goose",
+            "kimi",
+            "codebuddy",
+            "codebuddy-acp",
+            "command-code",
+            "command-code-acp",
+            "lmstudio",
+            "llama.cpp"
           ],
           "default": ""
         },
@@ -5762,7 +5855,21 @@ to execute an operation or install a component.
             "openai",
             "openrouter",
             "openai-compatible",
-            "ollama"
+            "ollama",
+            "codex-exec",
+            "opencode-cli",
+            "acp",
+            "gemini",
+            "qwen-code",
+            "devin",
+            "goose",
+            "kimi",
+            "codebuddy",
+            "codebuddy-acp",
+            "command-code",
+            "command-code-acp",
+            "lmstudio",
+            "llama.cpp"
           ],
           "default": ""
         },
@@ -6091,6 +6198,414 @@ to execute an operation or install a component.
     "exclusiveGroups": [
       "install"
     ],
+    "canRunAsync": true,
+    "canCancel": true,
+    "supportsProgress": true
+  },
+  {
+    "id": "remote_resources",
+    "name": "Approved remote resources",
+    "description": "Read resources explicitly approved by the host or referenced by an approved remote tool. Optional watch uses SDK notifications only on a compatible transport; events returns their metadata. Expired references never repeat an operation.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "server": {
+          "type": "string",
+          "description": "Configured server."
+        },
+        "action": {
+          "type": "string",
+          "description": "Resource action.",
+          "enum": [
+            "list",
+            "read",
+            "watch",
+            "events"
+          ],
+          "default": "list"
+        },
+        "uri": {
+          "type": "string",
+          "description": "Approved URI or a reference returned by an approved tool.",
+          "default": ""
+        }
+      },
+      "required": [
+        "server"
+      ],
+      "additionalProperties": false
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": true
+    },
+    "resourceRequirements": {
+      "ramBytes": 67108864
+    },
+    "supportedBackends": [],
+    "permissions": [
+      "network",
+      "processSpawn"
+    ],
+    "exclusiveGroups": [],
+    "canRunAsync": true,
+    "canCancel": true,
+    "supportsProgress": true
+  },
+  {
+    "id": "workspace_grep_native",
+    "name": "Native workspace grep",
+    "description": "Search saved text using SDK ripgrep with bounded pages. Requires the host to enable ripgrep and explicitly choose workspaceRoot; no directory is inferred from a prompt.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "description": "Literal or regular expression."
+        },
+        "regex": {
+          "type": "boolean",
+          "description": "Use the bounded Rust regular-expression engine.",
+          "default": false
+        },
+        "ignore_case": {
+          "type": "boolean",
+          "description": "Ignore case.",
+          "default": false
+        },
+        "glob": {
+          "type": "string",
+          "description": "Optional relative file glob."
+        },
+        "cursor": {
+          "type": "string",
+          "description": "Continue the same search with this cursor only."
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": true
+    },
+    "resourceRequirements": {
+      "ramBytes": 67108864
+    },
+    "supportedBackends": [],
+    "permissions": [
+      "filesystemExternal",
+      "processSpawn"
+    ],
+    "exclusiveGroups": [],
+    "canRunAsync": true,
+    "canCancel": true,
+    "supportsProgress": true
+  },
+  {
+    "id": "workspace_read_native",
+    "name": "Native workspace range read",
+    "description": "Read a bounded UTF-8 byte range inside the host-selected native search workspace. Retain the returned revision to detect changes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path relative to the explicit host workspace."
+        },
+        "offset": {
+          "type": "integer",
+          "description": "Byte offset.",
+          "default": 0,
+          "minimum": 0
+        },
+        "length": {
+          "type": "integer",
+          "description": "Maximum bytes.",
+          "default": 32768,
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "revision": {
+          "type": "string",
+          "description": "Previous revision, if available."
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": true
+    },
+    "resourceRequirements": {
+      "ramBytes": 67108864
+    },
+    "supportedBackends": [],
+    "permissions": [
+      "filesystemExternal"
+    ],
+    "exclusiveGroups": [],
+    "canRunAsync": true,
+    "canCancel": true,
+    "supportsProgress": true
+  },
+  {
+    "id": "assistant_send",
+    "name": "Integrated assistant",
+    "description": "Send a streamed turn through CyMCPSDK Conversation. The assistant can call the real application tools allowed by this client. Reuse conversationId to restore exactly that session; never retries a mutation automatically.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "User request.",
+          "minLength": 1,
+          "maxLength": 1000000
+        },
+        "conversationId": {
+          "type": "string",
+          "description": "Existing session ID, or empty for a new conversation.",
+          "default": ""
+        },
+        "projectId": {
+          "type": "string",
+          "description": "Optional selected project scope.",
+          "default": ""
+        },
+        "provider": {
+          "type": "string",
+          "description": "Override the configured AI provider for this call.",
+          "enum": [
+            "",
+            "claude-code",
+            "codex",
+            "antigravity",
+            "opencode",
+            "anthropic",
+            "openai",
+            "openrouter",
+            "openai-compatible",
+            "ollama",
+            "codex-exec",
+            "opencode-cli",
+            "acp",
+            "gemini",
+            "qwen-code",
+            "devin",
+            "goose",
+            "kimi",
+            "codebuddy",
+            "codebuddy-acp",
+            "command-code",
+            "command-code-acp",
+            "lmstudio",
+            "llama.cpp"
+          ],
+          "default": ""
+        },
+        "model": {
+          "type": "string",
+          "description": "Override the model id for this call (empty = configured/default).",
+          "default": ""
+        },
+        "allowEdits": {
+          "type": "boolean",
+          "description": "Permit business mutations already authorized to this client. Destructive actions and credentials remain excluded.",
+          "default": true
+        },
+        "attachments": {
+          "type": "array",
+          "description": "Explicit local files, maximum 8 MiB each; supported media depend on the provider.",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "description": "Persistent conversation ID."
+        },
+        "answer": {
+          "type": "string",
+          "description": "Final answer."
+        }
+      },
+      "additionalProperties": true
+    },
+    "resourceRequirements": {
+      "ramBytes": 67108864
+    },
+    "supportedBackends": [],
+    "permissions": [
+      "network",
+      "processSpawn"
+    ],
+    "exclusiveGroups": [],
+    "canRunAsync": true,
+    "canCancel": true,
+    "supportsProgress": true
+  },
+  {
+    "id": "assistant_history",
+    "name": "Assistant history",
+    "description": "List this client\u2019s SDK conversations or read the full retained history of one exact conversation.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "description": "Empty lists conversations.",
+          "default": ""
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": true
+    },
+    "resourceRequirements": {
+      "ramBytes": 67108864
+    },
+    "supportedBackends": [],
+    "permissions": [],
+    "exclusiveGroups": [],
+    "canRunAsync": true,
+    "canCancel": true,
+    "supportsProgress": true
+  },
+  {
+    "id": "assistant_connections",
+    "name": "Assistant providers",
+    "description": "Inspect the compiled SDK provider catalogue; optionally detect installed CLIs and running local models without generating a reply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "refresh": {
+          "type": "boolean",
+          "description": "Probe configured providers and loopback model services.",
+          "default": false
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": true
+    },
+    "resourceRequirements": {
+      "ramBytes": 67108864
+    },
+    "supportedBackends": [],
+    "permissions": [
+      "network",
+      "processSpawn"
+    ],
+    "exclusiveGroups": [],
+    "canRunAsync": true,
+    "canCancel": true,
+    "supportsProgress": true
+  },
+  {
+    "id": "remote_tools",
+    "name": "Approved external tools",
+    "description": "Discover tools from a user-configured MCP server. Returns only the explicitly approved tools and their schemas; does not grant additional rights.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "server": {
+          "type": "string",
+          "description": "User-configured server identifier."
+        },
+        "refresh": {
+          "type": "boolean",
+          "description": "Invalidate discovery/read cache and refresh explicitly.",
+          "default": false
+        }
+      },
+      "required": [
+        "server"
+      ],
+      "additionalProperties": false
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": true
+    },
+    "resourceRequirements": {
+      "ramBytes": 67108864
+    },
+    "supportedBackends": [],
+    "permissions": [
+      "network",
+      "processSpawn"
+    ],
+    "exclusiveGroups": [],
+    "canRunAsync": true,
+    "canCancel": true,
+    "supportsProgress": true
+  },
+  {
+    "id": "remote_call",
+    "name": "Call approved external tool",
+    "description": "Call one explicitly approved tool of a user-configured MCP server through CyMCPSDK McpClient. Business errors remain errors; mutations are never replayed.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "server": {
+          "type": "string",
+          "description": "Configured server."
+        },
+        "tool": {
+          "type": "string",
+          "description": "Exact approved tool name."
+        },
+        "arguments": {
+          "type": "object",
+          "description": "Arguments matching the discovered remote schema."
+        }
+      },
+      "required": [
+        "server",
+        "tool",
+        "arguments"
+      ],
+      "additionalProperties": false
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": true
+    },
+    "resourceRequirements": {
+      "ramBytes": 67108864
+    },
+    "supportedBackends": [],
+    "permissions": [
+      "network",
+      "processSpawn"
+    ],
+    "exclusiveGroups": [],
     "canRunAsync": true,
     "canCancel": true,
     "supportsProgress": true

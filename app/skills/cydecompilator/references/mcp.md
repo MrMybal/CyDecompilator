@@ -79,3 +79,7 @@ task cleanup too.
 Never disclose authentication tokens or add them to the example configuration.
 The local server provides its standalone identity; a configured restricted token
 may intentionally disallow process spawning, downloads or external AI calls.
+
+## CyMCPSDK transport compatibility
+
+Native SDK builds retain the asynchronous op_ tools and controls described above. With compact discovery, use cy_tools_search, load the full schema with cy_tools_describe, then cy_tools_call. Native direct tools return their result; op_ aliases return a job to poll. Use cy_read_result for durable chunked output and never rerun a mutation after resource expiration. A running GUI may expose authenticated loopback /mcp; the matching CLI --connect URL ends in /v1. Full stdio discovery remains available with mcp --full.

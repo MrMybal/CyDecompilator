@@ -9,7 +9,7 @@ import shutil
 import time
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from . import components
 from .engines import ENGINES, get as get_engine

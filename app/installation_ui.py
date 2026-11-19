@@ -15,7 +15,7 @@ _executor = None
 
 def configure():
     global _message
-    from cytools_core.shared_installation import InstallationStorage
+    from cydec.mcp.shared_installation import InstallationStorage
     storage = InstallationStorage(ROOT)
     try: storage.apply_environment()
     except Exception as exc:
@@ -26,7 +26,7 @@ def configure():
 
 def panel(native, tr, label):
     global _storage, _draft, _message, _cuda_path, _future, _executor
-    from cytools_core.shared_installation import InstallationStorage
+    from cydec.mcp.shared_installation import InstallationStorage
     if _storage is None: _storage = InstallationStorage(ROOT)
     native.separator()
     native.text(tr('Installation storage'))
@@ -79,7 +79,7 @@ def panel(native, tr, label):
 
 def cli():
     import argparse
-    from cytools_core.shared_installation import InstallationStorage
+    from cydec.mcp.shared_installation import InstallationStorage
     parser = argparse.ArgumentParser(description='CyTools local/shared installation storage')
     sub = parser.add_subparsers(dest='action',required=True)
     sub.add_parser('status')

@@ -1,0 +1,10 @@
+{
+  "name": "Legacy installation storage and HTTPS behavior",
+  "sourceRevision": "05352e1d2f58f423fa2ad57b8eec48d2609f2626",
+  "license": "MIT",
+  "note": "Application-owned compatibility behavior; the former SDK is not a runtime dependency.",
+  "sourceFiles": {
+    "downloads.py": "c6f7965dd7d229acb1368ae6e8ff7c58c4ceb0f374926fe85fb9bd8c524cdf81",
+    "shared_installation.py": "65e0743a642d466fa90c72ee266aadcb5eaac8e4c212232df5df05a73c09d819"
+  }
+}

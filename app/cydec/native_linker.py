@@ -8,7 +8,7 @@ import struct
 
 import capstone as cs
 import pefile
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 
 def align(value, alignment):

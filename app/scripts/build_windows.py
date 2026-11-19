@@ -72,7 +72,8 @@ def extract_python(archive, destination):
     with tarfile.open(archive, 'r:gz') as source:
         for member in source:
             parts = Path(member.name).parts
-            if not parts or parts[0] != 'python' or '..' in parts or member.issym() or member.islnk():
+            if (not parts or parts[0] != 'python' or '..' in parts
+                    or any(':' in part for part in parts) or member.issym() or member.islnk()):
                 raise ValueError('Unexpected Python archive entry')
             if not (member.isfile() or member.isdir()):
                 raise ValueError('Non-regular Python archive entry')
@@ -87,11 +88,13 @@ def extract_python(archive, destination):
                     shutil.copyfileobj(incoming, out)
 
 
-def source_files():
+def source_files(include_working_tree=False):
     paths = git('ls-files', '-z').split('\0')
+    if include_working_tree:
+        paths+=git('ls-files','--others','--exclude-standard','-z','app').split('\0')
     roots = {'README.md','README.fr.md','LISEZ-MOI.md','CHANGELOG.md','CHANGELOG.en.md','LICENSE'}
     pictures = {'workspace.png','project.png','history.png','investigation.png'}
-    for name in sorted(p for p in paths if p):
+    for name in sorted(set(p for p in paths if p and (ROOT/p).is_file())):
         if (name in roots or name.startswith('app/') and not name.startswith(('app/tests/','app/.CyDocBuild/'))
                 or name.startswith('website/assets/') and Path(name).name in pictures):
             if Path(name).suffix not in {'.pyc','.pyo'} and '__pycache__' not in Path(name).parts:
@@ -112,23 +115,25 @@ def build_payload(allow_working_tree=False):
     build_documentation.check_current()
     stage = WORK/'payload'
     reset_owned(stage, WORK)
-    for name in source_files():
+    for name in source_files(allow_working_tree):
         source = ROOT/name
         if source.is_symlink() or not source.resolve().is_relative_to(ROOT):
             raise ValueError('Refusing linked source input')
         target = stage/name; target.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(source,target)
-    if not (stage/'app/packaging/vendor'/config['sdk']['wheel']).is_file():
-        raise SystemExit('Add the packaging inputs to Git before building a local candidate.')
+    from scripts import build_mcp_sdk
+    sdk_sources=APP/'native/vendor'/config['sdk']['sourceArchive']
+    if digest(sdk_sources)!=config['sdk']['sha256']:raise ValueError('SDK source archive hash mismatch.')
+    run([sys.executable,APP/'scripts/build_mcp_sdk.py','--bundled'])
+    native=ROOT/'runtime/native/CyMCPSDK'
+    native_target=stage/'app/native/bin';native_target.mkdir(parents=True,exist_ok=True)
+    shutil.copy2(native/'cydec_mcp.dll',native_target/'cydec_mcp.dll')
+    shutil.copy2(native/'build.json',native_target/'build.json')
     python_archive = download(config['python'],WORK/'downloads'/config['python']['name'])
     home = stage/'runtime/python'
     extract_python(python_archive,home)
     interpreter = home/'python.exe'
     wheels = WORK/'wheels'; wheels.mkdir(parents=True,exist_ok=True)
-    sdk = APP/'packaging/vendor'/config['sdk']['wheel']
-    if digest(sdk) != config['sdk']['sha256']:
-        raise ValueError('Vendored SDK wheel hash mismatch')
-    shutil.copy2(sdk,wheels/sdk.name)
     env = {**os.environ,'PIP_CONFIG_FILE':os.devnull,'PIP_DISABLE_PIP_VERSION_CHECK':'1',
            'PIP_CACHE_DIR':str(WORK/'pip-cache'),'TEMP':str(WORK/'tmp'),'TMP':str(WORK/'tmp')}
     (WORK/'tmp').mkdir(exist_ok=True)
@@ -158,7 +163,8 @@ def build_payload(allow_working_tree=False):
     (home/'Scripts').mkdir(exist_ok=True)
     shutil.copy2(native/'python-proxy.exe',home/'Scripts/python.exe')
     # Native DLLs ship in their official wheels and Python distribution, without registry setup.
-    metadata = {'version':version,'runtimeAbi':'python311-cytools010-imgui192-cydec01',
+    from cydec.updates import RUNTIME_ABI
+    metadata = {'version':version,'runtimeAbi':RUNTIME_ABI,
                 'repository':'MrMybal/CyDecompilator','commit':git('rev-parse','HEAD'),
                 'distribution':'windows-x64-full','python':config['python'],'sdk':config['sdk'],
                 'requirementsSha256':digest(LOCK),'workingTreeCandidate':bool(dirty)}

@@ -6,7 +6,7 @@ import socket
 import threading
 import time
 from pathlib import Path
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from . import process
 from .engines.base import EngineContext
 from .paths import ENGINES, read_json, write_json

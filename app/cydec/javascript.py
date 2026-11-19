@@ -8,7 +8,7 @@ import struct
 from html.parser import HTMLParser
 from pathlib import Path, PurePosixPath
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from . import components, investigation as inv, process
 from .paths import read_json, write_json
 

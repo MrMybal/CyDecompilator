@@ -13,7 +13,7 @@ so the C output compiles and runs on x64 as well.
 import re
 import struct
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from .ir import (Addr, Assign, Bin, Branch, Call, Cast, Clobber, Cmp, Comment, Cond, Const, ExprStmt, FConst,
                  Flags, IndirectJump, Intrinsic, Jump, Load, Logic, Ret, Store, Switch, Sym, Tern, Un, Var, mask)

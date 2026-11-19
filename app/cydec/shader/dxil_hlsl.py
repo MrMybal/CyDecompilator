@@ -16,7 +16,7 @@ whatever the control-flow nesting.
 import re
 import struct
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from . import llvmbc
 from .dxbc import chunks

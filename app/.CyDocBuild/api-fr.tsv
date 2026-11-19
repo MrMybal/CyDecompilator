@@ -485,3 +485,36 @@ passed, failed, unavailable or skipped.	État passed, failed, unavailable ou ski
 prepared	État prepared.
 pyinstaller, dotnet-bundle, upx or zip-overlay; empty = first detected.	Type pyinstaller, dotnet-bundle, upx ou zip-overlay ; vide pour le premier détecté.
 scenarios-matched, compiled-unverified, compilation-failed, tests-failed, behavior-differs, blocked or cancelled.	État scenarios-matched, compiled-unverified, compilation-failed, tests-failed, behavior-differs, blocked ou cancelled.
+Approved URI or a reference returned by an approved tool.	URI approuvée ou référence renvoyée par un outil autorisé.
+Arguments matching the discovered remote schema.	Arguments conformes au schéma distant découvert.
+Byte offset.	Position en octets.
+Call one explicitly approved tool of a user-configured MCP server through CyMCPSDK McpClient. Business errors remain errors; mutations are never replayed.	Appeler avec CyMCPSDK McpClient un outil explicitement autorisé sur un serveur MCP configuré par l’utilisateur. Les erreurs métier restent des erreurs ; une modification n’est jamais rejouée.
+Configured server.	Serveur configuré.
+Continue the same search with this cursor only.	Poursuivre la même recherche avec ce curseur uniquement.
+Discover tools from a user-configured MCP server. Returns only the explicitly approved tools and their schemas; does not grant additional rights.	Découvrir les outils d’un serveur MCP configuré par l’utilisateur. Renvoie uniquement les outils explicitement approuvés et leurs schémas, sans accorder de droits supplémentaires.
+Empty lists conversations.	Vide pour lister les conversations.
+Exact approved tool name.	Nom exact de l’outil approuvé.
+Existing session ID, or empty for a new conversation.	Identifiant de session existant ; vide pour une nouvelle conversation.
+Explicit local files, maximum 8 MiB each; supported media depend on the provider.	Fichiers locaux explicitement choisis, de 8 Mio maximum chacun ; les médias acceptés dépendent du fournisseur.
+Final answer.	Réponse finale.
+Ignore case.	Ignorer la casse.
+Inspect the compiled SDK provider catalogue; optionally detect installed CLIs and running local models without generating a reply.	Consulter le catalogue des fournisseurs du SDK compilé ; rechercher facultativement les CLI installés et les modèles locaux actifs sans générer de réponse.
+Invalidate discovery/read cache and refresh explicitly.	Invalider le cache de découverte et de lecture, puis actualiser explicitement.
+List this client’s SDK conversations or read the full retained history of one exact conversation.	Lister les conversations SDK de ce client ou lire l’historique complet conservé d’une conversation précise.
+Literal or regular expression.	Texte littéral ou expression régulière.
+Maximum bytes.	Nombre maximal d’octets.
+Optional relative file glob.	Filtre relatif facultatif sur les noms de fichiers.
+Optional selected project scope.	Périmètre facultatif du projet sélectionné.
+Path relative to the explicit host workspace.	Chemin relatif à l’espace explicitement choisi par l’hôte.
+Permit business mutations already authorized to this client. Destructive actions and credentials remain excluded.	Permettre les modifications métier déjà autorisées à ce client. Les actions destructives et les identifiants restent exclus.
+Persistent conversation ID.	Identifiant persistant de la conversation.
+Previous revision, if available.	Révision précédente, si disponible.
+Probe configured providers and loopback model services.	Vérifier les fournisseurs configurés et les services de modèles sur loopback.
+Read a bounded UTF-8 byte range inside the host-selected native search workspace. Retain the returned revision to detect changes.	Lire une plage limitée d’octets UTF-8 dans l’espace de recherche natif choisi par l’hôte. Conserver la révision renvoyée pour détecter les changements.
+Read resources explicitly approved by the host or referenced by an approved remote tool. Optional watch uses SDK notifications only on a compatible transport; events returns their metadata. Expired references never repeat an operation.	Lire les ressources explicitement approuvées par l’hôte ou référencées par un outil distant autorisé. watch utilise les notifications du SDK uniquement sur un transport compatible ; events renvoie leurs métadonnées. Une référence expirée ne rejoue jamais une opération.
+Resource action.	Action sur les ressources.
+Search saved text using SDK ripgrep with bounded pages. Requires the host to enable ripgrep and explicitly choose workspaceRoot; no directory is inferred from a prompt.	Rechercher dans les textes enregistrés avec ripgrep du SDK et des pages limitées. L’hôte doit activer ripgrep et choisir explicitement workspaceRoot ; aucun dossier n’est déduit d’un prompt.
+Send a streamed turn through CyMCPSDK Conversation. The assistant can call the real application tools allowed by this client. Reuse conversationId to restore exactly that session; never retries a mutation automatically.	Envoyer un tour progressif avec CyMCPSDK Conversation. L’assistant appelle les véritables outils de l’application autorisés à ce client. Réutiliser conversationId pour restaurer cette session précise ; aucune modification n’est relancée automatiquement.
+Use the bounded Rust regular-expression engine.	Utiliser le moteur Rust d’expressions régulières bornées.
+User request.	Demande de l’utilisateur.
+User-configured server identifier.	Identifiant du serveur configuré par l’utilisateur.

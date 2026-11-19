@@ -1,7 +1,7 @@
 """Recover server-recorded input provenance without trusting operation parameters."""
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 
 def original_path(context, operation='open_file', field='path'):

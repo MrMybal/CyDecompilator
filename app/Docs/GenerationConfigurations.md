@@ -21,8 +21,8 @@ le JSON. Pour partager une configuration, fournir aussi les entrees necessaires.
 
 ## Format portable versionne
 
-Source de verite : `cytools_core/schemas/generation-config.schema.json`. Le generateur
-copie ce contrat dans app/ pour permettre la validation avec un runtime Core plus ancien.
+Source de vérité : `app/generation-config.schema.json`, validé par
+`app/generation_config.py`. Le nom de format historique reste compatible.
 
 ```json
 {

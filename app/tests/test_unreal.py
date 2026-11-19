@@ -10,7 +10,7 @@ import pytest
 
 APP = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(APP))
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from cydec import unreal, service
 from cydec.project import ProjectStore
 

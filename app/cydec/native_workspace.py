@@ -6,7 +6,7 @@ import uuid
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from .paths import write_json
 
 

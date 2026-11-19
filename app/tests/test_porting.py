@@ -17,7 +17,7 @@ import pytest
 
 APP=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(APP))
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from cydec import porting,service,process
 from cydec.engines.base import EngineContext
 from cydec.project import ProjectStore

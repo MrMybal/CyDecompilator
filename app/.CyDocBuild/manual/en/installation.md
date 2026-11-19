@@ -25,7 +25,7 @@ Linux x64 remains experimental and uses **CyDecompilator.sh** with a Linux-creat
 | runtime/engines/ | Optional analysis engines and toolchains |
 | data/ | Projects, settings, history, jobs and reports |
 
-Do not move an existing Python virtual environment and assume it will still work: its launcher paths can be absolute. For a new development installation, create it in its final directory, then install the application requirements and the pinned CyToolsCore SDK. The developer setup is recorded in **app/README.md**. Linux execution and individual engines have platform-specific validation limits; Windows results do not establish Linux compatibility.
+Do not move an existing Python virtual environment and assume it will still work: its launcher paths can be absolute. For a new development installation, create it in its final directory, then install the application requirements and compile the pinned native CyMCPSDK with app/scripts/build_mcp_sdk.py. The developer setup is recorded in **app/README.md**. Linux execution and individual engines have platform-specific validation limits; Windows results do not establish Linux compatibility.
 
 ## Check prerequisites by task {#check-prerequisites-by-task}
 

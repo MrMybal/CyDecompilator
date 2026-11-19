@@ -9,7 +9,7 @@ import re
 from collections import deque
 from pathlib import Path
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from .paths import read_json, write_json
 
 

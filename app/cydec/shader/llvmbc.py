@@ -8,7 +8,7 @@ Two layers:
 """
 import struct
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 # Block ids
 BLOCKINFO, MODULE, PARAMATTR, PARAMATTR_GROUP, CONSTANTS, FUNCTION = 0, 8, 9, 10, 11, 12

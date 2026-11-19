@@ -10,7 +10,7 @@ import re
 import time
 import uuid
 from pathlib import Path
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 from . import investigation as inv, process
 from .engines.base import EngineContext
 from .javascript import read_tree, safe_relative

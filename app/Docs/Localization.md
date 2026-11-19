@@ -1,5 +1,7 @@
 # Interface multilingue, Options et licences
 
+> Référence historique des contrats applicatifs. Pour cette application, suivre [CyMCPSDK.md](CyMCPSDK.md) et `app/AGENTS.md`. Les exemples de génération `cytools` ne sont pas des commandes livrées avec CyDecompilator ; aucun ancien SDK Python n’est requis.
+
 Depuis le SDK 0.3.0, chaque Tool utilisateur doit fournir une interface anglaise par
 defaut et une traduction francaise selectionnable. Cette obligation couvre les Tools
 existants lors de leur prochaine correction, ainsi que CyToolsManager.

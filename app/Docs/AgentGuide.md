@@ -1,5 +1,7 @@
 # Créer un CyTool avec une IA
 
+> Référence historique des contrats applicatifs. Pour cette application, suivre [CyMCPSDK.md](CyMCPSDK.md) et `app/AGENTS.md`. Les exemples de génération `cytools` ne sont pas des commandes livrées avec CyDecompilator ; aucun ancien SDK Python n’est requis.
+
 Ce document est le contrat de travail à fournir à une IA chargée de créer un Tool.
 Il s'applique à Codex, Claude, OpenCode ou tout autre assistant, sans dépendance au client.
 
@@ -70,8 +72,8 @@ en **secondes**, la progression entre **0 et 100**.
 
 ```python
 from pathlib import Path
-from cytools_core import Runtime, load_manifest, CyToolError
-from cytools_core.transports.cli import run_cli
+from cydec.mcp import Runtime, load_manifest, CyToolError
+from cydec.mcp.cli import run_cli
 
 def create_runtime(data_dir, **options):
     runtime = Runtime(load_manifest(Path(__file__).with_name('CyTool.json')),

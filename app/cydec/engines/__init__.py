@@ -14,7 +14,7 @@ ENGINES = {engine.id: engine for engine in (GhidraEngine(), CDecompilerEngine(),
 
 
 def get(engine_id):
-    from cytools_core import CyToolError
+    from cydec.mcp import CyToolError
     engine = ENGINES.get(str(engine_id))
     if engine is None:
         raise CyToolError('NotFound', 'Unknown engine %r. Known: %s' % (engine_id, ', '.join(ENGINES)))

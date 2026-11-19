@@ -15,7 +15,7 @@ import threading
 import time
 import uuid
 
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from .. import service
 from ..paths import DATA, SETTINGS, read_json, write_json
@@ -79,7 +79,9 @@ def registry():
     with _registry_lock:
         if _registry is None:
             WORKSPACE.mkdir(parents=True, exist_ok=True)
-            _registry = Registry(settings=settings().get('providers', {}), workspace=WORKSPACE)
+            from cydec.mcp.configuration import validate_options
+            sdk_options=validate_options(read_json(SETTINGS_FILE.parent/'mcp.json',{}))
+            _registry = Registry(settings=settings().get('providers', {}), workspace=WORKSPACE,options=sdk_options)
         return _registry
 
 

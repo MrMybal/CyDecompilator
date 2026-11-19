@@ -14,7 +14,7 @@ from pathlib import Path
 import capstone as cs
 import pefile
 from capstone import x86_const as x86
-from cytools_core import CyToolError
+from cydec.mcp import CyToolError
 
 from . import process
 from .paths import read_json, write_json

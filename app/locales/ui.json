@@ -11614,5 +11614,69 @@
  "Copy local documentation link": {
   "en": "Copy local documentation link",
   "fr": "Copier le lien local de la documentation"
+ },
+ "Application assistant": {
+  "en": "Application assistant",
+  "fr": "Assistant de l’application"
+ },
+ "Project assistant": {
+  "en": "Project assistant",
+  "fr": "Assistant du projet"
+ },
+ "The assistant uses the same operations and permissions as the CLI and MCP.": {
+  "en": "The assistant uses the same operations and permissions as the CLI and MCP.",
+  "fr": "L’assistant utilise les mêmes opérations et permissions que le CLI et MCP."
+ },
+ "Refresh conversations": {
+  "en": "Refresh conversations",
+  "fr": "Actualiser les conversations"
+ },
+ "Restore conversation": {
+  "en": "Restore conversation",
+  "fr": "Restaurer la conversation"
+ },
+ "Allow application changes": {
+  "en": "Allow application changes",
+  "fr": "Autoriser les modifications de l’application"
+ },
+ "Attach files": {
+  "en": "Attach files",
+  "fr": "Joindre des fichiers"
+ },
+ "Clear attachments": {
+  "en": "Clear attachments",
+  "fr": "Retirer les pièces jointes"
+ },
+ "CyMCPSDK options and external tools": {
+  "en": "CyMCPSDK options and external tools",
+  "fr": "Options CyMCPSDK et outils externes"
+ },
+ "Options are independent. Save and restart to apply. External tools require an explicit allowedTools list.": {
+  "en": "Options are independent. Save and restart to apply. External tools require an explicit allowedTools list.",
+  "fr": "Les options sont indépendantes. Enregistrez et redémarrez pour les appliquer. Les outils externes nécessitent une liste allowedTools explicite."
+ },
+ "Save SDK options": {
+  "en": "Save SDK options",
+  "fr": "Enregistrer les options du SDK"
+ },
+ "Confirm destructive action": {
+  "en": "Confirm destructive action",
+  "fr": "Confirmer l’action destructive"
+ },
+ "Not running": {
+  "en": "Not running",
+  "fr": "Arrêté"
+ },
+ "Not configured": {
+  "en": "Not configured",
+  "fr": "Non configuré"
+ },
+ "Executable missing": {
+  "en": "Executable missing",
+  "fr": "Exécutable absent"
+ },
+ "Authentication required": {
+  "en": "Authentication required",
+  "fr": "Authentification requise"
  }
 }

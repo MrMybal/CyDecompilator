@@ -161,7 +161,7 @@ class Jobs:
     def submit(self, operation, parameters, *, tag, done=None, failed=None, streamed=None, timeout=None, priority='Interactive'):
         try:
             job = self.runtime.submit(self.actor, self.session, operation, parameters, priority=priority,
-                                      execution_timeout=timeout)
+                                      execution_timeout=timeout,confirmed=operation in {'delete_project','remove_component','update_apply','update_rollback'})
         except Exception as exc:
             self.message = '%s: %s' % (operation, exc)
             if failed:
@@ -300,6 +300,8 @@ class App:
         self.code_editor = make_editor()
         self.ai_editor = DocumentView()
         self.ai_conversation = ConversationView()
+        from mcp_ui import AssistantPanel
+        self.sdk_chat = AssistantPanel(self)
         self.ai_is_conversation = False
         self.converted_editor = SourceView('c')
         self.function_properties = inspector.InspectorState()
@@ -1342,10 +1344,14 @@ class App:
             self.ai_editor.render('###ai-output', imgui.ImVec2(0, 0))
 
     def assistant_page(self):
-        if not self.project:
-            cyui.empty_state(tr('No application selected'), tr('Open an application in Workspace.'), cyui.icon.code)
-            return
-        self.ai_panel()
+        if imgui.begin_tab_bar('##assistant-pages'):
+            opened,_=imgui.begin_tab_item(label('Application assistant'))
+            if opened:
+                self.sdk_chat.panel();imgui.end_tab_item()
+            if self.project:
+                opened,_=imgui.begin_tab_item(label('Project assistant'))
+                if opened:self.ai_panel();imgui.end_tab_item()
+            imgui.end_tab_bar()
 
     def start_agent(self, project_id, objective, workflow, run_id=''):
         self.ai_is_conversation = False
@@ -1587,6 +1593,8 @@ class App:
 
     def ai_tab(self):
         from cydec.ai import credentials
+        from mcp_ui import settings_panel
+        settings_panel(self)
         cyui.panel_header(tr('AI assistant settings'))
         status = self.ai_status
         if status is None or self.ai_draft is None:
@@ -1702,6 +1710,8 @@ class App:
 
 
 def main():
+    from cydec.mcp.transport import token_environment
+    external_token_required=bool(token_environment())
     if '--smoke-test' in sys.argv:
         print('smoke', file=sys.stderr)
     runner = hello_imgui.RunnerParams()
@@ -1716,9 +1726,20 @@ def main():
     testing_layout = any(a.startswith('--ui-test-') for a in sys.argv) or '--smoke-test' in sys.argv
     runner.ini_filename = str(ROOT / ('data/reports/ui-test-imgui.ini' if testing_layout else 'data/settings/imgui.ini'))
     runner.imgui_window_params.default_imgui_window_type = hello_imgui.DefaultImGuiWindowType.no_default_window
-    with create_runtime(ROOT / 'data/jobs') as runtime:
+    def launch_option(name,default=None):
+        for index,value in enumerate(sys.argv[1:],1):
+            if value.startswith(name+'='):return value.split('=',1)[1]
+            if value==name and index+1<len(sys.argv):return sys.argv[index+1]
+        return default
+    with create_runtime(Path(launch_option('--data-dir',str(ROOT/'data/jobs')))) as runtime:
         from tool import declared_permissions
-        actor = runtime.authenticate(runtime.create_client('ImGui', declared_permissions(runtime))['token'])
+        from cydec.ai import credentials
+        import hashlib
+        credential_id='gui:'+hashlib.sha256(str(runtime.root).encode()).hexdigest()[:16]
+        stored=credentials.resolve(credential_id)
+        try:actor=runtime.authenticate(stored)
+        except Exception:
+            local=runtime.create_client('ImGui',declared_permissions(runtime));credentials.store(credential_id,local['token']);actor=runtime.authenticate(local['token'])
         session = runtime.create_session(actor, temporary=False)['sessionId']
         app = App(runtime, actor, session)
         frames = [0]
@@ -1730,11 +1751,18 @@ def main():
         test_unit = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--ui-test-unit=')), '')
         test_project = next((a.split('=',1)[1] for a in sys.argv if a.startswith('--ui-test-project=')), '')
         test_source = next((a.split('=',1)[1] for a in sys.argv if a.startswith('--ui-test-source=')), '')
+        test_sdk_prompt=launch_option('--ui-test-sdk-prompt','')
+        test_sdk_report=launch_option('--ui-test-sdk-report','')
+        sdk_stream_observed=[False]
 
         def gui():
             frames[0] += 1
             app.draw()
             app.ide.exit_modal(runner)
+            if test_sdk_prompt and frames[0]==5:
+                app.sdk_chat.text=test_sdk_prompt;app.sdk_chat.send()
+            sdk_job,_=app.jobs.active('sdk-chat')
+            if sdk_job and app.jobs.deltas.get(sdk_job):sdk_stream_observed[0]=True
             if test_open and frames[0] == 3:
                 app.open_path(test_open)
             if test_project and frames[0] == 3:
@@ -1769,11 +1797,16 @@ def main():
         runner.callbacks.show_gui = gui
         runner.callbacks.confirm_exit = app.ide.confirm_exit
         runner.callbacks.load_additional_fonts = load_fonts
-        run(runner, shell_navigation=True)
+        from cydec.mcp.transport import LiveServer
+        port=launch_option('--mcp-port','0')
+        with LiveServer(runtime,None if '--no-mcp' in sys.argv else int(port),advertise=True,require_token=external_token_required):
+            run(runner, shell_navigation=True)
         if screenshot:
             from standalone_log import save_screenshot
             Path(screenshot).parent.mkdir(parents=True, exist_ok=True)
             save_screenshot(screenshot, hello_imgui.final_app_window_screenshot())
+        if test_sdk_report:
+            Path(test_sdk_report).write_text(json.dumps({'streamObservedInFrame':sdk_stream_observed[0],'conversationId':app.sdk_chat.identifier,'messages':len(app.sdk_chat.view.messages),'error':app.sdk_chat.message,'frames':frames[0]},indent=2),'utf-8')
 
 
 if __name__ == '__main__':

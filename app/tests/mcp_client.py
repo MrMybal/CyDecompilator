@@ -60,6 +60,7 @@ async def client(directory, model_decisions=None):
         encoding='utf-8')
     env = dict(os.environ)
     env.pop('CYTOOLS_TOKEN', None)
+    env.pop('CYMCP_TOKEN', None)  # The child owns an isolated credential database.
     server = StdioServerParameters(command=sys.executable, args=[str(bootstrap)], cwd=str(ROOT), env=env)
     async with stdio_client(server) as (read, write):
         async with ClientSession(read, write) as session:
