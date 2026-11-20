@@ -5,9 +5,14 @@ from urllib.parse import urlsplit
 from .errors import CyToolError
 from .native import DEFAULTS
 
+ACCESS_PROFILES={'free':(False,False),'local_controlled':(False,True),
+                 'token_only':(True,False),'protected_access':(True,True)}
+
 def validate_options(value):
     if not isinstance(value,dict) or set(value)-set(DEFAULTS):raise CyToolError('InvalidParameters','Unknown SDK option.')
     result={**DEFAULTS,**value}
+    if not isinstance(result['accessProfile'],str) or result['accessProfile'] not in ACCESS_PROFILES:
+        raise CyToolError('InvalidParameters','Unknown local access profile.')
     for key in ('compactDiscovery','cache','notifications','diskSpool','telemetry','ripgrep'):
         if type(result[key])is not bool:raise CyToolError('InvalidParameters',key+' must be boolean.')
     bounds={'cacheTtlMs':(0,300000),'diskBytes':(1024*1024,1024**3),'memoryBytes':(1024*1024,256*1024**2),'retentionSeconds':(1,86400),'chunkBytes':(1024,65536),'inlineBytes':(1024,1024**2),'contextBytes':(0,64*1024**2),'recentTurns':(1,1000)}
@@ -17,6 +22,16 @@ def validate_options(value):
     if result['ripgrep'] and (not Path(result['workspaceRoot']).is_absolute() or not Path(result['workspaceRoot']).is_dir()):raise CyToolError('InvalidParameters','Ripgrep requires an explicit existing absolute workspace root.')
     spool=result['spoolRoot']
     if not isinstance(spool,str) or spool and (not Path(spool).is_absolute() or Path(spool).is_symlink() or Path(spool).exists() and not Path(spool).is_dir()):raise CyToolError('InvalidParameters','spoolRoot must be empty or an explicit absolute directory.')
+    return result
+
+def load_options(path):
+    """Persist the new default only for configurations without an explicit choice."""
+    import json
+    from ..paths import write_json
+    try:value=json.loads(Path(path).read_text('utf-8'))
+    except FileNotFoundError:value={}
+    result=validate_options(value)
+    if 'accessProfile' not in value:write_json(Path(path),result)
     return result
 
 def validate_servers(value):

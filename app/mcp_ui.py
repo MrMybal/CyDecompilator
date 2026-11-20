@@ -72,6 +72,21 @@ def settings_panel(app):
         from cyui_modules.code import CodeEditor
         panel.settings_editor=CodeEditor(panel.settings_text,'json');panel.settings_loaded=True
     imgui.text_wrapped(tr('Options are independent. Save and restart to apply. External tools require an explicit allowedTools list.'))
+    from cydec.mcp.configuration import ACCESS_PROFILES
+    profiles=list(ACCESS_PROFILES);names=['Free','Local controlled','Token only','Protected']
+    try:
+        values=json.loads(panel.settings_editor.text)
+        selected=profiles.index(values.get('optimizations',{}).get('accessProfile','free'))
+        changed,selected=imgui.combo(label('Local MCP access profile'),selected,[tr(n) for n in names])
+        if changed:
+            values['optimizations']['accessProfile']=profiles[selected]
+            panel.settings_editor.text=json.dumps(values,indent=2,ensure_ascii=False)
+    except (ValueError,KeyError,TypeError):pass
+    from cydec.paths import read_json
+    endpoint=read_json(app.runtime.root/'mcp-instance.json',{}).get('mcpUrl','')
+    if endpoint:
+        imgui.text_wrapped(endpoint)
+        if imgui.button(label('Copy local MCP address')):imgui.set_clipboard_text(endpoint)
     panel.settings_editor.draw('##sdk-options',(-1,cyui.dp(260)))
     if imgui.button(label('Save SDK options')):
         try:

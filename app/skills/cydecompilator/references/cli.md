@@ -23,7 +23,7 @@ The input file contains validated operation arguments, for example
 also accepts the SDK example's positional file syntax. Do not invent IDs, paths
 or schemas: query `describe-operation` before an unfamiliar call.
 
-`--auto` attaches to the running instance's authenticated local endpoint. If no
+`--auto` attaches to the running instance's local endpoint (Free uses the address alone; token profiles use the configured credential). If no
 instance owns the selected directory, it runs without a window. Its local identity
 is persisted in an account-protected vault, so another command/chat can recover
 its jobs. Explicit credentials retain their restrictions and are never replaced

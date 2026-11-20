@@ -77,7 +77,7 @@ def test_auto_starts_headless_and_reuses_identity_after_restart(tmp_path):
             result=await call(session,'list_components',{})
             return result['_jobId']
     job=asyncio.run(first());assert not (jobs/MARKER).exists()
-    assert (jobs/VAULT).is_file()
+    assert not (jobs/VAULT).is_file() # Free headless access needs no generated credential.
     async def second():
         async with client(tmp_path/'second',['--data-dir',str(jobs),'mcp','--auto','--full']) as session:
             result=await call(session,'cy_get_job',{'jobId':job});assert result['state']=='Completed'
@@ -146,3 +146,15 @@ def test_sdk_close_waits_for_an_active_external_call(tmp_path):
     closer=threading.Thread(target=lambda:(native.close(),closed.set()));closer.start()
     assert not closed.wait(.1);release.set();worker.join(3);closer.join(3)
     assert results==[{'ok':True}] and closed.is_set()
+
+
+def test_native_sdk_stdio_client_joins_http_instance_with_modern_headers(instance,tmp_path):
+    runtime,_,__,___=instance
+    native=Native(directory=tmp_path/'modern-peer')
+    try:
+        with LiveServer(runtime,0,advertise=True):
+            native.call('remoteConnect',id='proxy',config={'executable':sys.executable,'arguments':[str(APP/'tool.py'),'--data-dir',str(runtime.root),'mcp','--auto','--full']})
+            result=native.call('remoteCall',id='proxy',name='list_projects',arguments={})
+            assert not result.get('isError'),result
+            assert 'projects' in json.loads(result['content'][0]['text'])
+    finally:native.close()

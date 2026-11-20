@@ -1710,8 +1710,6 @@ class App:
 
 
 def main():
-    from cydec.mcp.transport import token_environment
-    external_token_required=bool(token_environment())
     if '--smoke-test' in sys.argv:
         print('smoke', file=sys.stderr)
     runner = hello_imgui.RunnerParams()
@@ -1799,7 +1797,7 @@ def main():
         runner.callbacks.load_additional_fonts = load_fonts
         from cydec.mcp.transport import LiveServer
         port=launch_option('--mcp-port','0')
-        with LiveServer(runtime,None if '--no-mcp' in sys.argv else int(port),advertise=True,require_token=external_token_required):
+        with LiveServer(runtime,None if '--no-mcp' in sys.argv else int(port),advertise=True):
             run(runner, shell_navigation=True)
         if screenshot:
             from standalone_log import save_screenshot

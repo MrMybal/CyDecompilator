@@ -5,6 +5,14 @@
 CyDecompilator est **en développement**. Windows x64 est pris en charge ; Linux x64 est expérimental.
 Les paquets Windows complets incluent leur runtime ; la petite mise à jour applicative demande un runtime compatible existant. Le numéro de version ne garantit ni reconstruction complète ni compatibilité console.
 
+## 1.5.4 — 20 novembre 2026
+
+- Mise à jour de CyMCPSDK compilé localement vers la version 0.7.2, révision `e562c73`, compatible avec `34d4bca`.
+- MCP local en Free par défaut : accès loopback par adresse seule à toutes les opérations exposées, sans confirmation supplémentaire ; validation des arguments maintenue.
+- Conservation des choix explicites Local contrôlé, Jeton seul et Protégé ; migration des réglages sans profil vers Free. Ajout du sélecteur de profil et de la copie de l’adresse locale.
+- Utilisation du serveur HTTP natif du SDK et sources locales figées avant compilation pour conserver une provenance reproductible.
+- Documentation hors ligne anglais/français actualisée et reconstruction de l’installateur Windows, du portable et de la mise à jour applicative. L’ABI reste compatible avec la 1.5.3 ; depuis la 1.5.2, un paquet complet demeure nécessaire.
+
 ## 1.5.3 — 19 novembre 2026
 
 - Remplacement de l’intégration de l’ancien SDK Python par CyMCPSDK 0.7.0 compilé, en conservant tâches durables, opérations métier et permissions.

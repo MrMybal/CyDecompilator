@@ -5,14 +5,14 @@ description: Connecter un client MCP ou CLI et suivre le protocole des opératio
 section: IA et automatisation
 parent: ai
 order: 14
-sourceRevision: 6
+sourceRevision: 7
 ---
 
 Interface, CLI et MCP exposent les mêmes opérations métier Runtime. Ouvrez les [opérations avancées](doc:automation) pour consulter contrats installés, formulaires de paramètres, permissions et sorties. Ce catalogue actif fait référence pour votre version ; ne figez pas un nombre d’opérations dans un guide ou un prompt IA.
 
 ## IA externe par le CLI du SDK {#external-ai-through-sdk-cli}
 
-Une IA externe ayant accès au terminal peut piloter CyDecompilator sans MCP, sans conversation intégrée et sans compte de modèle dans cette application. **--auto** rejoint la fenêtre ouverte ou travaille sans fenêtre si elle est fermée. Le CLI gère la connexion locale authentifiée et conserve son identité entre commandes.
+Une IA externe ayant accès au terminal peut piloter CyDecompilator sans MCP, sans conversation intégrée et sans compte de modèle dans cette application. **--auto** rejoint la fenêtre ouverte ou travaille sans fenêtre si elle est fermée. Le CLI gère la connexion et le profil d’accès local choisi et conserve son identité entre commandes.
 
 ```powershell
 CyDecompilatorCLI.exe --auto list-operations
@@ -40,7 +40,7 @@ Les paquets Windows complets fournissent **CyDecompilatorCLI.exe mcp** comme ser
 }
 ```
 
-Pour piloter la fenêtre déjà ouverte, connectez-vous à cette même instance via HTTP authentifié comme indiqué plus bas. Un **--data-dir** absolu distinct avant **mcp** crée un ordonnanceur sans interface séparé. Les projets d’analyse restent partagés : coordonnez les modifications du même projet entre clients. Installez le skill CyDecompilator fourni via **app/scripts/install_skill.py** si votre client le permet ; cela ne configure pas automatiquement MCP.
+Pour piloter la fenêtre déjà ouverte, connectez-vous à cette même instance avec le profil HTTP local choisi comme indiqué plus bas. Un **--data-dir** absolu distinct avant **mcp** crée un ordonnanceur sans interface séparé. Les projets d’analyse restent partagés : coordonnez les modifications du même projet entre clients. Installez le skill CyDecompilator fourni via **app/scripts/install_skill.py** si votre client le permet ; cela ne configure pas automatiquement MCP.
 
 ## Découvrir, soumettre, attendre et examiner {#discover-submit-wait-inspect}
 
@@ -60,9 +60,20 @@ Consultez l’[IA](doc:ai), les [projets](doc:projects) et les [observations](do
 
 ## Se connecter à la fenêtre ouverte {#connect-to-the-open-window}
 
-Créer un client avant de démarrer l’instance avec **CyDecompilatorCLI.exe --data-dir D:/CyDecJobs create-client --name external --permission processSpawn --permission filesystemExternal**. Conserver le jeton renvoyé dans un emplacement privé. Lancer **CyDecompilator.exe --data-dir D:/CyDecJobs --mcp-port=8766**, puis **CyDecompilatorCLI.exe --connect http://127.0.0.1:8766/v1 list-operations** ou **invoke**. Le point d’accès HTTP partage le registre, les tâches et les projets de la fenêtre. Avec le port 0, l’adresse loopback effective est indiquée sur stderr.
+**Free est le profil MCP local par défaut.** Lancer **CyDecompilator.exe --mcp-port=8766**, puis connecter le client MCP à **http://127.0.0.1:8766/mcp**. L’adresse seule donne accès à toutes les opérations exposées, modifications comprises, sans jeton ni confirmation supplémentaire. La validation des arguments reste active. Le point d’accès utilise les mêmes tâches, projets et moteur que la fenêtre ouverte. Le port 0 choisit un port local disponible ; copier l’adresse active dans **Réglages de l’assistant IA → Options CyMCPSDK et outils externes**.
 
-Fournir l’identifiant du client par **CYMCP_TOKEN** ; l’ancien alias **CYTOOLS_TOKEN** reste accepté. Un client MCP externe utilise **http://127.0.0.1:8766/mcp** et un en-tête Authorization Bearer. Ne jamais placer de secret dans les paramètres métier. HTTP utilise du JSON authentifié sur loopback, avec TTL/actualisation explicite plutôt que des souscriptions SSE persistantes. Stdio propose le chemin de notifications du SDK. Le serveur n’écoute jamais sur une interface publique.
+Choisir un profil dans ce panneau, enregistrer et redémarrer. Les configurations sans profil migrent vers Free ; les choix explicites sont conservés.
+
+| Profil | Jeton | Accès aux opérations |
+| --- | --- | --- |
+| Free | Aucun | Toutes les opérations exposées sans confirmation supplémentaire |
+| Local contrôlé | Aucun | Permissions et confirmations de l’application |
+| Jeton seul | Requis | Toutes les opérations exposées sans confirmation supplémentaire |
+| Protégé | Requis | Permissions et confirmations de l’application |
+
+Les appelants Free et Local contrôlé partagent une identité locale. Pour le profil Protégé, créer un client avant de lancer la fenêtre : **CyDecompilatorCLI.exe --data-dir D:/CyDecJobs create-client --name external --permission processSpawn --permission filesystemExternal**. Conserver le jeton renvoyé dans un emplacement privé ; le fournir par **CYMCP_TOKEN** (l’ancien alias **CYTOOLS_TOKEN** est accepté) ou un en-tête HTTP Authorization Bearer. Ne jamais placer les identifiants dans les arguments métier.
+
+Pour le CLI sur la fenêtre ouverte, utiliser **CyDecompilatorCLI.exe --connect http://127.0.0.1:8766/v1 list-operations** ou **invoke**. Free ne demande aucun jeton. Le serveur SDK écoute uniquement sur **127.0.0.1** et conserve les contrôles Host/Origin dans tous les profils.
 
 ## Découverte compacte et résultats complets {#compact-discovery-and-complete-results}
 
@@ -80,4 +91,4 @@ Ouvrir **Réglages de l’assistant IA → Options CyMCPSDK et outils externes**
 
 Seuls les serveurs configurés par l’utilisateur et les noms d’outils explicitement autorisés sont accessibles au chat intégré. La configuration contient un exécutable et ses arguments structurés, ou une URL HTTPS (HTTP seulement sur loopback), et une liste **allowedTools**. Les secrets restent dans le coffre sous **mcp:identifiant-serveur**, jamais dans le JSON. **remote_tools** renvoie les schémas approuvés ; **remote_call** appelle le véritable outil distant et conserve ses erreurs métier. **remote_resources** lit les URI explicitement approuvées ou les ressources référencées par un outil autorisé, et peut activer/lire les notifications d’un transport compatible. Le SDK suit la pagination et invalide les lectures compatibles via les notifications. Une ressource absente ou expirée n’autorise jamais à rejouer l’action initiale.
 
-Les actions destructives hors du chat exigent **--confirm** ou la case de confirmation du formulaire avancé. CLI et MCP refusent les mêmes permissions manquantes. L’assistant intégré exclut réglages de compte, mises à jour applicatives et actions destructives. Consulter le schéma installé avant toute opération inconnue.
+Les profils contrôlés et les identités CLI indépendantes exigent **--confirm** pour les actions destructives et appliquent les permissions déclarées. Les accès HTTP Free et Jeton seul ne demandent pas ces confirmations. L’assistant intégré exclut réglages de compte, mises à jour applicatives et actions destructives. Consulter le schéma installé avant toute opération inconnue.

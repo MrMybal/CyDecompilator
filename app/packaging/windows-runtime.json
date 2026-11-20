@@ -14,13 +14,13 @@
     "size": 14336568
   },
   "sdk": {
-    "version": "0.7.0",
+    "version": "0.7.2",
     "repository": "https://github.com/MrMybal/CyMCPSDK",
-    "revision": "791d4d7d7680213b282ec8529d248a10f8494d77",
+    "revision": "e562c731a146d599e3404718ea8414bb5b96b66d",
     "name": "CyMCPSDK",
     "license": "MIT",
     "sourceArchive": "CyMCPSDK-source.zip",
-    "sha256": "858aa2d6b1240a611a10b793140625dbd61dc45a2d1ae75a9e14f6c5b7141ad8",
+    "sha256": "8d2b491263b1eab9a7622ddb480947503059b08b9c4fc28d5c42ee88cafe9f56",
     "modules": [
       "Core",
       "Platform",

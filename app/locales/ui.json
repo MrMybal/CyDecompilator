@@ -11678,5 +11678,29 @@
  "Authentication required": {
   "en": "Authentication required",
   "fr": "Authentification requise"
+ },
+ "Free": {
+  "en": "Free",
+  "fr": "Free"
+ },
+ "Local controlled": {
+  "en": "Local controlled",
+  "fr": "Local contrôlé"
+ },
+ "Token only": {
+  "en": "Token only",
+  "fr": "Jeton seul"
+ },
+ "Protected": {
+  "en": "Protected",
+  "fr": "Protégé"
+ },
+ "Local MCP access profile": {
+  "en": "Local MCP access profile",
+  "fr": "Profil d’accès MCP local"
+ },
+ "Copy local MCP address": {
+  "en": "Copy local MCP address",
+  "fr": "Copier l’adresse MCP locale"
  }
 }

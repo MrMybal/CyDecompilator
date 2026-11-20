@@ -22,9 +22,11 @@ from cydec.mcp import CyToolError,Native
 from cydec.mcp.transport import make_server,HTTPClient
 
 @pytest.fixture
-def instance(tmp_path,monkeypatch):
+def instance(tmp_path,monkeypatch,request):
     monkeypatch.setenv('CYTOOLS_TOKEN','explicit-test-identity');monkeypatch.delenv('CYMCP_TOKEN',raising=False)
     monkeypatch.setattr(service,'store',ProjectStore(tmp_path/'projects'))
+    settings=tmp_path/'settings/mcp.json';settings.parent.mkdir()
+    settings.write_text(json.dumps({'accessProfile':getattr(request,'param','protected_access')}),'utf-8')
     runtime=create_runtime(tmp_path/'jobs');runtime.start()
     identity=runtime.create_client('test',declared_permissions(runtime));actor=runtime.authenticate(identity['token'])
     session=runtime.create_session(actor,temporary=False)['sessionId']
@@ -98,6 +100,7 @@ def test_sdk_chat_streams_calls_real_tool_and_restores(instance,tmp_path,monkeyp
         after=runtime.assistant.history(actor,identifier)['history'];assert len(after)>len(before)
         assert out2['conversationId']==identifier and requests[-1]['messages'][0]['role']=='system'
 
+@pytest.mark.parametrize('instance',['protected_access','free'],indirect=True)
 def test_chat_cancellation_and_read_only_grant(instance,tmp_path,monkeypatch):
     runtime,actor,session,_=instance
     project=run(instance,'open_file',path=str(APP/'tests/fixtures/shaders/lit_vs.cso'))['outputs']['projectId']
@@ -116,7 +119,7 @@ def test_live_instance_cli_and_mcp_share_rights(instance,tmp_path):
     server=make_server(runtime,0);thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
     try:
         url='http://127.0.0.1:'+str(server.server_port)+'/v1';client=HTTPClient(url,token)
-        assert client.call('SDKInfo')['version']=='0.7.0'
+        assert client.call('SDKInfo')['version']=='0.7.2'
         params=tmp_path/'read.json';params.write_text('{}','utf-8')
         env={**os.environ,'CYMCP_TOKEN':token}
         proc=subprocess.run([sys.executable,str(APP/'tool.py'),'--connect',url,'invoke','list_projects','--params-file',str(params)],env=env,capture_output=True,text=True,encoding='utf-8',timeout=15)

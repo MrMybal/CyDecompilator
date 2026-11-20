@@ -54,4 +54,8 @@ def test_bundled_sdk_and_build_inputs_are_hash_locked():
     build=builder(); config=json.loads(build.CONFIG.read_text('utf-8'))
     sdk=APP/'native/vendor'/config['sdk']['sourceArchive']
     assert build.digest(sdk)==config['sdk']['sha256']
+    provenance=json.loads((APP/'native/cymcpsdk-source.json').read_text('utf-8'))
+    assert config['sdk']['version']==provenance['version']
+    assert config['sdk']['revision']==provenance['revision']
+    assert config['sdk']['sha256']==provenance['archiveSha256']
     assert all('--hash=sha256:' in line for line in build.LOCK.read_text().splitlines() if line and not line.startswith('#'))

@@ -60,7 +60,7 @@ def run_cli(factory,argv=None):
                 raise CyToolError('Busy','The owning instance has not published its MCP endpoint. Start the updated application with MCP enabled or choose another --data-dir.') from None
             runtime.start()
             actor=runtime.authenticate(explicit_token) if explicit_token else automation_identity(runtime)[0]
-            with LiveServer(runtime,0,advertise=True,require_token=bool(explicit_token)):
+            with LiveServer(runtime,0,advertise=True):
                 print('CyDecompilator MCP: running headless; the integrated chat is not required.',file=sys.stderr,flush=True)
                 serve_stdio(runtime,actor,compact=compact)
             return 0
@@ -74,7 +74,6 @@ def run_cli(factory,argv=None):
         elif args.connect:
             if args.command in ('serve','create-client'):raise CyToolError('InvalidParameters','Use a local data directory for this command.')
             token=token_environment()
-            if not token:raise CyToolError('AuthenticationRequired','Set CYMCP_TOKEN for the selected instance (CYTOOLS_TOKEN remains accepted).')
             if args.command=='mcp':
                 endpoint=args.connect.rstrip('/').removesuffix('/v1').removesuffix('/mcp')+'/mcp'
                 serve_proxy(endpoint,token,compact=args.compact and not args.full);return 0
@@ -84,7 +83,7 @@ def run_cli(factory,argv=None):
             if args.command=='create-client':print(json.dumps(runtime.create_client(args.name,args.permission)));return 0
             if args.command=='serve':
                 server=make_server(runtime,args.port)
-                print('CyDecompilator instance: http://127.0.0.1:%d/v1; MCP: /mcp; bearer authentication required.'%server.server_port,file=sys.stderr,flush=True)
+                print('CyDecompilator instance: http://127.0.0.1:%d/v1; MCP: /mcp; profile %s.'%(server.server_port,runtime.options['accessProfile']),file=sys.stderr,flush=True)
                 try:server.serve_forever()
                 except KeyboardInterrupt:pass
                 finally:server.server_close()
@@ -95,7 +94,7 @@ def run_cli(factory,argv=None):
             else:actor=runtime.authenticate(token_environment())
             client=LocalClient(runtime,actor)
             if args.auto_instance:
-                owned=LiveServer(runtime,0,advertise=True,require_token=bool(initial_token))
+                owned=LiveServer(runtime,0,advertise=True)
                 owned.__enter__();live=owned
         if args.command=='mcp':serve_stdio(runtime,actor,compact=args.compact and not args.full)
         elif args.command=='stdio':

@@ -1929,5 +1929,11 @@
  "Not running": "Not running",
  "Not configured": "Not configured",
  "Executable missing": "Executable missing",
- "Authentication required": "Authentication required"
+ "Authentication required": "Authentication required",
+ "Free": "자유",
+ "Local controlled": "제어된 로컬",
+ "Token only": "토큰만",
+ "Protected": "보호",
+ "Local MCP access profile": "로컬 MCP 접근 프로필",
+ "Copy local MCP address": "로컬 MCP 주소 복사"
 }

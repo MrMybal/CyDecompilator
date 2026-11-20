@@ -148,9 +148,9 @@
   },
   {
     "kind": "Component",
-    "name": "CyMCPSDK 0.7.0",
+    "name": "CyMCPSDK 0.7.2",
     "license": "MIT",
-    "url": "https://github.com/MrMybal/CyMCPSDK/blob/791d4d7d7680213b282ec8529d248a10f8494d77/LICENSE",
+    "url": "https://github.com/MrMybal/CyMCPSDK/blob/e562c731a146d599e3404718ea8414bb5b96b66d/LICENSE",
     "notes": "Compiled native Core, Platform, Http, MCP and AI modules. Source archive, exact hashes and MIT/transitive notices are in app/native/. The Python host owns durable jobs and adapts the existing CyUI interface to the SDK Conversation service."
   },
   {

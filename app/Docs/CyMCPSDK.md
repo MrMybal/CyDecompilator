@@ -1,7 +1,7 @@
 # CyMCPSDK integration
 
-CyDecompilator uses **CyMCPSDK 0.7.0**, compiled from revision
-`791d4d7d7680213b282ec8529d248a10f8494d77`. The native library links Core,
+CyDecompilator uses **CyMCPSDK 0.7.2**, compiled from revision
+`e562c731a146d599e3404718ea8414bb5b96b66d` (compatible with `34d4bca`). The native library links Core,
 Platform, Http, MCP and AI. Local is unnecessary: optional analysis engines retain
 their existing installers, and local model services are connected through AI.
 ChatUI is a C++ ImGui/CyUI component; this application's `imgui_bundle` Python
@@ -19,7 +19,7 @@ runtime/python/Scripts/python.exe app/build_manifest.py
 runtime/python/Scripts/python.exe app/scripts/build_documentation.py
 ```
 
-The build prefers a clean sibling `CyMCPSDK` checkout, records its exact Git revision and
+The build prefers a clean sibling `CyMCPSDK` checkout, freezes its selected Git commit before compilation, records its exact revision and
 compiles the sources rather than importing an upstream executable. An unavailable
 checkout can use the hash-verified source archive in `app/native/vendor/`; only
 when neither is available does the build clone the official Git repository.
@@ -49,20 +49,44 @@ package rather than applying code with an incompatible native runtime.
 
 `operations.py` and the generated `CyTool.json` remain the stable application
 contract. `tool.py` binds real `cydec/` handlers. The C ABI in `native/bridge.cpp`
-registers these operations in **CyMCPSDK Registry**. Its policy invokes the host's
-authenticated permission checks; the SDK validates inputs and outputs. The same
+registers these operations in **CyMCPSDK Registry**. Free and Token only select
+`Policy::allow_all()`; controlled profiles select the host policy. The SDK validates inputs and outputs. The same
 registry serves GUI jobs, native tool calls, CLI and MCP. The historical
 `x-cy-kind` metadata stays in the host manifest for input staging and is omitted
 from the SDK schema because it is not a supported validation keyword.
 
 Every call retains network/process/external-filesystem requirements, revision
 guards, original-input preservation, Git backup behavior and cancellation.
-`delete_project`, `remove_component`, `update_apply` and `update_rollback` need
+Under controlled access, `delete_project`, `remove_component`, `update_apply` and `update_rollback` need
 explicit confirmation. CLI requires `--confirm`; advanced forms provide a
 confirmation checkbox. The integrated assistant excludes credentials, application
 updates and destructive operations. A selected-project conversation cannot pass
 another `projectId`. Local storage/theme/provider preferences remain host UI
 configuration rather than assistant tools.
+
+## Local access profiles
+
+**Free is the default** for new settings and existing configurations without an explicit
+`accessProfile`. Explicit choices remain unchanged. In AI assistant settings, open
+**CyMCPSDK options and external tools**, choose the profile, save and restart.
+The panel shows the active MCP address and offers a copy button.
+
+| Profile / stored value | Token | Operation policy |
+| --- | --- | --- |
+| Free / `free` | None | All exposed operations, no extra confirmation |
+| Local controlled / `local_controlled` | None | Host permissions and confirmations |
+| Token only / `token_only` | Required | All exposed operations, no extra confirmation |
+| Protected / `protected_access` | Required | Host permissions and confirmations |
+
+The SDK `LocalHttpServer::UnauthenticatedLoopback` constructor handles profiles
+without tokens; token profiles use its authentication callback. All bind only to
+`127.0.0.1`. Host/Origin checks and argument schemas remain active in every profile.
+Free and Local controlled callers share the `unauthenticated-local` identity.
+Protected tokens come from `create-client` and are supplied through `CYMCP_TOKEN`
+or an HTTP Bearer header. Do not put credentials in business arguments.
+Independent CLI identities and integrated chat grants retain their existing scopes;
+an automatic CLI using Free joins the shared local identity. Free intentionally
+exposes every registered operation to local clients, including mutations.
 
 `cydec/mcp/runtime.py` owns application jobs because SDK tool calls return direct
 results rather than durable scheduled jobs. It reads the existing SQLite
@@ -131,10 +155,10 @@ Keep JSONL stdin open throughout a multi-step/asynchronous/debugging task. Each
 line gets one JSON response. Errors stay structured; subsequent lines continue;
 a stream containing errors exits 1. Historical `stdio` keeps its old envelope.
 
-`--auto` uses the selected running instance through private local IPC, or runs
-without a window if the database is free. A stable account-protected local
-identity preserves access to its jobs between commands/chats. Explicit credentials
-retain their restrictions. The CLI manages the local connection; no terminal token
+`--auto` uses the selected running instance over loopback HTTP, or runs
+without a window if the database is free. Free and Local controlled use the shared
+local identity; token profiles retain a stable account-protected identity.
+Protected credentials retain their restrictions. The CLI manages the connection; no terminal token
 copy or MCP configuration is needed for this path. The owning headless process
 must stay alive while its asynchronous jobs run; closing it stops that work.
 
@@ -179,13 +203,15 @@ Compact discovery provides `cy_tools_search`, `cy_tools_describe`,
 remains reachable. Load a complete schema before invoking an unfamiliar tool.
 Only the host metadata annotation is removed; supported schema assertions remain.
 
-One runtime owns a job database. The GUI now advertises an authenticated ephemeral
+One runtime owns a job database. The GUI advertises a Free ephemeral
 loopback endpoint by default; `--no-mcp` disables it. `mcp --auto` attaches or runs
 headless, and `mcp-config` prints an installation-specific client declaration
 without credentials. This optional MCP path is independent of SDK CLI/JSONL.
 Automatic MCP discovery defaults to compact; `--full` remains available.
 
-For an explicit token-based connection to an already open GUI, create a restricted
+Free clients connect using only `http://127.0.0.1:PORT/mcp`, or CLI
+`--connect http://127.0.0.1:PORT/v1`. For a Protected token-based connection,
+select `protected_access` in settings, save and restart, then create a restricted
 client **before** starting that instance, retain its token privately, then launch
 the GUI with `--mcp-port=8766` (or `--mcp-port=0` for an ephemeral port reported on
 stderr). A standalone server can use `serve --port 8766`.
@@ -201,13 +227,13 @@ CyDecompilatorCLI.exe --connect http://127.0.0.1:8766/v1 invoke list_projects
 `CYTOOLS_TOKEN` remains a credential-variable alias for existing configurations.
 No token belongs in business arguments, a screenshot or a checked-in config.
 The GUI's own identity is retained in its credential vault so its conversation
-ownership survives restarts. External clients authenticate with their own token.
-`/v1` is the application JSON endpoint; `/mcp` is MCP over authenticated loopback
-HTTP JSON. It acts on the **same runtime and store** as the open window. An MCP
-client can configure `/mcp` and an `Authorization: Bearer …` header. HTTP endpoints
-reject non-loopback binding and browser origins. This adapter uses JSON responses,
-not persistent HTTP SSE subscriptions. Stdio supports native notifications;
-HTTP clients retain TTL/explicit refresh.
+ownership survives restarts. Token profiles authenticate external clients with their token.
+`/v1` is the application JSON endpoint; `/mcp` is the SDK's loopback MCP HTTP
+endpoint. Both act on the **same runtime and store** as the open window. A Free
+MCP client needs only the `/mcp` address; token profiles add an `Authorization: Bearer …`
+header. The SDK handles Host/Origin checks, protocol/session headers and HTTP
+notifications. The existing stdio proxy retains its full/compact discovery modes,
+connection-specific cancellation and task scopes.
 This SDK revision negotiates MCP `2026-07-28`, with legacy `2025-11-25` and
 `2025-06-18`. Native `subscriptions/listen` requires the modern protocol;
 legacy peers use TTL/explicit refresh. Older protocol dates are not advertised

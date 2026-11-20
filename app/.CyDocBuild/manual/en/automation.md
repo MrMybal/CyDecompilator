@@ -5,14 +5,14 @@ description: Connect an MCP client or CLI and follow the operation/job protocol.
 section: AI and automation
 parent: ai
 order: 14
-revision: 6
+revision: 7
 ---
 
 The GUI, CLI and MCP expose the same Runtime business operations. Open [Advanced operations](doc:automation) to browse the installed operation contracts, parameter forms, declared permissions and outputs. This live catalogue is the reference for the exact installed version; do not rely on a fixed operation count in a guide or an AI prompt.
 
 ## External AI through the SDK CLI {#external-ai-through-sdk-cli}
 
-An external AI with terminal access can drive CyDecompilator without MCP, an integrated conversation or a model account inside this application. Use **--auto** to attach to the running window or work without a window when it is closed. The CLI manages the authenticated local connection and retains its local identity between commands.
+An external AI with terminal access can drive CyDecompilator without MCP, an integrated conversation or a model account inside this application. Use **--auto** to attach to the running window or work without a window when it is closed. The CLI manages the local connection and selected access profile and retains its local identity between commands.
 
 ```powershell
 CyDecompilatorCLI.exe --auto list-operations
@@ -40,7 +40,7 @@ Full Windows packages provide **CyDecompilatorCLI.exe mcp** as a stdio server. D
 }
 ```
 
-To control an already open desktop, connect to that same instance through authenticated HTTP as described below. A distinct absolute **--data-dir** before **mcp** creates a separate headless scheduler instead. Analysis projects remain shared by the installation: coordinate mutations across separate schedulers. Install the bundled CyDecompilator skill using **app/scripts/install_skill.py** when your client supports skills; installing it does not configure MCP automatically.
+To control an already open desktop, connect to that same instance using the selected local HTTP profile as described below. A distinct absolute **--data-dir** before **mcp** creates a separate headless scheduler instead. Analysis projects remain shared by the installation: coordinate mutations across separate schedulers. Install the bundled CyDecompilator skill using **app/scripts/install_skill.py** when your client supports skills; installing it does not configure MCP automatically.
 
 ## Discover, submit, wait, inspect {#discover-submit-wait-inspect}
 
@@ -60,9 +60,20 @@ See [AI](doc:ai), [projects](doc:projects) and [observations](doc:observations) 
 
 ## Connect to the open window {#connect-to-the-open-window}
 
-Create a client before starting the instance with **CyDecompilatorCLI.exe --data-dir D:/CyDecJobs create-client --name external --permission processSpawn --permission filesystemExternal**. Retain the returned token privately. Launch **CyDecompilator.exe --data-dir D:/CyDecJobs --mcp-port=8766**, then use **CyDecompilatorCLI.exe --connect http://127.0.0.1:8766/v1 list-operations** or **invoke**. The HTTP endpoint uses the same registry, jobs and project store as the window. If port 0 is chosen, the actual loopback address is reported on stderr.
+**Free is the default local MCP profile.** Start **CyDecompilator.exe --mcp-port=8766** and connect your MCP client to **http://127.0.0.1:8766/mcp**. The address alone grants access to all exposed operations, including changes, without a token or additional confirmation. Argument validation remains active. The endpoint uses the same runtime, jobs and projects as the open window. Port 0 selects an available local port; copy the active address from **AI assistant settings → CyMCPSDK options and external tools**.
 
-Supply the client credential through **CYMCP_TOKEN**; the historical **CYTOOLS_TOKEN** alias remains accepted. An external MCP client uses **http://127.0.0.1:8766/mcp** and an Authorization Bearer header. Credentials never belong in operation arguments. HTTP is authenticated loopback JSON, with TTL/explicit refresh rather than persistent SSE subscriptions. Stdio supports the SDK notification path. The server never binds a public interface.
+Choose a profile in that panel, save and restart. Existing configurations without a profile migrate to Free; explicit choices are preserved.
+
+| Profile | Token | Operation access |
+| --- | --- | --- |
+| Free | None | All exposed operations without extra confirmation |
+| Local controlled | None | Host permissions and confirmations |
+| Token only | Required | All exposed operations without extra confirmation |
+| Protected | Required | Host permissions and confirmations |
+
+Free and Local controlled callers share a local identity. For Protected access, create a client before starting the window: **CyDecompilatorCLI.exe --data-dir D:/CyDecJobs create-client --name external --permission processSpawn --permission filesystemExternal**. Keep the returned token privately; supply it through **CYMCP_TOKEN** (legacy **CYTOOLS_TOKEN** is accepted) or an HTTP Authorization Bearer header. Never place credentials in business arguments.
+
+For CLI access to the open window, use **CyDecompilatorCLI.exe --connect http://127.0.0.1:8766/v1 list-operations** or **invoke**. Free needs no token. The SDK server binds only to **127.0.0.1** and retains Host/Origin checks in every profile.
 
 ## Compact discovery and complete results {#compact-discovery-and-complete-results}
 
@@ -80,4 +91,4 @@ Open **AI assistant settings → CyMCPSDK options and external tools**. Compact 
 
 Only user-configured servers and explicitly approved tool names are available to the integrated chat. A server configuration contains an executable plus structured arguments, or an HTTPS URL (HTTP only on loopback), and an **allowedTools** array. Keep credentials in the vault under **mcp:server-id**, not JSON. **remote_tools** returns approved schemas; **remote_call** invokes the real remote tool and preserves business errors. **remote_resources** reads explicitly approved URIs or resources referenced by an approved tool, and can watch/drain notifications on supported transports. The SDK follows pagination and invalidates compatible cached reads from change notifications. A missing/expired resource never authorizes repeating the original action.
 
-Destructive standalone actions need **--confirm** or the advanced form's confirmation checkbox. Missing permissions are refused consistently by CLI and MCP. The integrated assistant excludes account settings, application updates and destructive actions. Consult the installed schema before each unfamiliar operation.
+Controlled profiles and independent standalone CLI identities require **--confirm** for destructive actions and enforce declared permissions. Free and Token only HTTP access do not add those confirmations. The integrated assistant excludes account settings, application updates and destructive actions. Consult the installed schema before each unfamiliar operation.

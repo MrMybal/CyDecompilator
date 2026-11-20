@@ -39,6 +39,15 @@ def main():
     if (source/'.git').exists():
         revision=git(source,'rev-parse','HEAD')
         if git(source,'status','--porcelain'): raise RuntimeError('SDK has local changes; commit them before recording a reproducible source revision.')
+        # Freeze the selected local commit: another SDK task may update that
+        # checkout while CMake runs. Metadata and compiled inputs must agree.
+        snapshot=ROOT/'runtime/build/cymcpsdk/input'/revision
+        snapshot.mkdir(parents=True,exist_ok=True)
+        archive=snapshot.parent/(revision+'.zip')
+        paths=['include','src','cmake','third_party','CMakeLists.txt','LICENSE','README.md','README.fr.md','VERSION.md','VERSION.fr.md','THIRD_PARTY_NOTICES.md']
+        subprocess.run(['git','-c','safe.directory='+source.as_posix(),'-C',str(source),'archive','--format=zip','--output='+str(archive),revision,*paths],check=True)
+        with zipfile.ZipFile(archive) as package:package.extractall(snapshot)
+        source=snapshot
     else: revision=json.loads(provenance_path.read_text('utf-8'))['revision']
     cmake=shutil.which('cmake')
     if not cmake and os.name=='nt':

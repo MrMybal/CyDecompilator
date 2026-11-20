@@ -14,7 +14,7 @@ def sdk_schema(value):
     if isinstance(value,dict):return {k:sdk_schema(v) for k,v in value.items() if k!='x-cy-kind'}
     if isinstance(value,list):return [sdk_schema(v) for v in value]
     return value
-DEFAULTS={'compactDiscovery':True,'cache':True,'cacheTtlMs':30000,'notifications':True,
+DEFAULTS={'accessProfile':'free','compactDiscovery':True,'cache':True,'cacheTtlMs':30000,'notifications':True,
           'diskSpool':True,'diskBytes':128*1024**2,'memoryBytes':16*1024**2,
           'retentionSeconds':900,'chunkBytes':32768,'inlineBytes':16384,'telemetry':False,
           'contextBytes':256*1024,'recentTurns':8,'ripgrep':False,'workspaceRoot':'','spoolRoot':''}

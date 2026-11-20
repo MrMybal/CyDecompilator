@@ -78,7 +78,11 @@ struct Bridge {
         auto policy=Policy([this](const CallContext& c,const std::string& name,const Json& a){
             return this->callback("authorize",{{"name",name},{"arguments",a}},c).value("allowed",false)?Decision::allow:Decision::deny;
         });
-        registry=std::make_shared<Registry>(policy);
+        const auto profile=options.value("accessProfile",std::string("free"));
+        const auto access=local_access_settings(profile=="free" ? LocalAccessProfile::free :
+            profile=="local_controlled" ? LocalAccessProfile::local_controlled :
+            profile=="token_only" ? LocalAccessProfile::token_only : LocalAccessProfile::protected_access);
+        registry=std::make_shared<Registry>(access.control_operations ? policy : Policy::allow_all());
         ResourceOptions ro;
         ro.chunk_bytes=options.value("chunkBytes",32768);
         ro.max_stored_bytes=options.value("memoryBytes",16*1024*1024);
@@ -150,6 +154,31 @@ struct Bridge {
             registry->add(std::move(o));return {{"registered",true}};
         }
         if(command=="describe")return p.contains("name")?registry->describe(p.at("name")):registry->describe();
+        if(command=="httpStop") {if(http){http->stop();http.reset();}return Json::object();}
+        if(command=="httpStart") {
+            if(http)throw Error("InvalidState","HTTP server already started");
+            JsonEndpoint endpoint=[this](const Json& wire,const CallContext& transport){
+                auto c=transport;auto request=wire;
+                c.principal=callback("httpPrincipal",Json::object(),transport).at("principal");
+                if(request.contains("_cyConnection")) {
+                    const auto id=request.at("_cyConnection").get<std::string>();
+                    if(id.size()!=32 || id.find_first_not_of("0123456789abcdef")!=std::string::npos)throw Error("InvalidRequest","Invalid local connection identifier");
+                    c.transport_scope="http-client:"+id;request.erase("_cyConnection");
+                }
+                auto discovery=request.value("_cyDiscovery",std::string());request.erase("_cyDiscovery");
+                if(discovery!="" && discovery!="compact" && discovery!="full")throw Error("InvalidRequest","Invalid discovery mode");
+                if(request.value("jsonrpc",Json())=="2.0")
+                    return (discovery=="compact" || (discovery.empty() && options.value("compactDiscovery",true)) ? compact : full)->handle(request,c);
+                return callback("httpRequest",request,c);
+            };
+            if(p.at("requireToken").get<bool>())
+                http=std::make_unique<LocalHttpServer>(TokenAuthenticator([this](std::string_view token){
+                    return callback("httpAuthenticate",{{"token",std::string(token)}}).at("principal").get<std::string>();
+                }),endpoint,8);
+            else http=std::make_unique<LocalHttpServer>(LocalHttpServer::UnauthenticatedLoopback{},endpoint,8);
+            try {return {{"port",http->start(p.value("port",0))}};}
+            catch(...) {http.reset();throw;}
+        }
         if(command=="cancel") {std::lock_guard lock(mutex);auto it=active.find(p.at("id"));if(it!=active.end())it->second.cancel();return {{"cancelled",it!=active.end()}};}
         if(command=="releaseRequest") {std::lock_guard lock(mutex);active.erase(p.at("id"));return Json::object();}
         if(command=="checkCancellation") {std::lock_guard lock(mutex);auto it=active.find(p.at("id"));if(it==active.end())throw Error("InvalidState","Host invocation ended");it->second.check();return {{"active",true}};}

@@ -24,6 +24,7 @@ def local_url(value,path):
 
 
 def automation_identity(runtime):
+    if runtime.options['accessProfile'] in ('free','local_controlled'):return runtime.local_actor(),''
     from ..ai import credentials
     path=runtime.root/VAULT
     with runtime._cv:
@@ -39,10 +40,10 @@ def automation_identity(runtime):
 
 def publish(runtime,server,*,require_token=False):
     from ..paths import write_json
-    if not require_token:automation_identity(runtime)
+    automation_identity(runtime)
     row={'schemaVersion':1,'instanceId':runtime.instance_id,'pid':os.getpid(),
          'mcpUrl':'http://127.0.0.1:'+str(server.server_port)+'/mcp',
-         'credentialRequired':bool(require_token)}
+         'credentialRequired':bool(require_token),'accessProfile':runtime.options['accessProfile']}
     path=runtime.root/MARKER;write_json(path,row);path.chmod(0o600)
     return row
 
@@ -70,8 +71,8 @@ def discover(directory,token=''):
     except (ValueError,UnicodeError):raise CyToolError('InvalidState','The local MCP instance descriptor is invalid.') from None
     if not isinstance(row,dict) or row.get('schemaVersion')!=1 or not isinstance(row.get('instanceId'),str):raise CyToolError('InvalidState','Unsupported local MCP instance descriptor.')
     endpoint=local_url(row.get('mcpUrl'),'/mcp')
-    selected=token or ('' if row.get('credentialRequired') else credentials.resolve(KEY,file=directory/VAULT))
-    if not selected:raise CyToolError('AuthenticationRequired','This instance requires its configured CYMCP_TOKEN credential.')
+    selected=token or (credentials.resolve(KEY,file=directory/VAULT) if row.get('accessProfile') not in ('free','local_controlled') else '')
+    if not selected and row.get('credentialRequired'):raise CyToolError('AuthenticationRequired','This instance requires its configured CYMCP_TOKEN credential.')
     try:status=HTTPClient(endpoint.removesuffix('/mcp')+'/v1',selected,timeout=2).call('GetRuntimeStatus')
     except CyToolError as exc:
         if exc.code in ('AuthenticationRequired','AccessDenied'):raise

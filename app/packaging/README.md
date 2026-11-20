@@ -2,7 +2,7 @@
 
 The complete Windows x64 installer and portable ZIP share one freshly built payload.
 Python 3.11.18 comes from the pinned python-build-standalone Windows distribution;
-the required runtime wheels are locked by version and SHA-256. CyMCPSDK 0.7.0 is compiled from the pinned local or bundled source archive; the selected native modules and notices are included under `app/native/`. No former Python SDK wheel is installed.
+the required runtime wheels are locked by version and SHA-256. CyMCPSDK 0.7.2 is compiled from the pinned local or bundled source archive; the selected native modules and notices are included under `app/native/`. No former Python SDK wheel is installed.
 No development venv, settings, optional engines or external module working tree is copied.
 
 From the repository root, using Python 3.11+, Node.js 22+, Git, Visual Studio C++ tools

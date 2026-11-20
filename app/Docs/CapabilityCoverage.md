@@ -1,4 +1,4 @@
-# Capability coverage — CyDecompilator 1.5.1
+# Capability coverage — CyDecompilator 1.5.4
 
 Status values: **Tested** (exercised on this machine, with the proof named), **Implemented**
 (code path present, not run end to end here), **Not exposed** (engine feature not offered),
@@ -199,7 +199,7 @@ See [Investigation.md](Investigation.md) for setup and limits.
 | Agentic Q&A with tools | `ai_ask` | Tested with Claude Code: 4 tool calls, answer produced |
 | Autonomous project work with verified completion | `ai_agent/status`, AI panel | Tested: `test_autonomous_agent.py`, actual Node compiler recovery/scenario comparisons, native DLL replacement/harness assertions, scoped authenticated child jobs, cancellation, checkpoints, source freshness and editor freezing; real configured Claude Code repaired and validated three Node scenarios. Model prose cannot mark an unverified task completed. Account administration and unrelated projects remain outside the selected task. |
 | Batch naming | `ai_batch_rename` | Implemented |
-| Providers | CyMCPSDK 0.7.0 provider registry; native CLI/API and local-service profiles | Current SDK integration: real Codex business-tool calls passed; HTTP streaming/tool/cancellation fixtures passed. Claude Code's native MCP route returned AuthenticationRequired on this machine. Other transport/model combinations require their own validation; see the SDK guide. |
+| Providers | CyMCPSDK 0.7.2 provider registry; native CLI/API and local-service profiles | HTTP streaming/tool/cancellation fixtures passed with the updated SDK. Earlier Codex business-tool calls passed; Claude Code's native MCP route previously returned AuthenticationRequired on this machine. Live cloud-provider authentication was not repeated for this update. Other transport/model combinations require their own validation; see the SDK guide. |
 | Compile checks | Python, Java (javac), HLSL (D3DCompile), C/C++ (MSVC via vswhere, clang, gcc), C# (dotnet SDK), Rust, Go | Python/HLSL/Java/C/C++ Tested; others Implemented |
 
 ## Interfaces
@@ -211,7 +211,7 @@ See [Investigation.md](Investigation.md) for setup and limits.
 | External AI through native SDK CLI/JSONL | Tested: `test_external_cli.py`, real Node reconstruction, Git snapshot, source edit, build/run, stable job ownership, chunk reads and cross-process cancellation. `--auto` joins a live instance or runs headless; `jsonl` calls the compiled SDK's `dispatch_app`. No embedded model account or MCP client is required. |
 | MCP (stdio) | Tested: `tests/acceptance_mcp.py` and `tests/test_mcp_workflows.py`: every declared operation discoverable/describable; real Node/Git/conflicts, native reconstruction/patch/captures, .NET local dependency/reconstruction/managed-copy run/debug cancellation, Chromium HTTP/graphics/evidence integrity. Not every engine/operation combination has a transport-level scenario. |
 | Dedicated AI skill and client guide | Tested: `tests/test_skill_delivery.py`, self-contained reference links, install/copy parity, idempotence and existing-customization protection; bundled `app/skills/cydecompilator`, `Docs/AIIntegration.md`. Installing a skill does not configure a client's MCP connection. |
-| HTTP / JSONL | CyMCPSDK-backed application adapter; authenticated live-instance CLI/MCP and existing JSONL framing covered by the SDK integration tests. |
+| HTTP / JSONL | SDK-owned loopback HTTP with Free by default. All four access profiles, input validation, address-only read/write/delete on the native desktop, Protected token enforcement, CLI/JSONL and modern/legacy MCP proxy paths tested locally. Explicit choices persist; missing profiles migrate to Free. |
 | Windows launcher | Tested: built with MSVC |
 | Linux launcher | Implemented, not run (no Linux runtime prepared) |
 | Application update stream | Implemented; check tested without a repository (no release exists) |
@@ -225,4 +225,4 @@ See [Investigation.md](Investigation.md) for setup and limits.
 
 ## Native SDK integration
 
-See [CyMCPSDK](CyMCPSDK.md) for the exact 0.7.0 source revision, selected modules, durable compatibility, independent optimizations, provider and transport limits, and local validation.
+See [CyMCPSDK](CyMCPSDK.md) for the exact 0.7.2 source revision, selected modules, durable compatibility, independent optimizations, provider and transport limits, and local validation.

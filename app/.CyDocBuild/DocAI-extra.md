@@ -18,7 +18,7 @@ to execute an operation or install a component.
 
 ## Native SDK discovery
 
-The runtime uses CyMCPSDK 0.7.0. Full discovery retains op_<operation> asynchronous jobs and adds direct business tools. Compact discovery exposes cy_tools_search, cy_tools_describe and cy_tools_call; complete schemas remain accessible. Native resources and chunk reads preserve private large results. Expiration must never cause an action to be repeated; use durable job results through cy_read_result. For an open GUI use its authenticated loopback /mcp endpoint rather than starting another scheduler on the same database. The CLI preserves its commands and supports --connect for /v1. SDK business chat, external allowlists and independent options are documented in the human automation/AI chapters.
+The runtime uses CyMCPSDK 0.7.2. Full discovery retains op_<operation> asynchronous jobs and adds direct business tools. Compact discovery exposes cy_tools_search, cy_tools_describe and cy_tools_call; complete schemas remain accessible. Native resources and chunk reads preserve private large results. Expiration must never cause an action to be repeated; use durable job results through cy_read_result. For an open GUI use its loopback /mcp endpoint (Free by default, address only; explicit controlled/token profiles are preserved) rather than starting another scheduler on the same database. The CLI preserves its commands and supports --connect for /v1. SDK business chat, external allowlists and independent options are documented in the human automation/AI chapters.
 
 
 ## External CLI agents

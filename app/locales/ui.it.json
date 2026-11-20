@@ -1929,5 +1929,11 @@
  "Not running": "Not running",
  "Not configured": "Not configured",
  "Executable missing": "Executable missing",
- "Authentication required": "Authentication required"
+ "Authentication required": "Authentication required",
+ "Free": "Libero",
+ "Local controlled": "Locale controllato",
+ "Token only": "Solo token",
+ "Protected": "Protetto",
+ "Local MCP access profile": "Profilo di accesso MCP locale",
+ "Copy local MCP address": "Copia indirizzo MCP locale"
 }

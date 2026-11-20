@@ -2,7 +2,7 @@
 
 # CyDecompilator — developer guide
 
-AI-assisted multi-engine decompiler using native CyMCPSDK 0.7.0 with durable Python jobs (Python 3.11, Dear ImGui).
+AI-assisted multi-engine decompiler using native CyMCPSDK 0.7.2 with durable Python jobs (Python 3.11, Dear ImGui).
 Native SDK integration: [CyMCPSDK](Docs/CyMCPSDK.md).
 
 An external AI can operate the application through the SDK CLI, without an embedded
@@ -193,6 +193,9 @@ those effects. When neither `CYMCP_TOKEN` nor its legacy alias `CYTOOLS_TOKEN` i
 the declared permissions and exports its token for the transport. To restrict an MCP client,
 create one with `tool.py create-client --name ai --permission processSpawn` and set
 `CYMCP_TOKEN` to its token: it can then analyse and decompile but not download or call AI.
+For HTTP restrictions, select **Protected** first: the default **Free** profile
+accepts the loopback address alone and authorizes every exposed operation without
+extra confirmation. **Local controlled** and **Token only** are also available.
 For a shared live instance, select the same explicit `--data-dir` when creating the
 client and starting the GUI. See [CyMCPSDK.md](Docs/CyMCPSDK.md).
 

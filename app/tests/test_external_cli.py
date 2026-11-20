@@ -56,7 +56,7 @@ def test_native_sdk_jsonl_reconstructs_edits_builds_and_runs_without_a_chat(tmp_
     original=tmp_path/'original';original.mkdir();(original/'main.js').write_text('console.log("original CLI behavior");','utf-8')
     with jsonl(tmp_path/'agent') as (sdk,run):
         described=sdk('describe')
-        assert described['sdkVersion']=='0.7.0'
+        assert described['sdkVersion']=='0.7.2'
         assert {'application_open','workspace_execute'}<={o['name'] for o in described['operations']}
         project=sdk('invoke','application_open',{'path':str(original)})['projectId']
         rebuilt=sdk('invoke','reconstruction_run',{'projectId':project,'maxRounds':1})
@@ -110,7 +110,7 @@ def test_sdk_jsonl_reports_failure_without_losing_the_stream(tmp_path):
     result=subprocess.run([*command,'jsonl'],input='{"method":"not-a-method"}\n{"method":"describe"}\n',capture_output=True,text=True,encoding='utf-8',env=env,timeout=15)
     assert result.returncode==1
     lines=[json.loads(v) for v in result.stdout.splitlines()]
-    assert lines[0]['error']['code']=='UnknownMethod' and lines[1]['sdkVersion']=='0.7.0'
+    assert lines[0]['error']['code']=='UnknownMethod' and lines[1]['sdkVersion']=='0.7.2'
 
 
 def test_sdk_cli_connections_have_independent_temporary_tasks(instance):

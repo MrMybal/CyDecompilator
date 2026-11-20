@@ -872,5 +872,11 @@
   "Not running": "Arrêté",
   "Not configured": "Non configuré",
   "Executable missing": "Exécutable absent",
-  "Authentication required": "Authentification requise"
+  "Authentication required": "Authentification requise",
+  "Free": "Free",
+  "Local controlled": "Local contrôlé",
+  "Token only": "Jeton seul",
+  "Protected": "Protégé",
+  "Local MCP access profile": "Profil d’accès MCP local",
+  "Copy local MCP address": "Copier l’adresse MCP locale"
 }

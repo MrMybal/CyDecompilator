@@ -74,14 +74,14 @@ class Runtime:
         self._events=deque(maxlen=event_limit);self._sequence=0;self._closed=False;self._started=False;self._transport_sessions={};self._notification_sinks={}
         self._chat_grants={}
         self._delegations={}
+        self._http_uncontrolled=set()
         self.input_root=self.root/'inputs';self.input_root.mkdir(exist_ok=True);self.input_fields={};self.input_max_bytes=1024**4
         self.max_workers=descriptor.get('concurrency',{}).get('maxWorkers',6)
         self.capacity=capacity or {};self.system=system or {};self._active_groups=set()
         self._business_locks={}
         options_path=self.root.parent/'settings/mcp.json'
-        from .configuration import validate_options
-        try:self.options=validate_options(json.loads(options_path.read_text('utf-8')))
-        except FileNotFoundError:self.options=validate_options({})
+        from .configuration import load_options
+        self.options=load_options(options_path)
         self.native=Native(self._native_callback,directory=self.root/'sdk',options=self.options)
         from .assistant import Assistant
         self.assistant=Assistant(self)
@@ -130,11 +130,22 @@ class Runtime:
         row=self._clients.get(identifier)
         if row is None:raise CyToolError('AccessDenied','Unknown authenticated identity.')
         if row.get('delegated') and identifier not in self._delegations:raise CyToolError('AccessDenied','Conversation delegation is no longer active.')
-        return Principal(identifier,frozenset(row['permissions']))
+        permissions=row['permissions']
+        if identifier in self._http_uncontrolled:permissions=sorted({p for o in self.descriptor['operations'] for p in o.get('permissions',[])})
+        return Principal(identifier,frozenset(permissions))
+    def local_actor(self):
+        identifier='unauthenticated-local'
+        with self._cv:
+            if identifier not in self._clients:
+                self._clients[identifier]={'clientId':identifier,'name':'Local MCP','permissions':sorted({p for o in self.descriptor['operations'] for p in o.get('permissions',[])}),'tokenHash':''}
+                self.store.put('clients',identifier,self._clients[identifier])
+            if self.options['accessProfile']=='free':self._http_uncontrolled.add(identifier)
+        return self.actor(identifier)
     def authorize(self,actor,name,parameters,*,confirmed=False):
         actual=self.actor(actor.client_id);operation=self.operation(name)
-        if not set(operation.get('permissions',[]))<=actual.permissions:raise CyToolError('AccessDenied','The client lacks required application permissions.')
-        if name in CONFIRM and not confirmed:raise CyToolError('ConfirmationRequired','Review the action, then explicitly confirm it. Noninteractive calls require --confirm or confirmed=true.')
+        if actor.client_id not in self._http_uncontrolled:
+            if not set(operation.get('permissions',[]))<=actual.permissions:raise CyToolError('AccessDenied','The client lacks required application permissions.')
+            if name in CONFIRM and not confirmed:raise CyToolError('ConfirmationRequired','Review the action, then explicitly confirm it. Noninteractive calls require --confirm or confirmed=true.')
         if name=='remote_call':
             from generation_config import secret_key
             def secret_fields(value):
@@ -308,6 +319,18 @@ class Runtime:
             return identifier
     def _native_callback(self,request):
         kind=request['type'];p=request['payload'];identifier=request.get('requestId','')
+        if kind=='httpAuthenticate':return {'principal':self.authenticate(p['token']).client_id}
+        if kind=='httpPrincipal':
+            principal=request['principal']
+            if principal=='unauthenticated-local':
+                self.local_actor()
+            self.actor(principal)
+            from .configuration import ACCESS_PROFILES
+            if not ACCESS_PROFILES[self.options['accessProfile']][1]:self._http_uncontrolled.add(principal)
+            return {'principal':principal}
+        if kind=='httpRequest':
+            from .api import LocalClient
+            return LocalClient(self,self.actor(request['principal']),scope=request['scope']).dispatch(p)
         if kind=='notification':
             sink=self._notification_sinks.get(request['principal'])
             if sink:sink(p)
@@ -321,6 +344,9 @@ class Runtime:
                 else:self._emit(event,job,data)
             return {}
         actor=self.actor(request['principal'])
+        # Free SDK registries skip the policy callback. Keep chat delegations,
+        # argument validation and controlled CLI identities enforced by the host.
+        if kind=='invoke':self._native_callback({**request,'type':'authorize'})
         name=p.get('name','');arguments=p.get('arguments',{})
         delegation=self._delegations.get(actor.client_id)
         if kind=='authorize':
